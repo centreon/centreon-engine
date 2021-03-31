@@ -40,8 +40,7 @@
 CCE_BEGIN()
 class command_manager {
   std::mutex _queue_m;
-  std::condition_variable _queue_cv;
-  std::deque<std::packaged_task<int()>> _queue;
+  std::deque<std::packaged_task<int()> > _queue;
   command_manager();
 
  public:

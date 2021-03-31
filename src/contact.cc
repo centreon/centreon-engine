@@ -38,14 +38,10 @@ using namespace com::centreon::engine::string;
 
 contact_map contact::contacts;
 
-std::array<contact::to_notify, 6> const contact::_to_notify{{
-    &contact::_to_notify_normal,
-    &contact::_to_notify_recovery,
-    &contact::_to_notify_acknowledgement,
-    &contact::_to_notify_flapping,
-    &contact::_to_notify_downtime,
-    &contact::_to_notify_custom,
-}};
+std::array<contact::to_notify, 6> const contact::_to_notify{
+    {&contact::_to_notify_normal,          &contact::_to_notify_recovery,
+     &contact::_to_notify_acknowledgement, &contact::_to_notify_flapping,
+     &contact::_to_notify_downtime,        &contact::_to_notify_custom, }};
 
 /**************************************
  *                                     *
@@ -87,27 +83,21 @@ void contact::set_addresses(std::vector<std::string> const& addresses) {
  *
  *  @return a reference to the alias
  */
-std::string const& contact::get_alias() const {
-  return _alias;
-}
+std::string const& contact::get_alias() const { return _alias; }
 
 /**
  *  Set alias
  *
  *  @param[in] alias  New alias.
  */
-void contact::set_alias(std::string const& alias) {
-  _alias = alias;
-}
+void contact::set_alias(std::string const& alias) { _alias = alias; }
 
 /**
  *  Check if contact can submit commands.
  *
  *  @return True if contact can submit commands.
  */
-bool contact::get_can_submit_commands() const {
-  return _can_submit_commands;
-}
+bool contact::get_can_submit_commands() const { return _can_submit_commands; }
 
 /**
  *  (Dis)Allow a contact to submit commands.
@@ -123,18 +113,14 @@ void contact::set_can_submit_commands(bool can_submit) {
  *
  *  @return a reference to the email
  */
-std::string const& contact::get_email() const {
-  return _email;
-}
+std::string const& contact::get_email() const { return _email; }
 
 /**
  *  Set contact email.
  *
  *  @param[in] email  New email.
  */
-void contact::set_email(std::string const& email) {
-  _email = email;
-}
+void contact::set_email(std::string const& email) { _email = email; }
 
 /**
  *  Get the contact's modified attributes.
@@ -168,36 +154,28 @@ void contact::add_modified_attributes(uint32_t attr) {
  *
  *  @return A reference to the name.
  */
-std::string const& contact::get_name() const {
-  return _name;
-}
+std::string const& contact::get_name() const { return _name; }
 
 /**
  *  Set the contact name.
  *
  *  @param[in] name  New name.
  */
-void contact::set_name(std::string const& name) {
-  _name = name;
-}
+void contact::set_name(std::string const& name) { _name = name; }
 
 /**
  *  Return the contact pager
  *
  *  @return a reference to the pager
  */
-std::string const& contact::get_pager() const {
-  return _pager;
-}
+std::string const& contact::get_pager() const { return _pager; }
 
 /**
  *  Set the pager.
  *
  *  @param[in] pager  New pager.
  */
-void contact::set_pager(std::string const& pager) {
-  _pager = pager;
-}
+void contact::set_pager(std::string const& pager) { _pager = pager; }
 
 /**
  *  Check if status info should be retained.
@@ -240,9 +218,7 @@ void contact::set_retain_nonstatus_information(bool retain) {
  *
  *  @return Contact timezone.
  */
-std::string const& contact::get_timezone() const {
-  return _timezone;
-}
+std::string const& contact::get_timezone() const { return _timezone; }
 
 /**
  *  Set timezone.
@@ -334,17 +310,13 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
     svc_notif_str = obj.get_service_notification_period_ptr()->get_name();
 
   os << "contact {\n"
-        "  name:                            "
-     << obj.get_name()
+        "  name:                            " << obj.get_name()
      << "\n"
-        "  alias:                           "
-     << obj.get_alias()
+        "  alias:                           " << obj.get_alias()
      << "\n"
-        "  email:                           "
-     << obj.get_email()
+        "  email:                           " << obj.get_email()
      << "\n"
-        "  pager:                           "
-     << obj.get_pager()
+        "  pager:                           " << obj.get_pager()
      << "\n"
         "  address:                         ";
   std::vector<std::string> const& address(obj.get_addresses());
@@ -419,8 +391,7 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
         "  service_notifications_enabled:     "
      << obj.get_service_notifications_enabled()
      << "\n"
-        "  can_submit_commands:               "
-     << obj.get_can_submit_commands()
+        "  can_submit_commands:               " << obj.get_can_submit_commands()
      << "\n"
         "  retain_status_information:         "
      << obj.get_retain_status_information()
@@ -434,8 +405,7 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
         "  last_service_notification:         "
      << string::ctime(obj.get_last_service_notification())
      << "\n"
-        "  modified_attributes:               "
-     << obj.get_modified_attributes()
+        "  modified_attributes:               " << obj.get_modified_attributes()
      << "\n"
         "  modified_host_attributes:          "
      << obj.get_modified_host_attributes()
@@ -443,14 +413,11 @@ std::ostream& operator<<(std::ostream& os, contact const& obj) {
         "  modified_service_attributes:       "
      << obj.get_modified_service_attributes()
      << "\n"
-        "  host_notification_period_ptr:      "
-     << hst_notif_str
+        "  host_notification_period_ptr:      " << hst_notif_str
      << "\n"
-        "  service_notification_period_ptr:   "
-     << svc_notif_str
+        "  service_notification_period_ptr:   " << svc_notif_str
      << "\n"
-        "  contactgroups_ptr:                 "
-     << cg_name
+        "  contactgroups_ptr:                 " << cg_name
      << "\n"
         "  customvariables:                   ";
   for (auto const& cv : obj.get_custom_variables())
@@ -538,8 +505,8 @@ std::shared_ptr<contact> add_contact(
   // Check if the contact already exist.
   std::string const& id(name);
   if (contact::contacts.count(id)) {
-    logger(log_config_error, basic)
-        << "Error: Contact '" << name << "' has already been defined";
+    logger(log_config_error, basic) << "Error: Contact '" << name
+                                    << "' has already been defined";
     return nullptr;
   }
 
@@ -596,11 +563,20 @@ std::shared_ptr<contact> add_contact(
 
     // Notify event broker.
     timeval tv(get_broker_timestamp(nullptr));
-    broker_adaptive_contact_data(NEBTYPE_CONTACT_ADD, NEBFLAG_NONE,
-                                 NEBATTR_NONE, obj.get(), CMD_NONE, MODATTR_ALL,
-                                 MODATTR_ALL, MODATTR_ALL, MODATTR_ALL,
-                                 MODATTR_ALL, MODATTR_ALL, &tv);
-  } catch (...) {
+    broker_adaptive_contact_data(NEBTYPE_CONTACT_ADD,
+                                 NEBFLAG_NONE,
+                                 NEBATTR_NONE,
+                                 obj.get(),
+                                 CMD_NONE,
+                                 MODATTR_ALL,
+                                 MODATTR_ALL,
+                                 MODATTR_ALL,
+                                 MODATTR_ALL,
+                                 MODATTR_ALL,
+                                 MODATTR_ALL,
+                                 &tv);
+  }
+  catch (...) {
     obj.reset();
   }
 
@@ -781,33 +757,37 @@ void contact::set_service_notifications_enabled(bool enabled) {
 void contact::update_status_info(bool aggregated_dump) {
   /* send data to event broker (non-aggregated dumps only) */
   if (!aggregated_dump)
-    broker_contact_status(NEBTYPE_CONTACTSTATUS_UPDATE, NEBFLAG_NONE,
-                          NEBATTR_NONE, this, nullptr);
+    broker_contact_status(NEBTYPE_CONTACTSTATUS_UPDATE,
+                          NEBFLAG_NONE,
+                          NEBATTR_NONE,
+                          this,
+                          nullptr);
 }
 
-std::list<std::shared_ptr<commands::command>> const&
+std::list<std::shared_ptr<commands::command> > const&
 contact::get_host_notification_commands() const {
   return _host_notification_commands;
 }
 
-std::list<std::shared_ptr<commands::command>>&
+std::list<std::shared_ptr<commands::command> >&
 contact::get_host_notification_commands() {
   return _host_notification_commands;
 }
 
-std::list<std::shared_ptr<commands::command>> const&
+std::list<std::shared_ptr<commands::command> > const&
 contact::get_service_notification_commands() const {
   return _service_notification_commands;
 }
 
-std::list<std::shared_ptr<commands::command>>&
+std::list<std::shared_ptr<commands::command> >&
 contact::get_service_notification_commands() {
   return _service_notification_commands;
 }
 
 std::ostream& operator<<(std::ostream& os, contact_map_unsafe const& obj) {
   for (contact_map_unsafe::const_iterator it{obj.begin()}, end{obj.end()};
-       it != end; ++it) {
+       it != end;
+       ++it) {
     os << it->first;
     if (next(it) != end)
       os << ", ";
@@ -821,9 +801,7 @@ contactgroup_map_unsafe const& contact::get_parent_groups() const {
   return _contactgroups;
 }
 
-contactgroup_map_unsafe& contact::get_parent_groups() {
-  return _contactgroups;
-}
+contactgroup_map_unsafe& contact::get_parent_groups() { return _contactgroups; }
 
 /**
  *  Returns a boolean telling if this contact should be notified by a notifier
@@ -917,8 +895,8 @@ bool contact::_to_notify_recovery(notifier::reason_type type
     return false;
   }
 
-  std::shared_ptr<notification> normal_notif =
-      notif.get_current_notifications()[notifier::cat_normal];
+  notification* normal_notif =
+      notif.get_current_notifications()[notifier::cat_normal].get();
   if (!normal_notif || !normal_notif->sent_to(get_name())) {
     logger(dbg_notifications, most)
         << "We shouldn't notify this contact about a "
@@ -958,9 +936,10 @@ bool contact::_to_notify_flapping(notifier::reason_type type,
     what_notif = notifier::flappingdisabled;
 
   if (!notify_on(nt, what_notif)) {
-    logger(dbg_notifications, most)
-        << "We shouldn't notify contact '" << _name << "' about "
-        << notifier::tab_notification_str[type] << " notifier events.";
+    logger(dbg_notifications, most) << "We shouldn't notify contact '" << _name
+                                    << "' about "
+                                    << notifier::tab_notification_str[type]
+                                    << " notifier events.";
     return false;
   }
   return true;
@@ -1139,9 +1118,8 @@ void contact::resolve(int& w, int& e) {
   /* check service notification timeperiod */
   if (get_service_notification_period().empty()) {
     logger(log_verification_error, basic)
-        << "Warning: Contact '" << _name
-        << "' has no service "
-           "notification time period defined!";
+        << "Warning: Contact '" << _name << "' has no service "
+                                            "notification time period defined!";
     warnings++;
     _service_notification_period_ptr = nullptr;
   } else {
@@ -1163,9 +1141,8 @@ void contact::resolve(int& w, int& e) {
   /* check host notification timeperiod */
   if (get_host_notification_period().empty()) {
     logger(log_verification_error, basic)
-        << "Warning: Contact '" << _name
-        << "' has no host "
-           "notification time period defined!";
+        << "Warning: Contact '" << _name << "' has no host "
+                                            "notification time period defined!";
     warnings++;
     _host_notification_period_ptr = nullptr;
   } else {
@@ -1201,9 +1178,8 @@ void contact::resolve(int& w, int& e) {
       !notify_on(notifier::service_notification, notifier::warning)) {
     logger(log_verification_error, basic)
         << "Warning: Service recovery notification option for contact '"
-        << _name
-        << "' doesn't make any sense - specify critical "
-           "and/or warning options as well";
+        << _name << "' doesn't make any sense - specify critical "
+                    "and/or warning options as well";
     warnings++;
   }
 
@@ -1242,6 +1218,4 @@ map_customvar const& contact::get_custom_variables() const {
   return _custom_variables;
 }
 
-map_customvar& contact::get_custom_variables() {
-  return _custom_variables;
-}
+map_customvar& contact::get_custom_variables() { return _custom_variables; }

@@ -22,7 +22,6 @@
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
-#include "com/centreon/engine/broker/handle.hh"
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -40,14 +39,10 @@ using namespace com::centreon::engine::logging;
 /****************************************************************************/
 
 /* initialize module routines */
-int neb_init_modules() {
-  return OK;
-}
+int neb_init_modules() { return OK; }
 
 /* deinitialize module routines */
-int neb_deinit_modules() {
-  return OK;
-}
+int neb_deinit_modules() { return OK; }
 
 /* add a new module to module list */
 int neb_add_module(char const* filename,
@@ -60,9 +55,10 @@ int neb_add_module(char const* filename,
 
   try {
     broker::loader::instance().add_module(filename, args);
-    logger(dbg_eventbroker, basic)
-        << "Added module: name='" << filename << "', args='" << args << "'";
-  } catch (...) {
+    logger(dbg_eventbroker, basic) << "Added module: name='" << filename
+                                   << "', args='" << args << "'";
+  }
+  catch (...) {
     logger(dbg_eventbroker, basic) << "Counld not add module: name='"
                                    << filename << "', args='" << args << "'";
     return ERROR;
@@ -74,7 +70,8 @@ int neb_add_module(char const* filename,
 int neb_free_module_list() {
   try {
     logger(dbg_eventbroker, basic) << "unload all modules success.";
-  } catch (...) {
+  }
+  catch (...) {
     logger(dbg_eventbroker, basic) << "unload all modules failed.";
     return ERROR;
   }
@@ -101,10 +98,12 @@ int neb_load_all_modules() {
     for (std::list<std::shared_ptr<broker::handle> >::const_iterator
              it(modules.begin()),
          end(modules.end());
-         it != end; ++it)
+         it != end;
+         ++it)
       if (neb_load_module(&(*(*it))))
         ++unloaded;
-  } catch (...) {
+  }
+  catch (...) {
     logger(dbg_eventbroker, basic) << "Could not load all modules";
     return -1;
   }
@@ -124,17 +123,19 @@ int neb_load_module(void* mod) {
 
   try {
     module->open();
-    logger(log_info_message, basic)
-        << "Event broker module '" << module->get_filename()
-        << "' initialized successfully";
-  } catch (std::exception const& e) {
-    logger(log_runtime_error, basic)
-        << "Error: Could not load module '" << module->get_filename()
-        << "': " << e.what();
+    logger(log_info_message, basic) << "Event broker module '"
+                                    << module->get_filename()
+                                    << "' initialized successfully";
+  }
+  catch (std::exception const& e) {
+    logger(log_runtime_error, basic) << "Error: Could not load module '"
+                                     << module->get_filename()
+                                     << "': " << e.what();
     return ERROR;
-  } catch (...) {
-    logger(log_runtime_error, basic)
-        << "Error: Could not load module '" << module->get_filename() << "'";
+  }
+  catch (...) {
+    logger(log_runtime_error, basic) << "Error: Could not load module '"
+                                     << module->get_filename() << "'";
     return ERROR;
   }
   return OK;
@@ -153,17 +154,20 @@ int neb_reload_all_modules() {
       for (std::list<std::shared_ptr<broker::handle> >::const_iterator
                it(modules.begin()),
            end(modules.end());
-           it != end; ++it) {
+           it != end;
+           ++it) {
         neb_reload_module(&**it);
       }
       logger(dbg_eventbroker, basic) << "All modules got successfully reloaded";
     }
     retval = OK;
-  } catch (std::exception const& e) {
-    logger(log_runtime_error, basic)
-        << "Warning: Module reloading failed: " << e.what();
+  }
+  catch (std::exception const& e) {
+    logger(log_runtime_error, basic) << "Warning: Module reloading failed: "
+                                     << e.what();
     retval = ERROR;
-  } catch (...) {
+  }
+  catch (...) {
     logger(log_runtime_error, basic)
         << "Warning: Module reloading failed: unknown error";
     retval = ERROR;
@@ -180,11 +184,11 @@ int neb_reload_module(void* mod) {
   if (module->is_loaded() == false)
     return OK;
 
-  logger(dbg_eventbroker, basic)
-      << "Attempting to reload module '" << module->get_filename() << "'";
+  logger(dbg_eventbroker, basic) << "Attempting to reload module '"
+                                 << module->get_filename() << "'";
   module->reload();
-  logger(dbg_eventbroker, basic)
-      << "Module '" << module->get_filename() << "' reloaded successfully";
+  logger(dbg_eventbroker, basic) << "Module '" << module->get_filename()
+                                 << "' reloaded successfully";
 
   return OK;
 }
@@ -200,24 +204,24 @@ int neb_reload_module(void* mod) {
 int neb_unload_all_modules(int flags, int reason) {
   int retval;
   try {
-    broker::loader* loader(&broker::loader::instance());
-    if (loader) {
-      std::list<std::shared_ptr<broker::handle> > modules(
-          loader->get_modules());
-      for (std::list<std::shared_ptr<broker::handle> >::const_iterator
-               it(modules.begin()),
-           end(modules.end());
-           it != end; ++it)
-        neb_unload_module(&**it, flags, reason);
-      loader->unload_modules();
-      logger(dbg_eventbroker, basic) << "All modules got successfully unloaded";
-    }
+    broker::loader& loader(broker::loader::instance());
+    std::list<std::shared_ptr<broker::handle> > modules(loader.get_modules());
+    for (std::list<std::shared_ptr<broker::handle> >::const_iterator
+             it = modules.begin(),
+             end = modules.end();
+         it != end;
+         ++it)
+      neb_unload_module((*it).get(), flags, reason);
+    loader.unload_modules();
+    logger(dbg_eventbroker, basic) << "All modules got successfully unloaded";
     retval = OK;
-  } catch (std::exception const& e) {
-    logger(log_runtime_error, basic)
-        << "Error: Module unloading failed: " << e.what();
+  }
+  catch (std::exception const& e) {
+    logger(log_runtime_error, basic) << "Error: Module unloading failed: "
+                                     << e.what();
     retval = ERROR;
-  } catch (...) {
+  }
+  catch (...) {
     logger(log_runtime_error, basic)
         << "Error: unloading of all modules failed";
     retval = ERROR;
@@ -226,32 +230,30 @@ int neb_unload_all_modules(int flags, int reason) {
 }
 
 /* close (unload) a particular module */
-int neb_unload_module(void* mod, int flags, int reason) {
+int neb_unload_module(broker::handle* module, int flags, int reason) {
   (void)flags;
   (void)reason;
 
-  if (mod == NULL)
+  if (module == nullptr)
     return ERROR;
 
-  broker::handle* module = static_cast<broker::handle*>(mod);
-
-  if (module->is_loaded() == false)
+  if (!module->is_loaded())
     return OK;
 
-  logger(dbg_eventbroker, basic)
-      << "Attempting to unload module '" << module->get_filename() << "'";
+  logger(dbg_eventbroker, basic) << "Attempting to unload module '"
+                                 << module->get_filename() << "'";
 
   module->close();
 
   /* deregister all of the module's callbacks */
   neb_deregister_module_callbacks(module);
 
-  logger(dbg_eventbroker, basic)
-      << "Module '" << module->get_filename() << "' unloaded successfully";
+  logger(dbg_eventbroker, basic) << "Module '" << module->get_filename()
+                                 << "' unloaded successfully";
 
-  logger(log_info_message, basic)
-      << "Event broker module '" << module->get_filename()
-      << "' deinitialized successfully";
+  logger(log_info_message, basic) << "Event broker module '"
+                                  << module->get_filename()
+                                  << "' deinitialized successfully";
 
   return OK;
 }
@@ -300,10 +302,11 @@ int neb_set_module_info(void* handle, int type, char const* data) {
         break;
     }
 
-    logger(dbg_eventbroker, basic)
-        << "set module info success: filename='" << module->get_filename()
-        << "', type='" << type << "'";
-  } catch (...) {
+    logger(dbg_eventbroker, basic) << "set module info success: filename='"
+                                   << module->get_filename() << "', type='"
+                                   << type << "'";
+  }
+  catch (...) {
     logger(dbg_eventbroker, basic) << "Counld not set module info.";
     return ERROR;
   }
@@ -355,7 +358,8 @@ int neb_register_callback(int callback_type,
     nebcallback* last_callback(NULL);
     nebcallback* temp_callback(NULL);
     for (temp_callback = neb_callback_list[callback_type];
-         temp_callback != NULL; temp_callback = temp_callback->next) {
+         temp_callback != NULL;
+         temp_callback = temp_callback->next) {
       if (temp_callback->priority > new_callback->priority)
         break;
       last_callback = temp_callback;
@@ -376,17 +380,16 @@ int neb_register_callback(int callback_type,
 
 /* dregisters all callback functions for a given module */
 int neb_deregister_module_callbacks(void* mod) {
-  nebcallback* temp_callback;
-  nebcallback* next_callback{NULL};
-  int callback_type;
+  nebcallback* next_callback{nullptr};
 
   if (!mod)
     return NEBERROR_NOMODULE;
 
-  for (callback_type = 0; callback_type < NEBCALLBACK_NUMITEMS;
+  for (int callback_type = 0; callback_type < NEBCALLBACK_NUMITEMS;
        callback_type++) {
-    for (temp_callback = neb_callback_list[callback_type];
-         temp_callback != NULL; temp_callback = next_callback) {
+    for (nebcallback* temp_callback = neb_callback_list[callback_type];
+         temp_callback != nullptr;
+         temp_callback = next_callback) {
       next_callback = temp_callback->next;
       if ((void*)temp_callback->module_handle == (void*)mod) {
         union {
@@ -413,7 +416,8 @@ int neb_deregister_callback(int callback_type,
 
   /* find the callback to remove */
   for (temp_callback = last_callback = neb_callback_list[callback_type];
-       temp_callback != NULL; temp_callback = next_callback) {
+       temp_callback != NULL;
+       temp_callback = next_callback) {
     next_callback = temp_callback->next;
 
     /* we found it */
@@ -429,13 +433,13 @@ int neb_deregister_callback(int callback_type,
   }
 
   /* we couldn't find the callback */
-  if (temp_callback == NULL)
+  if (temp_callback == nullptr)
     return NEBERROR_CALLBACKNOTFOUND;
 
   else {
     /* only one item in the list */
     if (temp_callback != last_callback->next)
-      neb_callback_list[callback_type] = NULL;
+      neb_callback_list[callback_type] = nullptr;
     else
       last_callback->next = next_callback;
     delete temp_callback;
@@ -456,8 +460,8 @@ int neb_make_callbacks(int callback_type, void* data) {
     return ERROR;
 
   if (callback_type != NEBCALLBACK_LOG_DATA) {
-    logger(dbg_eventbroker, more)
-        << "Making callbacks (type " << callback_type << ")...";
+    logger(dbg_eventbroker, more) << "Making callbacks (type " << callback_type
+                                  << ")...";
   }
 
   /* make the callbacks... */
@@ -472,13 +476,11 @@ int neb_make_callbacks(int callback_type, void* data) {
     neb.data = temp_callback->callback_func;
     cbresult = (*neb.func)(callback_type, data);
 
-    temp_callback = next_callback;
-
     total_callbacks++;
     if (callback_type != NEBCALLBACK_LOG_DATA) {
-      logger(dbg_eventbroker, most)
-          << "Callback #" << total_callbacks << " (type " << callback_type
-          << ") return (code = " << cbresult << ")";
+      logger(dbg_eventbroker, most) << "Callback #" << total_callbacks
+                                    << " (type " << callback_type
+                                    << ") return (code = " << cbresult << ")";
     }
 
     /* module wants to cancel callbacks to other modules (and potentially cancel

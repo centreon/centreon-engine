@@ -55,27 +55,19 @@ timeperiod::timeperiod(std::string const& name, std::string const& alias)
   // Check if the timeperiod already exist.
   timeperiod_map::const_iterator it{timeperiod::timeperiods.find(name)};
   if (it != timeperiod::timeperiods.end()) {
-    logger(log_config_error, basic)
-        << "Error: Timeperiod '" << name << "' has already been defined";
+    logger(log_config_error, basic) << "Error: Timeperiod '" << name
+                                    << "' has already been defined";
     throw engine_error() << "Could not register time period '" << name << "'";
   }
 }
 
-std::string const& timeperiod::timeperiod::get_name() const {
-  return _name;
-}
+std::string const& timeperiod::timeperiod::get_name() const { return _name; }
 
-void timeperiod::set_name(std::string const& name) {
-  _name = name;
-}
+void timeperiod::set_name(std::string const& name) { _name = name; }
 
-std::string const timeperiod::get_alias() const {
-  return _alias;
-}
+std::string const timeperiod::get_alias() const { return _alias; }
 
-void timeperiod::set_alias(std::string const& alias) {
-  _alias = alias;
-}
+void timeperiod::set_alias(std::string const& alias) { _alias = alias; }
 
 /**
  *  Equal operator.
@@ -88,8 +80,8 @@ void timeperiod::set_alias(std::string const& alias) {
 bool timeperiod::operator==(timeperiod const& obj) noexcept {
   if (_name == obj._name && _alias == obj._alias &&
       (_exclusions.size() == obj._exclusions.size() &&
-       std::equal(_exclusions.begin(), _exclusions.end(),
-                  obj._exclusions.begin()))) {
+       std::equal(
+           _exclusions.begin(), _exclusions.end(), obj._exclusions.begin()))) {
     for (uint32_t i{0}; i < exceptions.size(); ++i)
       if (exceptions[i] != obj.exceptions[i])
         return false;
@@ -135,7 +127,8 @@ std::ostream& operator<<(std::ostream& os, timeperiod const& obj) {
   for (uint32_t i = 0; i < obj.exceptions.size(); ++i)
     for (daterange_list::const_iterator it(obj.exceptions[i].begin()),
          end(obj.exceptions[i].end());
-         it != end; ++it)
+         it != end;
+         ++it)
       os << "  " << **it << "\n";
   os << "}\n";
   return os;
@@ -143,7 +136,8 @@ std::ostream& operator<<(std::ostream& os, timeperiod const& obj) {
 
 std::ostream& operator<<(std::ostream& os, timeperiodexclusion const& obj) {
   for (timeperiodexclusion::const_iterator it(obj.begin()), end(obj.end());
-       it != end; ++it)
+       it != end;
+       ++it)
     os << it->first << (std::next(it) != obj.end() ? ", " : "");
   return os;
 }
@@ -212,7 +206,7 @@ static time_t calculate_time_from_day_of_month(int year,
     // If we rolled over to the next month, time is invalid, assume the
     // user's intention is to keep it in the current month.
     if (t.tm_mon != month)
-      midnight = (time_t)-1;
+      midnight = (time_t) - 1;
   }
   // Negative offset (last day, 3rd to last day).
   else {
@@ -228,7 +222,7 @@ static time_t calculate_time_from_day_of_month(int year,
       t.tm_mday = day;
       t.tm_isdst = -1;
       midnight = mktime(&t);
-    } while ((midnight == (time_t)-1) || (t.tm_mon != month));
+    } while ((midnight == (time_t) - 1) || (t.tm_mon != month));
 
     // Now that we know the last day, back up more.
     t.tm_mon = month;
@@ -296,7 +290,7 @@ static time_t calculate_time_from_weekday_of_month(int year,
     // If we rolled over to the next month, time is invalid, assume the
     // user's intention is to keep it in the current month.
     if (t.tm_mon != month)
-      midnight = (time_t)-1;
+      midnight = (time_t) - 1;
   }
   // Negative offset (last thursday, 3rd to last tuesday).
   else {
@@ -312,7 +306,7 @@ static time_t calculate_time_from_weekday_of_month(int year,
       t.tm_mday = days + 1;
       t.tm_isdst = -1;
       midnight = mktime(&t);
-    } while ((midnight == (time_t)-1) || (t.tm_mon != month));
+    } while ((midnight == (time_t) - 1) || (t.tm_mon != month));
 
     // Now that we know the last instance of the weekday, back up more.
     days = ((weekday_offset + 1) * 7);
@@ -363,7 +357,7 @@ static bool _daterange_calendar_date_to_time_t(daterange const& r,
   t.tm_mday = r.get_smday();
   t.tm_mon = r.get_smon();
   t.tm_year = r.get_syear() - 1900;
-  if ((start = mktime(&t)) == (time_t)-1)
+  if ((start = mktime(&t)) == (time_t) - 1)
     return false;
 
   if (r.get_eyear()) {
@@ -374,11 +368,11 @@ static bool _daterange_calendar_date_to_time_t(daterange const& r,
     t.tm_mday = r.get_emday();
     t.tm_mon = r.get_emon();
     t.tm_year = r.get_eyear() - 1900;
-    if ((end = mktime(&t)) == (time_t)-1)
+    if ((end = mktime(&t)) == (time_t) - 1)
       return false;
     end = _add_round_days_to_midnight(end, 24 * 60 * 60);
   } else
-    end = (time_t)-1;
+    end = (time_t) - 1;
 
   return true;
 }
@@ -406,9 +400,9 @@ static bool _daterange_month_date_to_time_t(daterange const& r,
   bool found(false);
   for (int i(0); (i < 3) && !found; ++i, ++year) {
     start = calculate_time_from_day_of_month(year, r.get_smon(), r.get_smday());
-    end = calculate_time_from_day_of_month(year + (end_before_start ? 1 : 0),
-                                           r.get_emon(), r.get_emday());
-    if (end != (time_t)-1) {
+    end = calculate_time_from_day_of_month(
+        year + (end_before_start ? 1 : 0), r.get_emon(), r.get_emday());
+    if (end != (time_t) - 1) {
       end = _add_round_days_to_midnight(end, 24 * 60 * 60);
       if (ti.preferred_time < end)
         found = true;
@@ -454,11 +448,11 @@ static bool _daterange_month_day_to_time_t(daterange const& r,
 
   // No decay, current month only.
   if (!decay) {
-    start = calculate_time_from_day_of_month(ti.preftime.tm_year,
-                                             ti.preftime.tm_mon, r.get_smday());
-    end = calculate_time_from_day_of_month(ti.preftime.tm_year,
-                                           ti.preftime.tm_mon, r.get_emday());
-    if ((start == (time_t)-1) || (end == (time_t)-1))
+    start = calculate_time_from_day_of_month(
+        ti.preftime.tm_year, ti.preftime.tm_mon, r.get_smday());
+    end = calculate_time_from_day_of_month(
+        ti.preftime.tm_year, ti.preftime.tm_mon, r.get_emday());
+    if ((start == (time_t) - 1) || (end == (time_t) - 1))
       return false;
     end = _add_round_days_to_midnight(end, 24 * 60 * 60);
   }
@@ -473,9 +467,9 @@ static bool _daterange_month_day_to_time_t(daterange const& r,
     } else
       --month;
     start = calculate_time_from_day_of_month(year, month, r.get_smday());
-    end = calculate_time_from_day_of_month(ti.preftime.tm_year,
-                                           ti.preftime.tm_mon, r.get_emday());
-    if ((start == (time_t)-1) || (end == (time_t)-1))
+    end = calculate_time_from_day_of_month(
+        ti.preftime.tm_year, ti.preftime.tm_mon, r.get_emday());
+    if ((start == (time_t) - 1) || (end == (time_t) - 1))
       return false;
     end = _add_round_days_to_midnight(end, 24 * 60 * 60);
 
@@ -492,7 +486,7 @@ static bool _daterange_month_day_to_time_t(daterange const& r,
       start = calculate_time_from_day_of_month(
           ti.preftime.tm_year, ti.preftime.tm_mon, r.get_smday());
       end = calculate_time_from_day_of_month(year, month, r.get_emday());
-      if ((start == (time_t)-1) || (end == (time_t)-1))
+      if ((start == (time_t) - 1) || (end == (time_t) - 1))
         return false;
       end = _add_round_days_to_midnight(end, 24 * 60 * 60);
     }
@@ -524,7 +518,7 @@ static bool _daterange_month_week_day_to_time_t(daterange const& r,
         ti.preftime.tm_year, r.get_smon(), r.get_swday(), r.get_swday_offset());
     end = calculate_time_from_weekday_of_month(
         ti.preftime.tm_year, r.get_emon(), r.get_ewday(), r.get_ewday_offset());
-    if ((start == (time_t)-1) || (end == (time_t)-1))
+    if ((start == (time_t) - 1) || (end == (time_t) - 1))
       return false;
     end = _add_round_days_to_midnight(end, 24 * 60 * 60);
   }
@@ -533,11 +527,12 @@ static bool _daterange_month_week_day_to_time_t(daterange const& r,
   else {
     // Check previous year -> current year.
     start = calculate_time_from_weekday_of_month(ti.preftime.tm_year - 1,
-                                                 r.get_smon(), r.get_swday(),
+                                                 r.get_smon(),
+                                                 r.get_swday(),
                                                  r.get_swday_offset());
     end = calculate_time_from_weekday_of_month(
         ti.preftime.tm_year, r.get_emon(), r.get_ewday(), r.get_ewday_offset());
-    if ((start == (time_t)-1) || (end == (time_t)-1))
+    if ((start == (time_t) - 1) || (end == (time_t) - 1))
       return false;
     end = _add_round_days_to_midnight(end, 24 * 60 * 60);
 
@@ -545,12 +540,14 @@ static bool _daterange_month_week_day_to_time_t(daterange const& r,
     // current year -> next year.
     if (ti.preferred_time >= end) {
       start = calculate_time_from_weekday_of_month(ti.preftime.tm_year,
-                                                   r.get_smon(), r.get_swday(),
+                                                   r.get_smon(),
+                                                   r.get_swday(),
                                                    r.get_swday_offset());
       end = calculate_time_from_weekday_of_month(ti.preftime.tm_year + 1,
-                                                 r.get_emon(), r.get_ewday(),
+                                                 r.get_emon(),
+                                                 r.get_ewday(),
                                                  r.get_ewday_offset());
-      if ((start == (time_t)-1) || (end == (time_t)-1))
+      if ((start == (time_t) - 1) || (end == (time_t) - 1))
         return false;
       end = _add_round_days_to_midnight(end, 24 * 60 * 60);
     }
@@ -581,13 +578,13 @@ static bool _daterange_week_day_to_time_t(daterange const& r,
 
   while (true) {
     // Calculate time of specified weekday of month.
-    start = calculate_time_from_weekday_of_month(year, month, r.get_swday(),
-                                                 r.get_swday_offset());
+    start = calculate_time_from_weekday_of_month(
+        year, month, r.get_swday(), r.get_swday_offset());
 
     // Use same year and month as was calculated for start time above.
-    end = calculate_time_from_weekday_of_month(year, month, r.get_ewday(),
-                                               r.get_ewday_offset());
-    if (end == (time_t)-1) {
+    end = calculate_time_from_weekday_of_month(
+        year, month, r.get_ewday(), r.get_ewday_offset());
+    if (end == (time_t) - 1) {
       // End date can't be helped, so skip it.
       if (r.get_ewday_offset() < 0)
         return false;
@@ -608,7 +605,7 @@ static bool _daterange_week_day_to_time_t(daterange const& r,
       end = _add_round_days_to_midnight(end, 24 * 60 * 60);
 
     // Error checking.
-    if (((time_t)-1 == start) || ((time_t)-1 == end) || (start > end))
+    if (((time_t) - 1 == start) || ((time_t) - 1 == end) || (start > end))
       return false;
 
     // We should have an interval that includes or is above
@@ -701,7 +698,7 @@ static time_t _earliest_midnight_in_daterange(time_t preferred_time,
   // XXX : handle full day skipping directly (from preferred_time to next
   // midnight)
   while ((drange_start_time < drange_end_time) ||
-         (drange_end_time == (time_t)-1)) {
+         (drange_end_time == (time_t) - 1)) {
     // Next day at midnight.
     time_t next_day(
         _add_round_days_to_midnight(drange_start_time, 24 * 60 * 60));
@@ -718,7 +715,7 @@ static time_t _earliest_midnight_in_daterange(time_t preferred_time,
       drange_start_time = _add_round_days_to_midnight(
           drange_start_time, drange->get_skip_interval() * 24 * 60 * 60);
   }
-  return (time_t)-1;
+  return (time_t) - 1;
 }
 
 /**
@@ -765,7 +762,7 @@ bool check_time_against_period(time_t test_time, timeperiod* tperiod) {
     return true;
 
   // Faked next valid time must be tested time.
-  time_t next_valid_time{(time_t)-1};
+  time_t next_valid_time{(time_t) - 1};
   tperiod->get_next_valid_time_per_timeperiod(test_time, &next_valid_time);
   return next_valid_time == test_time;
 }
@@ -788,9 +785,9 @@ void timeperiod::get_next_invalid_time_per_timeperiod(time_t preferred_time,
   // Do not compute more than one year ahead (we might compute forever).
   time_t earliest_time(preferred_time);
   time_t in_one_year(preferred_time + 366 * 24 * 60 * 60);
-  while ((earliest_time != (time_t)-1) && (preferred_time < in_one_year)) {
+  while ((earliest_time != (time_t) - 1) && (preferred_time < in_one_year)) {
     preferred_time = earliest_time;
-    earliest_time = (time_t)-1;
+    earliest_time = (time_t) - 1;
 
     // Compute time information.
     time_info ti;
@@ -805,24 +802,30 @@ void timeperiod::get_next_invalid_time_per_timeperiod(time_t preferred_time,
     // XXX: handle range end reached.
     // Browse all date range.
     for (unsigned int daterange_type(0);
-         (daterange_type < DATERANGE_TYPES) && ((time_t)-1 == earliest_time);
+         (daterange_type < DATERANGE_TYPES) && ((time_t) - 1 == earliest_time);
          ++daterange_type) {
       for (daterange_list::iterator
                it(this->exceptions[daterange_type].begin()),
            end(this->exceptions[daterange_type].end());
-           it != end && ((time_t)-1 == earliest_time); ++it) {
+           it != end && ((time_t) - 1 == earliest_time);
+           ++it) {
         // Get range limits.
-        time_t daterange_start_time((time_t)-1);
-        time_t daterange_end_time((time_t)-1);
-        if (_daterange_to_time_t(it->get(), daterange_type, &ti,
-                                 daterange_start_time, daterange_end_time) &&
+        time_t daterange_start_time((time_t) - 1);
+        time_t daterange_end_time((time_t) - 1);
+        if (_daterange_to_time_t(it->get(),
+                                 daterange_type,
+                                 &ti,
+                                 daterange_start_time,
+                                 daterange_end_time) &&
             ((preferred_time < daterange_end_time) ||
-             ((time_t)-1 == daterange_end_time))) {
+             ((time_t) - 1 == daterange_end_time))) {
           // Check that date is within range.
-          time_t earliest_midnight(_earliest_midnight_in_daterange(
-              preferred_time, it->get(), daterange_start_time,
-              daterange_end_time));
-          if (earliest_midnight != (time_t)-1) {
+          time_t earliest_midnight(
+              _earliest_midnight_in_daterange(preferred_time,
+                                              it->get(),
+                                              daterange_start_time,
+                                              daterange_end_time));
+          if (earliest_midnight != (time_t) - 1) {
             // Midnight.
             struct tm midnight;
             localtime_r(&earliest_midnight, &midnight);
@@ -830,12 +833,13 @@ void timeperiod::get_next_invalid_time_per_timeperiod(time_t preferred_time,
             // Browse all time range of date range.
             for (timerange_list::iterator it_tr((*it)->times.begin()),
                  end_tr((*it)->times.end());
-                 it_tr != end_tr && ((time_t)-1 == earliest_time); ++it_tr) {
+                 it_tr != end_tr && ((time_t) - 1 == earliest_time);
+                 ++it_tr) {
               // Get range limits.
-              time_t range_start((time_t)-1);
-              time_t range_end((time_t)-1);
-              if (_timerange_to_time_t(it_tr->get(), &midnight, range_start,
-                                       range_end) &&
+              time_t range_start((time_t) - 1);
+              time_t range_end((time_t) - 1);
+              if (_timerange_to_time_t(
+                      it_tr->get(), &midnight, range_start, range_end) &&
                   (preferred_time >= range_start) &&
                   (preferred_time < range_end))
                 earliest_time = range_end;
@@ -851,7 +855,7 @@ void timeperiod::get_next_invalid_time_per_timeperiod(time_t preferred_time,
     ** ahead) because time ranges are recurring the same way every week.
     */
     for (int weekday(ti.preftime.tm_wday), days_into_the_future(0);
-         (days_into_the_future <= 7) && ((time_t)-1 == earliest_time);
+         (days_into_the_future <= 7) && ((time_t) - 1 == earliest_time);
          ++weekday, ++days_into_the_future) {
       if (weekday >= 7)
         weekday -= 7;
@@ -865,26 +869,28 @@ void timeperiod::get_next_invalid_time_per_timeperiod(time_t preferred_time,
       // Check all time ranges for this day of the week.
       for (timerange_list::iterator it(this->days[weekday].begin()),
            end(this->days[weekday].end());
-           it != end && ((time_t)-1 == earliest_time); ++it) {
+           it != end && ((time_t) - 1 == earliest_time);
+           ++it) {
         // Get range limits.
-        time_t range_start((time_t)-1);
-        time_t range_end((time_t)-1);
-        if (_timerange_to_time_t(it->get(), &day_midnight, range_start,
-                                 range_end) &&
+        time_t range_start((time_t) - 1);
+        time_t range_end((time_t) - 1);
+        if (_timerange_to_time_t(
+                it->get(), &day_midnight, range_start, range_end) &&
             (preferred_time >= range_start) && (preferred_time < range_end))
           earliest_time = range_end;
       }
     }
 
     // Find next exclusion time.
-    time_t next_exclusion((time_t)-1);
+    time_t next_exclusion((time_t) - 1);
     timeperiodexclusion tpe = std::move(this->get_exclusions());
     for (timeperiodexclusion::iterator it(tpe.begin()), end(tpe.end());
-         it != end; ++it) {
-      time_t valid((time_t)-1);
+         it != end;
+         ++it) {
+      time_t valid((time_t) - 1);
       it->second->get_next_valid_time_per_timeperiod(preferred_time, &valid);
-      if ((valid != (time_t)-1) &&
-          (((time_t)-1 == next_exclusion) || (valid < next_exclusion)))
+      if ((valid != (time_t) - 1) &&
+          (((time_t) - 1 == next_exclusion) || (valid < next_exclusion)))
         next_exclusion = valid;
     }
     _exclusions = std::move(tpe);
@@ -896,22 +902,23 @@ void timeperiod::get_next_invalid_time_per_timeperiod(time_t preferred_time,
     ** before.
     */
 
-    if ((next_exclusion != (time_t)-1) &&
+    if ((next_exclusion != (time_t) - 1) &&
         (next_exclusion <
          _add_round_days_to_midnight(ti.midnight, 24 * 60 * 60)) &&
-        (((time_t)-1 == earliest_time) || (next_exclusion <= earliest_time))) {
-      earliest_time = (time_t)-1;
+        (((time_t) - 1 == earliest_time) ||
+         (next_exclusion <= earliest_time))) {
+      earliest_time = (time_t) - 1;
       preferred_time = next_exclusion;
       break;  // We have our time, no need to search anymore.
     }
-    if (earliest_time != (time_t)-1) {
+    if (earliest_time != (time_t) - 1) {
       preferred_time = earliest_time;
-      earliest_time = (time_t)-1;
+      earliest_time = (time_t) - 1;
     }
   }
 
   // If we couldn't find a time period there must be none defined.
-  if (earliest_time != (time_t)-1)
+  if (earliest_time != (time_t) - 1)
     *invalid_time = original_preferred_time;
   // Else use the calculated time.
   else
@@ -928,7 +935,7 @@ void timeperiod::get_next_invalid_time_per_timeperiod(time_t preferred_time,
  */
 static time_t _get_next_valid_time_in_timeranges(time_t preferred_time,
                                                  timerange_list timeranges) {
-  time_t earliest_time((time_t)-1);
+  time_t earliest_time((time_t) - 1);
   struct tm midnight;
   localtime_r(&preferred_time, &midnight);
   midnight.tm_hour = 0;
@@ -936,13 +943,14 @@ static time_t _get_next_valid_time_in_timeranges(time_t preferred_time,
   midnight.tm_sec = 0;
   midnight.tm_isdst = -1;
   for (timerange_list::iterator it(timeranges.begin()), end(timeranges.end());
-       it != end; ++it) {
-    time_t range_start((time_t)-1);
-    time_t range_end((time_t)-1);
+       it != end;
+       ++it) {
+    time_t range_start((time_t) - 1);
+    time_t range_end((time_t) - 1);
     if (_timerange_to_time_t(it->get(), &midnight, range_start, range_end)) {
       // Time range is in the future.
       if (range_start >= preferred_time) {
-        if ((earliest_time == (time_t)-1) || (range_start < earliest_time))
+        if ((earliest_time == (time_t) - 1) || (range_start < earliest_time))
           earliest_time = range_start;
       }
       // Preferred time is within the range.
@@ -963,16 +971,12 @@ void timeperiod::get_next_valid_time_per_timeperiod(time_t preferred_time,
                                                     time_t* valid_time) {
   logger(dbg_functions, basic) << "get_next_valid_time_per_timeperiod()";
 
-  // If no time can be found, the original preferred time will be set
-  // in valid_time at the end of the loop.
-  time_t original_preferred_time(preferred_time);
-
   // Loop through the upcoming year a day at a time.
-  time_t earliest_time((time_t)-1);
+  time_t earliest_time((time_t) - 1);
   time_info ti;
   ti.preferred_time = preferred_time;
   for (time_t in_one_year(ti.preferred_time + 366 * 24 * 60 * 60);
-       (earliest_time == (time_t)-1) && (ti.preferred_time < in_one_year);) {
+       (earliest_time == (time_t) - 1) && (ti.preferred_time < in_one_year);) {
     // Compute time information.
     localtime_r(&ti.preferred_time, &ti.preftime);
     ti.preftime.tm_sec = 0;
@@ -984,22 +988,26 @@ void timeperiod::get_next_valid_time_per_timeperiod(time_t preferred_time,
     // Browse all date range types in precedence order.
     bool skip_this_day(false);
     for (size_t daterange_type{0};
-         daterange_type < DATERANGE_TYPES && earliest_time == (time_t)-1 &&
-         !skip_this_day;
+         daterange_type < DATERANGE_TYPES && earliest_time == (time_t) - 1 &&
+             !skip_this_day;
          ++daterange_type) {
       // Browse all date ranges of a given type. The earliest valid
       // time found in any date range will be valid.
       for (daterange_list::iterator it{exceptions[daterange_type].begin()},
            end{exceptions[daterange_type].end()};
-           it != end; ++it) {
+           it != end;
+           ++it) {
         // Get next range limits and check that we are within bounds.
-        time_t daterange_start_time((time_t)-1);
-        time_t daterange_end_time((time_t)-1);
-        if (_daterange_to_time_t(it->get(), daterange_type, &ti,
-                                 daterange_start_time, daterange_end_time) &&
-            ((daterange_start_time == (time_t)-1) ||
+        time_t daterange_start_time((time_t) - 1);
+        time_t daterange_end_time((time_t) - 1);
+        if (_daterange_to_time_t(it->get(),
+                                 daterange_type,
+                                 &ti,
+                                 daterange_start_time,
+                                 daterange_end_time) &&
+            ((daterange_start_time == (time_t) - 1) ||
              (daterange_start_time <= ti.midnight)) &&
-            ((daterange_end_time == (time_t)-1) ||
+            ((daterange_end_time == (time_t) - 1) ||
              (ti.midnight < daterange_end_time))) {
           // Only test today. An higher precedence exception might have
           // been skipped because it was not valid on the current day
@@ -1008,8 +1016,8 @@ void timeperiod::get_next_valid_time_per_timeperiod(time_t preferred_time,
               ti.preferred_time, (*it)->times));
 
           // Potential time found.
-          if (potential_time != (time_t)-1) {
-            if ((earliest_time == (time_t)-1) ||
+          if (potential_time != (time_t) - 1) {
+            if ((earliest_time == (time_t) - 1) ||
                 (potential_time < earliest_time))
               earliest_time = potential_time;
             skip_this_day = false;
@@ -1028,33 +1036,35 @@ void timeperiod::get_next_valid_time_per_timeperiod(time_t preferred_time,
     if (!skip_this_day) {
       // Try the weekly schedule only if no valid time was found in
       // exceptions for this day.
-      if (earliest_time == (time_t)-1) {
+      if (earliest_time == (time_t) - 1) {
         time_t potential_time(_get_next_valid_time_in_timeranges(
             ti.preferred_time, this->days[ti.preftime.tm_wday]));
-        if ((potential_time != (time_t)-1) &&
-            ((earliest_time == (time_t)-1) || (potential_time < earliest_time)))
+        if ((potential_time != (time_t) - 1) &&
+            ((earliest_time == (time_t) - 1) ||
+             (potential_time < earliest_time)))
           earliest_time = potential_time;
       }
     }
 
     // Check exclusions.
     bool skipped(false);
-    if (earliest_time != (time_t)-1) {
-      time_t max_invalid((time_t)-1);
+    if (earliest_time != (time_t) - 1) {
+      time_t max_invalid((time_t) - 1);
       timeperiodexclusion tpe = std::move(this->get_exclusions());
 
       for (timeperiodexclusion::iterator it(tpe.begin()), end(tpe.end());
-           it != end; ++it) {
-        time_t invalid((time_t)-1);
+           it != end;
+           ++it) {
+        time_t invalid((time_t) - 1);
         it->second->get_next_invalid_time_per_timeperiod(earliest_time,
                                                          &invalid);
-        if ((invalid != (time_t)-1) &&
-            (((time_t)-1 == max_invalid) || (invalid > max_invalid)))
+        if ((invalid != (time_t) - 1) &&
+            (((time_t) - 1 == max_invalid) || (invalid > max_invalid)))
           max_invalid = invalid;
       }
       _exclusions = std::move(tpe);
-      if ((max_invalid != (time_t)-1) && (max_invalid != earliest_time)) {
-        earliest_time = (time_t)-1;
+      if ((max_invalid != (time_t) - 1) && (max_invalid != earliest_time)) {
+        earliest_time = (time_t) - 1;
         ti.preferred_time = max_invalid;
         skipped = true;
       }
@@ -1121,7 +1131,8 @@ void timeperiod::resolve(int& w __attribute__((unused)), int& e) {
   // Check for valid timeperiod names in exclusion list.
   for (timeperiodexclusion::iterator it{_exclusions.begin()},
        end{_exclusions.end()};
-       it != end; ++it) {
+       it != end;
+       ++it) {
     timeperiod_map::const_iterator found{
         timeperiod::timeperiods.find(it->first)};
 
@@ -1148,6 +1159,4 @@ timeperiodexclusion const& timeperiod::get_exclusions() const {
   return _exclusions;
 }
 
-timeperiodexclusion& timeperiod::get_exclusions() {
-  return _exclusions;
-}
+timeperiodexclusion& timeperiod::get_exclusions() { return _exclusions; }

@@ -108,9 +108,7 @@ host::host() : object(object::host) {}
  *
  *  @param[in] right Object to copy.
  */
-host::host(host const& right) : object(right) {
-  operator=(right);
-}
+host::host(host const& right) : object(right) { operator=(right); }
 
 /**
  *  Destructor.
@@ -195,62 +193,63 @@ host& host::operator=(host const& right) {
  *  @return True if is the same object, otherwise false.
  */
 bool host::operator==(host const& right) const noexcept {
-  return
-      object::operator==(right) &&
-      _acknowledgement_type == right._acknowledgement_type &&
-      _active_checks_enabled == right._active_checks_enabled &&
-      _check_command == right._check_command &&
-      _check_execution_time == right._check_execution_time &&
-      _check_flapping_recovery_notification ==
-          right._check_flapping_recovery_notification &&
-      _check_latency == right._check_latency &&
-      _check_options == right._check_options &&
-      _check_period == right._check_period &&
-      _check_type == right._check_type &&
-      _current_attempt == right._current_attempt &&
-      _current_event_id == right._current_event_id &&
-      _current_notification_id == right._current_notification_id &&
-      _current_notification_number == right._current_notification_number &&
-      _current_problem_id == right._current_problem_id &&
-      _current_state == right._current_state &&
-      std::operator==(_customvariables, right._customvariables) &&
-      _event_handler == right._event_handler &&
-      _event_handler_enabled == right._event_handler_enabled &&
-      _flap_detection_enabled == right._flap_detection_enabled &&
-      _has_been_checked == right._has_been_checked &&
-      _host_id == right._host_id && _host_name == right._host_name &&
-      _is_flapping == right._is_flapping &&
-      _last_acknowledgement == right._last_acknowledgement &&
-      _last_check == right._last_check &&
-      _last_event_id == right._last_event_id &&
-      _last_hard_state == right._last_hard_state &&
-      _last_hard_state_change == right._last_hard_state_change &&
-      _last_notification == right._last_notification &&
-      _last_problem_id == right._last_problem_id &&
-      _last_state == right._last_state &&
-      _last_state_change == right._last_state_change &&
-      _last_time_down == right._last_time_down &&
-      _last_time_unreachable == right._last_time_unreachable &&
-      _last_time_up == right._last_time_up &&
-      _long_plugin_output == right._long_plugin_output &&
-      _max_attempts == right._max_attempts &&
-      _modified_attributes == right._modified_attributes &&
-      _next_check == right._next_check &&
-      _normal_check_interval == right._normal_check_interval &&
-      _notification_period == right._notification_period &&
-      _notifications_enabled == right._notifications_enabled &&
-      _notified_on_down == right._notified_on_down &&
-      _notified_on_unreachable == right._notified_on_unreachable &&
-      _obsess_over_host == right._obsess_over_host &&
-      _passive_checks_enabled == right._passive_checks_enabled &&
-      _percent_state_change == right._percent_state_change &&
-      _performance_data == right._performance_data &&
-      _plugin_output == right._plugin_output &&
-      _problem_has_been_acknowledged == right._problem_has_been_acknowledged &&
-      _process_performance_data == right._process_performance_data &&
-      _retry_check_interval == right._retry_check_interval &&
-      _state_history == right._state_history &&
-      _state_type == right._state_type && _notification == right._notification;
+  return object::operator==(right) &&
+         _acknowledgement_type == right._acknowledgement_type &&
+         _active_checks_enabled == right._active_checks_enabled &&
+         _check_command == right._check_command &&
+         _check_execution_time == right._check_execution_time &&
+         _check_flapping_recovery_notification ==
+             right._check_flapping_recovery_notification &&
+         _check_latency == right._check_latency &&
+         _check_options == right._check_options &&
+         _check_period == right._check_period &&
+         _check_type == right._check_type &&
+         _current_attempt == right._current_attempt &&
+         _current_event_id == right._current_event_id &&
+         _current_notification_id == right._current_notification_id &&
+         _current_notification_number == right._current_notification_number &&
+         _current_problem_id == right._current_problem_id &&
+         _current_state == right._current_state &&
+         std::operator==(_customvariables, right._customvariables) &&
+         _event_handler == right._event_handler &&
+         _event_handler_enabled == right._event_handler_enabled &&
+         _flap_detection_enabled == right._flap_detection_enabled &&
+         _has_been_checked == right._has_been_checked &&
+         _host_id == right._host_id && _host_name == right._host_name &&
+         _is_flapping == right._is_flapping &&
+         _last_acknowledgement == right._last_acknowledgement &&
+         _last_check == right._last_check &&
+         _last_event_id == right._last_event_id &&
+         _last_hard_state == right._last_hard_state &&
+         _last_hard_state_change == right._last_hard_state_change &&
+         _last_notification == right._last_notification &&
+         _last_problem_id == right._last_problem_id &&
+         _last_state == right._last_state &&
+         _last_state_change == right._last_state_change &&
+         _last_time_down == right._last_time_down &&
+         _last_time_unreachable == right._last_time_unreachable &&
+         _last_time_up == right._last_time_up &&
+         _long_plugin_output == right._long_plugin_output &&
+         _max_attempts == right._max_attempts &&
+         _modified_attributes == right._modified_attributes &&
+         _next_check == right._next_check &&
+         _normal_check_interval == right._normal_check_interval &&
+         _notification_period == right._notification_period &&
+         _notifications_enabled == right._notifications_enabled &&
+         _notified_on_down == right._notified_on_down &&
+         _notified_on_unreachable == right._notified_on_unreachable &&
+         _obsess_over_host == right._obsess_over_host &&
+         _passive_checks_enabled == right._passive_checks_enabled &&
+         _percent_state_change == right._percent_state_change &&
+         _performance_data == right._performance_data &&
+         _plugin_output == right._plugin_output &&
+         _problem_has_been_acknowledged ==
+             right._problem_has_been_acknowledged &&
+         _process_performance_data == right._process_performance_data &&
+         _retry_check_interval == right._retry_check_interval &&
+         _state_history == right._state_history &&
+         _state_type == right._state_type &&
+         _notification == right._notification;
 }
 
 /**
@@ -342,9 +341,7 @@ opt<double> const& host::check_latency() const throw() {
  *
  *  @return The check_options.
  */
-opt<int> const& host::check_options() const throw() {
-  return _check_options;
-}
+opt<int> const& host::check_options() const throw() { return _check_options; }
 
 /**
  *  Get check_period.
@@ -360,9 +357,7 @@ opt<std::string> const& host::check_period() const throw() {
  *
  *  @return The check_type.
  */
-opt<int> const& host::check_type() const throw() {
-  return _check_type;
-}
+opt<int> const& host::check_type() const throw() { return _check_type; }
 
 /**
  *  Get current_attempt.
@@ -414,9 +409,7 @@ opt<uint64_t> const& host::current_problem_id() const throw() {
  *
  *  @return The current_state.
  */
-opt<int> const& host::current_state() const throw() {
-  return _current_state;
-}
+opt<int> const& host::current_state() const throw() { return _current_state; }
 
 /**
  *  Get customvariables.
@@ -468,27 +461,21 @@ opt<bool> const& host::has_been_checked() const throw() {
  *
  *  @return The host_id.
  */
-uint64_t host::host_id() const throw() {
-  return _host_id;
-}
+uint64_t host::host_id() const throw() { return _host_id; }
 
 /**
  *  Get host_name.
  *
  *  @return The host_name.
  */
-std::string const& host::host_name() const throw() {
-  return _host_name;
-}
+std::string const& host::host_name() const throw() { return _host_name; }
 
 /**
  *  Get is_flapping.
  *
  *  @return The is_flapping.
  */
-opt<bool> const& host::is_flapping() const throw() {
-  return _is_flapping;
-}
+opt<bool> const& host::is_flapping() const throw() { return _is_flapping; }
 
 /**
  *  Get last_acknowledgement.
@@ -504,9 +491,7 @@ opt<time_t> const& host::last_acknowledgement() const throw() {
  *
  *  @return The last_check.
  */
-opt<time_t> const& host::last_check() const throw() {
-  return _last_check;
-}
+opt<time_t> const& host::last_check() const throw() { return _last_check; }
 
 /**
  *  Get last_event_id.
@@ -558,9 +543,7 @@ opt<uint64_t> const& host::last_problem_id() const throw() {
  *
  *  @return The last_state.
  */
-opt<time_t> const& host::last_state() const throw() {
-  return _last_state;
-}
+opt<time_t> const& host::last_state() const throw() { return _last_state; }
 
 /**
  *  Get last_state_change.
@@ -594,9 +577,7 @@ opt<time_t> const& host::last_time_unreachable() const throw() {
  *
  *  @return The last_time_up.
  */
-opt<time_t> const& host::last_time_up() const throw() {
-  return _last_time_up;
-}
+opt<time_t> const& host::last_time_up() const throw() { return _last_time_up; }
 
 /**
  *  Get long_plugin_output.
@@ -630,9 +611,7 @@ opt<unsigned long> const& host::modified_attributes() const throw() {
  *
  *  @return The next_check.
  */
-opt<time_t> const& host::next_check() const throw() {
-  return _next_check;
-}
+opt<time_t> const& host::next_check() const throw() { return _next_check; }
 
 /**
  *  Get normal_check_interval.
@@ -765,9 +744,7 @@ opt<std::vector<int> > const& host::state_history() const throw() {
  *
  *  @return The state_type.
  */
-opt<int> const& host::state_type() const throw() {
-  return _state_type;
-}
+opt<int> const& host::state_type() const throw() { return _state_type; }
 
 /**
  *  Set acknowledgement_type.
@@ -1097,8 +1074,9 @@ bool host::_set_last_state_change(time_t value) {
 bool host::_set_last_time_down(time_t value) {
   time_t now = time(nullptr);
   if (value > now) {
-    logger(log_runtime_warning, basic)
-        << "Warning: Host last time down cannot be in the future (bad value: " << value << ")";
+    logger(log_verification_error, basic)
+        << "Warning: Host last time down cannot be in the future (bad value: "
+        << value << ")";
     value = now;
   }
   _last_time_down = value;
@@ -1113,8 +1091,9 @@ bool host::_set_last_time_down(time_t value) {
 bool host::_set_last_time_unreachable(time_t value) {
   time_t now = time(nullptr);
   if (value > now) {
-    logger(log_runtime_warning, basic)
-        << "Warning: Host last time unreachable cannot be in the future (bad value: " << value << ")";
+    logger(log_verification_error, basic)
+        << "Warning: Host last time unreachable cannot be in the future (bad "
+           "value: " << value << ")";
     value = now;
   }
   _last_time_unreachable = value;
@@ -1129,8 +1108,9 @@ bool host::_set_last_time_unreachable(time_t value) {
 bool host::_set_last_time_up(time_t value) {
   time_t now = time(nullptr);
   if (value > now) {
-    logger(log_runtime_warning, basic)
-        << "Warning: Host last time up cannot be in the future (bad value: " << value << ")";
+    logger(log_verification_error, basic)
+        << "Warning: Host last time up cannot be in the future (bad value: "
+        << value << ")";
     value = now;
   }
   _last_time_up = value;
@@ -1333,7 +1313,8 @@ bool host::_set_state_history(std::string const& value) noexcept {
   std::vector<int>& state_history(*_state_history);
   for (std::list<std::string>::const_iterator it(lst_history.begin()),
        end(lst_history.end());
-       it != end && x < MAX_STATE_HISTORY_ENTRIES; ++it) {
+       it != end && x < MAX_STATE_HISTORY_ENTRIES;
+       ++it) {
     int state(0);
     if (!string::to(it->c_str(), state)) {
       _state_history.reset();

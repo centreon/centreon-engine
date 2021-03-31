@@ -114,9 +114,7 @@ service::service() : object(object::service), _next_setter(_setters) {}
  *
  *  @param[in] right Object to copy.
  */
-service::service(service const& right) : object(right) {
-  operator=(right);
-}
+service::service(service const& right) : object(right) { operator=(right); }
 
 /**
  *  Destructor.
@@ -398,9 +396,7 @@ opt<std::string> const& service::check_period() const throw() {
  *
  *  @return The check_type.
  */
-opt<int> const& service::check_type() const throw() {
-  return _check_type;
-}
+opt<int> const& service::check_type() const throw() { return _check_type; }
 
 /**
  *  Get current_attempt.
@@ -506,27 +502,21 @@ opt<bool> const& service::has_been_checked() const throw() {
  *
  *  @return The host_id.
  */
-uint64_t service::host_id() const throw() {
-  return _host_id;
-}
+uint64_t service::host_id() const throw() { return _host_id; }
 
 /**
  *  Get host_name.
  *
  *  @return The host_name.
  */
-std::string const& service::host_name() const throw() {
-  return _host_name;
-}
+std::string const& service::host_name() const throw() { return _host_name; }
 
 /**
  *  Get is_flapping.
  *
  *  @return The is_flapping.
  */
-opt<bool> const& service::is_flapping() const throw() {
-  return _is_flapping;
-}
+opt<bool> const& service::is_flapping() const throw() { return _is_flapping; }
 
 /**
  *  Get last_acknowledgement.
@@ -542,9 +532,7 @@ opt<time_t> const& service::last_acknowledgement() const throw() {
  *
  *  @return The last_check.
  */
-opt<time_t> const& service::last_check() const throw() {
-  return _last_check;
-}
+opt<time_t> const& service::last_check() const throw() { return _last_check; }
 
 /**
  *  Get last_event_id.
@@ -596,9 +584,7 @@ opt<uint64_t> const& service::last_problem_id() const throw() {
  *
  *  @return The last_state.
  */
-opt<time_t> const& service::last_state() const throw() {
-  return _last_state;
-}
+opt<time_t> const& service::last_state() const throw() { return _last_state; }
 
 /**
  *  Get last_state_change.
@@ -677,9 +663,7 @@ opt<unsigned long> const& service::modified_attributes() const throw() {
  *
  *  @return The next_check.
  */
-opt<time_t> const& service::next_check() const throw() {
-  return _next_check;
-}
+opt<time_t> const& service::next_check() const throw() { return _next_check; }
 
 /**
  *  Get normal_check_interval.
@@ -812,9 +796,7 @@ opt<unsigned int> const& service::retry_check_interval() const throw() {
  *
  *  @return The service_id.
  */
-uint64_t service::service_id() const throw() {
-  return _service_id;
-}
+uint64_t service::service_id() const throw() { return _service_id; }
 
 /**
  *  Get service_description.
@@ -839,9 +821,7 @@ opt<std::vector<int> > const& service::state_history() const throw() {
  *
  *  @return The state_type.
  */
-opt<int> const& service::state_type() const throw() {
-  return _state_type;
-}
+opt<int> const& service::state_type() const throw() { return _state_type; }
 
 /**
  *  Set acknowledgement_type.
@@ -1171,8 +1151,9 @@ bool service::_set_last_state_change(time_t value) {
 bool service::_set_last_time_critical(time_t value) {
   time_t now = time(nullptr);
   if (value > now) {
-    logger(log_runtime_warning, basic)
-        << "Warning: Service last time critical cannot be in the future (bad value: " << value << ")";
+    logger(log_verification_error, basic) << "Warning: Service last time "
+                                             "critical cannot be in the future "
+                                             "(bad value: " << value << ")";
     value = now;
   }
   _last_time_critical = value;
@@ -1187,8 +1168,9 @@ bool service::_set_last_time_critical(time_t value) {
 bool service::_set_last_time_ok(time_t value) {
   time_t now = time(nullptr);
   if (value > now) {
-    logger(log_runtime_warning, basic)
-        << "Warning: Service last time ok cannot be in the future (bad value: " << value << ")";
+    logger(log_verification_error, basic)
+        << "Warning: Service last time ok cannot be in the future (bad value: "
+        << value << ")";
     value = now;
   }
   _last_time_ok = value;
@@ -1203,8 +1185,9 @@ bool service::_set_last_time_ok(time_t value) {
 bool service::_set_last_time_unknown(time_t value) {
   time_t now = time(nullptr);
   if (value > now) {
-    logger(log_runtime_warning, basic)
-        << "Warning: Service last time unknown cannot be in the future (bad value: " << value << ")";
+    logger(log_verification_error, basic) << "Warning: Service last time "
+                                             "unknown cannot be in the future "
+                                             "(bad value: " << value << ")";
     value = now;
   }
   _last_time_unknown = value;
@@ -1219,8 +1202,9 @@ bool service::_set_last_time_unknown(time_t value) {
 bool service::_set_last_time_warning(time_t value) {
   time_t now = time(nullptr);
   if (value > now) {
-    logger(log_runtime_warning, basic)
-        << "Warning: Service last time warning cannot be in the future (bad value: " << value << ")";
+    logger(log_verification_error, basic) << "Warning: Service last time "
+                                             "warning cannot be in the future "
+                                             "(bad value: " << value << ")";
     value = now;
   }
   _last_time_warning = value;
