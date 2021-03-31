@@ -21,6 +21,7 @@
 #ifndef CCE_NEBMODS_HH
 #define CCE_NEBMODS_HH
 
+#include "com/centreon/engine/broker/handle.hh"
 #include "com/centreon/engine/nebcallbacks.hh"
 
 // Module Structures
@@ -47,7 +48,9 @@ int neb_load_module(void* mod);
 int neb_reload_all_modules();
 int neb_reload_module(void* mod);
 int neb_unload_all_modules(int flags, int reason);
-int neb_unload_module(void* mod, int flags, int reason);
+int neb_unload_module(com::centreon::engine::broker::handle* mod,
+                      int flags,
+                      int reason);
 
 // Callback Functions
 int neb_make_callbacks(int callback_type, void* data);

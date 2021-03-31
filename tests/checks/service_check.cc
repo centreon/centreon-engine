@@ -20,6 +20,7 @@
 #include <gtest/gtest.h>
 #include <time.h>
 
+#include <fmt/format.h>
 #include <cstring>
 #include <iostream>
 #include <memory>
@@ -133,11 +134,10 @@ TEST_F(ServiceCheck, SimpleCheck) {
 
   set_time(50500);
 
-  std::ostringstream oss;
   std::time_t now{std::time(nullptr)};
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
-  std::string cmd{oss.str()};
+  std::string cmd{fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical",
+      now)};
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
@@ -148,10 +148,9 @@ TEST_F(ServiceCheck, SimpleCheck) {
   set_time(51000);
 
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
@@ -162,10 +161,9 @@ TEST_F(ServiceCheck, SimpleCheck) {
   set_time(51500);
 
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -176,10 +174,9 @@ TEST_F(ServiceCheck, SimpleCheck) {
   set_time(52000);
 
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -191,10 +188,9 @@ TEST_F(ServiceCheck, SimpleCheck) {
 
   time_t previous = now;
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -204,12 +200,9 @@ TEST_F(ServiceCheck, SimpleCheck) {
 
   set_time(53000);
 
-  previous = now;
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok", now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -221,10 +214,8 @@ TEST_F(ServiceCheck, SimpleCheck) {
 
   previous = now;
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok", now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -234,12 +225,10 @@ TEST_F(ServiceCheck, SimpleCheck) {
 
   set_time(54000);
 
-  previous = now;
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;4;service unknown";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;4;service unknown",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
@@ -250,12 +239,9 @@ TEST_F(ServiceCheck, SimpleCheck) {
 
   set_time(54500);
 
-  previous = now;
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok", now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
@@ -265,12 +251,9 @@ TEST_F(ServiceCheck, SimpleCheck) {
 
   set_time(55000);
 
-  previous = now;
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok", now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -290,14 +273,12 @@ TEST_F(ServiceCheck, SimpleCheck) {
  * ------------------------------------------------------
  */
 TEST_F(ServiceCheck, OkCritical) {
-  std::ostringstream oss;
   set_time(55000);
 
   time_t now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok";
-  std::string cmd = oss.str();
+  std::string cmd{fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok",
+      now)};
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -308,10 +289,9 @@ TEST_F(ServiceCheck, OkCritical) {
   set_time(55500);
 
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
@@ -323,10 +303,9 @@ TEST_F(ServiceCheck, OkCritical) {
 
   time_t previous = now;
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
@@ -337,10 +316,9 @@ TEST_F(ServiceCheck, OkCritical) {
   set_time(56500);
 
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -360,10 +338,8 @@ TEST_F(ServiceCheck, OkCritical) {
  * ------------------------------------------------------
  */
 TEST_F(ServiceCheck, OkSoft_Critical) {
-  std::ostringstream oss;
   set_time(55000);
 
-  time_t now = std::time(nullptr);
   _svc->set_current_state(engine::service::state_ok);
   _svc->set_last_state_change(55000);
   _svc->set_current_attempt(2);
@@ -372,11 +348,10 @@ TEST_F(ServiceCheck, OkSoft_Critical) {
 
   set_time(55500);
 
-  now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
-  std::string cmd = oss.str();
+  time_t now = std::time(nullptr);
+  std::string cmd{fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical",
+      now)};
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
@@ -388,10 +363,9 @@ TEST_F(ServiceCheck, OkSoft_Critical) {
 
   time_t previous = now;
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
@@ -402,10 +376,9 @@ TEST_F(ServiceCheck, OkSoft_Critical) {
   set_time(56500);
 
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -429,10 +402,8 @@ TEST_F(ServiceCheck, OkSoft_Critical) {
  * ------------------------------------------------------
  */
 TEST_F(ServiceCheck, OkCriticalStalking) {
-  std::ostringstream oss;
   set_time(55000);
 
-  time_t now = std::time(nullptr);
   _svc->set_current_state(engine::service::state_ok);
   _svc->set_last_state_change(55000);
   _svc->set_current_attempt(2);
@@ -442,12 +413,11 @@ TEST_F(ServiceCheck, OkCriticalStalking) {
 
   set_time(55500);
   testing::internal::CaptureStdout();
-  now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;RAID array "
-         "optimal";
-  std::string cmd = oss.str();
+  time_t now = std::time(nullptr);
+  std::string cmd{fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;RAID array "
+      "optimal",
+      now)};
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
 
@@ -460,11 +430,10 @@ TEST_F(ServiceCheck, OkCriticalStalking) {
   time_t previous = now;
 
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;RAID array "
-         "optimal";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;RAID array "
+      "optimal",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
 
@@ -479,11 +448,10 @@ TEST_F(ServiceCheck, OkCriticalStalking) {
     // When i == 1, the state_critical is soft => no notification
     // When i == 2, the state_critical is hard down => notification
     now = std::time(nullptr);
-    oss.str("");
-    oss << '[' << now << ']'
-        << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;RAID array "
-           "degraded (1 drive bad, 1 hot spare rebuilding)";
-    cmd = oss.str();
+    cmd = fmt::format(
+        "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;RAID array "
+        "degraded (1 drive bad, 1 hot spare rebuilding)",
+        now);
     process_external_command(cmd.c_str());
     checks::checker::instance().reap();
   }
@@ -495,11 +463,10 @@ TEST_F(ServiceCheck, OkCriticalStalking) {
   set_time(57000);
 
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;RAID array "
-         "degraded (2 drives bad, 1 host spare online, 1 hot spare rebuilding)";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;RAID array "
+      "degraded (2 drives bad, 1 host spare online, 1 hot spare rebuilding)",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
 
@@ -512,11 +479,10 @@ TEST_F(ServiceCheck, OkCriticalStalking) {
   previous = now;
 
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;RAID array "
-         "degraded (3 drives bad, 2 hot spares online)";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;RAID array "
+      "degraded (3 drives bad, 2 hot spares online)",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
 
@@ -528,10 +494,10 @@ TEST_F(ServiceCheck, OkCriticalStalking) {
   set_time(58000);
 
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;RAID array failed";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;RAID array "
+      "failed",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
 
@@ -543,10 +509,10 @@ TEST_F(ServiceCheck, OkCriticalStalking) {
   set_time(58500);
 
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;RAID array failed";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;RAID array "
+      "failed",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
 
@@ -558,10 +524,10 @@ TEST_F(ServiceCheck, OkCriticalStalking) {
   set_time(59000);
 
   now = std::time(nullptr);
-  oss.str("");
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;RAID array failed";
-  cmd = oss.str();
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;RAID array "
+      "failed",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
 
@@ -601,12 +567,10 @@ TEST_F(ServiceCheck, CheckRemoveCheck) {
   _svc->set_current_attempt(1);
 
   set_time(50500);
-
-  std::ostringstream oss;
   std::time_t now{std::time(nullptr)};
-  oss << '[' << now << ']'
-      << " PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical";
-  std::string cmd{oss.str()};
+  std::string cmd{fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical",
+      now)};
   process_external_command(cmd.c_str());
 
   /* We simulate a reload that destroyed the service */

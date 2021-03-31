@@ -150,6 +150,7 @@ notifier::notifier(notifier::notifier_type notifier_type,
       _retain_nonstatus_information{retain_nonstatus_information},
       _is_being_freshened{false},
       _is_volatile{is_volatile},
+      _notification_to_interval_on_timeperiod_in{false},
       _notification_number{0},
       _notification{{}},
       _state_history{{}},
@@ -775,7 +776,7 @@ int notifier::notify(notifier::reason_type type,
       get_contacts_to_notify(cat, type, notification_interval, escalated)};
 
   _current_notification_id = _next_notification_id++;
-  std::shared_ptr<notification> notif{std::make_shared<notification>(
+  std::unique_ptr<notification> notif{new notification(
       this, type, not_author, not_data, options, _current_notification_id,
       _notification_number, notification_interval, escalated)};
 
@@ -786,7 +787,7 @@ int notifier::notify(notifier::reason_type type,
     if (!to_notify.empty())
       _last_notification = std::time(nullptr);
 
-    _notification[cat] = notif;
+    _notification[cat] = std::move(notif);
     /* The notification has been sent.
      * Should we increment the notification number? */
     if (cat != cat_normal) {
@@ -1275,7 +1276,7 @@ std::array<int, MAX_STATE_HISTORY_ENTRIES>& notifier::get_state_history() {
   return _state_history;
 }
 
-std::array<std::shared_ptr<notification>, 6> const&
+std::array<std::unique_ptr<notification>, 6> const&
 notifier::get_current_notifications() const {
   return _notification;
 }
@@ -1515,10 +1516,9 @@ void notifier::set_notification(int32_t idx, std::string const& value) {
     }
   }
 
-  std::shared_ptr<notification> notif{
-      std::make_shared<notification>(this, type, author, "", options, id,
-                                     number, interval, escalated, contacts)};
-  _notification[idx] = notif;
+  _notification[idx].reset(new notification(this, type, author, "", options, id,
+                                            number, interval, escalated,
+                                            contacts));
 }
 
 bool notifier::get_is_volatile() const noexcept {

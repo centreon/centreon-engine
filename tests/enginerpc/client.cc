@@ -17,12 +17,12 @@
  *
  */
 
-#include <iostream>
-#include <memory>
 #include <grpc/grpc.h>
 #include <grpcpp/channel.h>
 #include <grpcpp/client_context.h>
 #include <grpcpp/create_channel.h>
+#include <iostream>
+#include <memory>
 #include "engine.grpc.pb.h"
 
 using namespace com::centreon::engine;
@@ -241,7 +241,8 @@ class EngineRPCClient {
   bool ProcessServiceCheckResult(Check const& sc) {
     grpc::ClientContext context;
     CommandSuccess response;
-    grpc::Status status = _stub->ProcessServiceCheckResult(&context, sc, &response);
+    grpc::Status status =
+        _stub->ProcessServiceCheckResult(&context, sc, &response);
     if (!status.ok()) {
       std::cout << "ProcessServiceCheckResult failed." << std::endl;
       return false;
@@ -252,7 +253,8 @@ class EngineRPCClient {
   bool ProcessHostCheckResult(Check const& hc) {
     grpc::ClientContext context;
     CommandSuccess response;
-    grpc::Status status = _stub->ProcessHostCheckResult(&context, hc, &response);
+    grpc::Status status =
+        _stub->ProcessHostCheckResult(&context, hc, &response);
     if (!status.ok()) {
       std::cout << "ProcessHostCheckResult failed." << std::endl;
       return false;
@@ -721,7 +723,6 @@ class EngineRPCClient {
       std::string const& author,
       std::string const& commentdata,
       std::pair<bool, uint32_t> const& entrytime,
-
       CommandSuccess* response) {
     ScheduleDowntimeIdentifier request;
     grpc::ClientContext context;
@@ -800,7 +801,6 @@ class EngineRPCClient {
       std::string const& author,
       std::string const& commentdata,
       std::pair<bool, uint32_t> const& entrytime,
-
       CommandSuccess* response) {
     ScheduleDowntimeIdentifier request;
     grpc::ClientContext context;
@@ -1361,12 +1361,10 @@ class EngineRPCClient {
     }
     return true;
   }
-
-
 };
 
 int main(int argc, char** argv) {
-  int32_t status;
+  int32_t status = 0;
   EngineRPCClient client(grpc::CreateChannel(
       "127.0.0.1:40001", grpc::InsecureChannelCredentials()));
 
@@ -1380,13 +1378,11 @@ int main(int argc, char** argv) {
     Version version;
     status = client.GetVersion(&version) ? 0 : 1;
     std::cout << "GetVersion: " << version.DebugString();
-  }
-  else if (strcmp(argv[1], "GetStats") == 0) {
+  } else if (strcmp(argv[1], "GetStats") == 0) {
     Stats stats;
     status = client.GetStats(&stats) ? 0 : 2;
     std::cout << "GetStats: " << stats.DebugString();
-  }
-  else if (strcmp(argv[1], "ProcessServiceCheckResult") == 0) {
+  } else if (strcmp(argv[1], "ProcessServiceCheckResult") == 0) {
     Check sc;
     sc.set_host_name(argv[2]);
     sc.set_svc_desc(argv[3]);
@@ -1394,28 +1390,24 @@ int main(int argc, char** argv) {
     sc.set_output("Test external command");
     status = client.ProcessServiceCheckResult(sc) ? 0 : 3;
     std::cout << "ProcessServiceCheckResult: " << status << std::endl;
-  }
-  else if (strcmp(argv[1], "ProcessHostCheckResult") == 0) {
+  } else if (strcmp(argv[1], "ProcessHostCheckResult") == 0) {
     Check hc;
     hc.set_host_name(argv[2]);
     hc.set_code(std::stol(argv[3]));
     hc.set_output("Test external command");
     status = client.ProcessHostCheckResult(hc) ? 0 : 4;
     std::cout << "ProcessHostCheckResult: " << status << std::endl;
-  }
-  else if (strcmp(argv[1], "NewThresholdsFile") == 0) {
+  } else if (strcmp(argv[1], "NewThresholdsFile") == 0) {
     ThresholdsFile tf;
     tf.set_filename(argv[2]);
     status = client.NewThresholdsFile(tf) ? 0 : 5;
     std::cout << "NewThresholdsFile: " << status << std::endl;
-  }
-  else if (strcmp(argv[1], "GetHost") == 0) {
+  } else if (strcmp(argv[1], "GetHost") == 0) {
     if (argc != 4) {
       std::cout << "GetHost require arguments : GetHost [mode] [hostname or id]"
                 << std::endl;
       return 1;
-    }
-    else if (strcmp(argv[2], "byhostid") == 0) {
+    } else if (strcmp(argv[2], "byhostid") == 0) {
       EngineHost response;
       uint32_t val = atoi(argv[3]);
       status = client.GetHostByHostId(val, &response) ? 0 : 1;
@@ -1426,8 +1418,7 @@ int main(int argc, char** argv) {
       std::cout << "Host address: " << response.address() << std::endl;
       std::cout << "Host state: " << response.current_state() << std::endl;
       std::cout << "Host period: " << response.check_period() << std::endl;
-    }
-    else if (strcmp(argv[2], "byhostname") == 0) {
+    } else if (strcmp(argv[2], "byhostname") == 0) {
       EngineHost response;
       std::string str(argv[3]);
       status = client.GetHostByHostName(str, &response) ? 0 : 1;
@@ -1438,24 +1429,21 @@ int main(int argc, char** argv) {
       std::cout << "Host address: " << response.address() << std::endl;
       std::cout << "Host state: " << response.current_state() << std::endl;
       std::cout << "Host period: " << response.check_period() << std::endl;
-
     }
-  }
-  else if (strcmp(argv[1], "GetContact") == 0) {
-      if (argc != 3) {
-        std::cout << "GetContact require arguments : GetContact [contactname]"
-                  << std::endl;
-        return 1;
-      }
-      EngineContact response;
-      std::string str = (argv[2]);
-      status = client.GetContact(str, &response) ? 0 : 1;
-      std::cout << "GetContact" << std::endl;
-      std::cout << response.name() << std::endl;
-      std::cout << response.alias() << std::endl;
-      std::cout << response.email() << std::endl;
-  }
-  else if (strcmp(argv[1], "GetService") == 0) {
+  } else if (strcmp(argv[1], "GetContact") == 0) {
+    if (argc != 3) {
+      std::cout << "GetContact require arguments : GetContact [contactname]"
+                << std::endl;
+      return 1;
+    }
+    EngineContact response;
+    std::string str = (argv[2]);
+    status = client.GetContact(str, &response) ? 0 : 1;
+    std::cout << "GetContact" << std::endl;
+    std::cout << response.name() << std::endl;
+    std::cout << response.alias() << std::endl;
+    std::cout << response.email() << std::endl;
+  } else if (strcmp(argv[1], "GetService") == 0) {
     if (argc != 5) {
       std::cout << "GetService require arguments : GetService [mode] [hostname "
                    "or hostid] [servicename or serviceid]"
@@ -1487,57 +1475,47 @@ int main(int argc, char** argv) {
       std::cout << "Service state: " << response.current_state() << std::endl;
       std::cout << "Service period: " << response.check_period() << std::endl;
     }
-  }
-
-  else if (strcmp(argv[1], "GetHostsCount") == 0) {
+  } else if (strcmp(argv[1], "GetHostsCount") == 0) {
     GenericValue response;
     status = client.GetHostsCount(&response) ? 0 : 1;
     std::cout << "GetHostsCount from client" << std::endl;
     std::cout << response.value() << std::endl;
-  }
-  else if (strcmp(argv[1], "GetContactsCount") == 0) {
+  } else if (strcmp(argv[1], "GetContactsCount") == 0) {
     GenericValue response;
     status = client.GetContactsCount(&response) ? 0 : 1;
     std::cout << "GetContactsCount from client" << std::endl;
     std::cout << response.value() << std::endl;
-  }
-  else if (strcmp(argv[1], "GetServicesCount") == 0) {
+  } else if (strcmp(argv[1], "GetServicesCount") == 0) {
     GenericValue response;
     status = client.GetServicesCount(&response) ? 0 : 1;
     std::cout << "GetServicesCount from client" << std::endl;
     std::cout << response.value() << std::endl;
-  }
-  else if (strcmp(argv[1], "GetServiceGroupsCount") == 0) {
+  } else if (strcmp(argv[1], "GetServiceGroupsCount") == 0) {
     GenericValue response;
     status = client.GetServiceGroupsCount(&response) ? 0 : 1;
     std::cout << "GetServiceGroupsCount from client" << std::endl;
     std::cout << response.value() << std::endl;
-  }
-  else if (strcmp(argv[1], "GetContactGroupsCount") == 0) {
+  } else if (strcmp(argv[1], "GetContactGroupsCount") == 0) {
     GenericValue response;
     status = client.GetContactGroupsCount(&response) ? 0 : 1;
     std::cout << "GetContactGroupsCount from client" << std::endl;
     std::cout << response.value() << std::endl;
-  }
-  else if (strcmp(argv[1], "GetHostGroupsCount") == 0) {
+  } else if (strcmp(argv[1], "GetHostGroupsCount") == 0) {
     GenericValue response;
     status = client.GetHostGroupsCount(&response) ? 0 : 1;
     std::cout << "GetHostGroupsCount from client" << std::endl;
     std::cout << response.value() << std::endl;
-  }
-  else if (strcmp(argv[1], "GetServiceDependenciesCount") == 0) {
+  } else if (strcmp(argv[1], "GetServiceDependenciesCount") == 0) {
     GenericValue response;
     status = client.GetServiceDependenciesCount(&response) ? 0 : 1;
     std::cout << "GetServiceDependenciesCount client" << std::endl;
     std::cout << response.value() << std::endl;
-  }
-  else if (strcmp(argv[1], "GetHostDependenciesCount") == 0) {
+  } else if (strcmp(argv[1], "GetHostDependenciesCount") == 0) {
     GenericValue response;
     status = client.GetHostDependenciesCount(&response) ? 0 : 1;
     std::cout << "GetHostDependenciesCount client" << std::endl;
     std::cout << response.value() << std::endl;
-  }
-  else if (strcmp(argv[1], "AddHostComment") == 0) {
+  } else if (strcmp(argv[1], "AddHostComment") == 0) {
     if (argc != 7) {
       std::cout << "AddHostComment require arguments : "
                    "AddHostComment "
@@ -1555,8 +1533,7 @@ int main(int argc, char** argv) {
     status = client.AddHostComment(hostname, entrytime, user, commentdata,
                                    persistent, &response);
     std::cout << "AddHostComment" << std::endl;
-  }
-  else if (strcmp(argv[1], "AddServiceComment") == 0) {
+  } else if (strcmp(argv[1], "AddServiceComment") == 0) {
     if (argc != 8) {
       std::cout << "AddHostComment require arguments : "
                    "AddHostComment "
@@ -1575,8 +1552,7 @@ int main(int argc, char** argv) {
     status = client.AddServiceComment(hostname, svcdsc, entrytime, user,
                                       commentdata, persistent, &response);
     std::cout << "AddServiceComment " << status << std::endl;
-  }
-  else if (strcmp(argv[1], "DeleteAllHostComments") == 0) {
+  } else if (strcmp(argv[1], "DeleteAllHostComments") == 0) {
     if (argc != 4) {
       std::cout << "DeleteAllHostComments require arguments : GetHost [mode] "
                    "[hostname or id]"
@@ -1593,8 +1569,7 @@ int main(int argc, char** argv) {
       status = client.DeleteAllHostCommentsById(hostid, &response);
       std::cout << "DeleteAllHostComments" << std::endl;
     }
-  }
-  else if (strcmp(argv[1], "DeleteAllServiceComments") == 0) {
+  } else if (strcmp(argv[1], "DeleteAllServiceComments") == 0) {
     if (argc != 5) {
       std::cout << "DeleteAllServiceComments require arguments : "
                    "DeleteAllServiceComments "
@@ -1617,8 +1592,7 @@ int main(int argc, char** argv) {
           client.DeleteAllServiceCommentsByIds(hostid, serviceid, &response);
       std::cout << "DeleteAllServiceComments" << std::endl;
     }
-  }
-  else if (strcmp(argv[1], "DeleteComment") == 0) {
+  } else if (strcmp(argv[1], "DeleteComment") == 0) {
     if (argc != 3) {
       std::cout
           << "DeleteComment require arguments : DeleteComment [comment_id]"
@@ -1629,8 +1603,7 @@ int main(int argc, char** argv) {
     uint32_t commentid = atoi(argv[2]);
     status = client.DeleteComment(commentid, &response);
     std::cout << "DeleteComment " << status << std::endl;
-  }
-  else if (strcmp(argv[1], "RemoveHostAcknowledgement") == 0) {
+  } else if (strcmp(argv[1], "RemoveHostAcknowledgement") == 0) {
     if (argc != 4) {
       std::cout << "RemoveHostAcknowledgement require arguments : "
                    "RemoveHostAcknowledgement [mode] [hostname or id]"
@@ -1647,8 +1620,7 @@ int main(int argc, char** argv) {
       status = client.RemoveHostAcknowledgementByIds(hostid, &response);
       std::cout << "RemoveHostAcknowledgement" << std::endl;
     }
-  }
-  else if (strcmp(argv[1], "RemoveServiceAcknowledgement") == 0) {
+  } else if (strcmp(argv[1], "RemoveServiceAcknowledgement") == 0) {
     if (argc != 5) {
       std::cout << "RemoveServiceAcknowledgement require arguments : "
                    "RemoveServiceAcknowledgement "
@@ -1671,8 +1643,7 @@ int main(int argc, char** argv) {
                                                         &response);
       std::cout << "RemoveServiceAcknowledgement" << std::endl;
     }
-  }
-  else if (strcmp(argv[1], "AcknowledgementHostProblem") == 0) {
+  } else if (strcmp(argv[1], "AcknowledgementHostProblem") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     std::string ackauthor(argv[3]);
@@ -1684,8 +1655,7 @@ int main(int argc, char** argv) {
     status = client.AcknowledgementHostProblem(
         hostname, ackauthor, ackdata, type, notify, persistent, &response);
     std::cout << "AcknowledgementHostProblem" << std::endl;
-  }
-  else if (strcmp(argv[1], "AcknowledgementServiceProblem") == 0) {
+  } else if (strcmp(argv[1], "AcknowledgementServiceProblem") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     std::string servicedesc(argv[3]);
@@ -1699,8 +1669,7 @@ int main(int argc, char** argv) {
         hostname, servicedesc, ackauthor, ackdata, type, notify, persistent,
         &response);
     std::cout << "AcknowledgementServiceProblem" << std::endl;
-  }
-  else if (strcmp(argv[1], "ScheduleHostDowntime") == 0) {
+  } else if (strcmp(argv[1], "ScheduleHostDowntime") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     std::pair<bool, uint32_t> start;
@@ -1745,8 +1714,7 @@ int main(int argc, char** argv) {
                                          triggeredby, duration, author,
                                          commentdata, entrytime, &response);
     std::cout << "ScheduleHostDowntime " << status << std::endl;
-  }
-  else if (strcmp(argv[1], "ScheduleServiceDowntime") == 0) {
+  } else if (strcmp(argv[1], "ScheduleServiceDowntime") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     std::string svcdsc(argv[3]);
@@ -1792,8 +1760,7 @@ int main(int argc, char** argv) {
                                             triggeredby, duration, author,
                                             commentdata, entrytime, &response);
     std::cout << "ScheduleServiceDowntime " << status << std::endl;
-  }
-  else if (strcmp(argv[1], "ScheduleHostServicesDowntime") == 0) {
+  } else if (strcmp(argv[1], "ScheduleHostServicesDowntime") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     std::pair<bool, uint32_t> start;
@@ -1838,8 +1805,7 @@ int main(int argc, char** argv) {
         hostname, start, end, fixed, triggeredby, duration, author, commentdata,
         entrytime, &response);
     std::cout << "ScheduleHostServicesDowntime " << status << std::endl;
-  }
-  else if (strcmp(argv[1], "ScheduleHostGroupHostsDowntime") == 0) {
+  } else if (strcmp(argv[1], "ScheduleHostGroupHostsDowntime") == 0) {
     CommandSuccess response;
     std::string hostgroupname(argv[2]);
     std::pair<bool, uint32_t> start;
@@ -1884,8 +1850,7 @@ int main(int argc, char** argv) {
         hostgroupname, start, end, fixed, triggeredby, duration, author,
         commentdata, entrytime, &response);
     std::cout << "ScheduleHostGroupHostsDowntime " << status << std::endl;
-  }
-  else if (strcmp(argv[1], "ScheduleHostGroupServicesDowntime") == 0) {
+  } else if (strcmp(argv[1], "ScheduleHostGroupServicesDowntime") == 0) {
     CommandSuccess response;
     std::string hostgroupname(argv[2]);
     std::pair<bool, uint32_t> start;
@@ -1930,8 +1895,7 @@ int main(int argc, char** argv) {
         hostgroupname, start, end, fixed, triggeredby, duration, author,
         commentdata, entrytime, &response);
     std::cout << "ScheduleHostGroupServicesDowntime " << status << std::endl;
-  }
-  else if (strcmp(argv[1], "ScheduleServiceGroupHostsDowntime") == 0) {
+  } else if (strcmp(argv[1], "ScheduleServiceGroupHostsDowntime") == 0) {
     CommandSuccess response;
     std::string servicegroupname(argv[2]);
     std::pair<bool, uint32_t> start;
@@ -1976,8 +1940,7 @@ int main(int argc, char** argv) {
         servicegroupname, start, end, fixed, triggeredby, duration, author,
         commentdata, entrytime, &response);
     std::cout << "ScheduleServiceGroupHostsDowntime " << status << std::endl;
-  }
-  else if (strcmp(argv[1], "ScheduleServiceGroupServicesDowntime") == 0) {
+  } else if (strcmp(argv[1], "ScheduleServiceGroupServicesDowntime") == 0) {
     CommandSuccess response;
     std::string servicegroupname(argv[2]);
     std::pair<bool, uint32_t> start;
@@ -2022,8 +1985,7 @@ int main(int argc, char** argv) {
         servicegroupname, start, end, fixed, triggeredby, duration, author,
         commentdata, entrytime, &response);
     std::cout << "ScheduleServiceGroupServicesDowntime " << status << std::endl;
-  }
-  else if (strcmp(argv[1], "ScheduleAndPropagateHostDowntime") == 0) {
+  } else if (strcmp(argv[1], "ScheduleAndPropagateHostDowntime") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     std::pair<bool, uint32_t> start;
@@ -2068,8 +2030,7 @@ int main(int argc, char** argv) {
         hostname, start, end, fixed, triggeredby, duration, author, commentdata,
         entrytime, &response);
     std::cout << "ScheduleAndPropagateHostDowntime " << status << std::endl;
-  }
-  else if (strcmp(argv[1], "ScheduleAndPropagateTriggeredHostDowntime") ==
+  } else if (strcmp(argv[1], "ScheduleAndPropagateTriggeredHostDowntime") ==
              0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
@@ -2116,14 +2077,12 @@ int main(int argc, char** argv) {
         entrytime, &response);
     std::cout << "ScheduleAndPropagateTriggeredHostDowntime " << status
               << std::endl;
-  }
-  else if (strcmp(argv[1], "DeleteDowntime") == 0) {
+  } else if (strcmp(argv[1], "DeleteDowntime") == 0) {
     CommandSuccess response;
     uint32_t downtimeid = atoi(argv[2]);
     status = client.DeleteDowntime(downtimeid, &response);
     std::cout << "DeleteDowntime" << std::endl;
-  }
-  else if (strcmp(argv[1], "DeleteDowntimeByHostName") == 0) {
+  } else if (strcmp(argv[1], "DeleteDowntimeByHostName") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     std::string svcdsc;
@@ -2142,8 +2101,7 @@ int main(int argc, char** argv) {
     status = client.DeleteDowntimeByHostName(hostname, svcdsc, start,
                                              commentdata, &response);
     std::cout << "DeleteDowntimeByHostName" << std::endl;
-  }
-  else if (strcmp(argv[1], "DeleteDowntimeByStartTimeComment") == 0) {
+  } else if (strcmp(argv[1], "DeleteDowntimeByStartTimeComment") == 0) {
     CommandSuccess response;
     uint32_t start = atoi(argv[2]);
     std::string commentdata = argv[3];
@@ -2151,8 +2109,7 @@ int main(int argc, char** argv) {
     status =
         client.DeleteDowntimeByStartTimeComment(start, commentdata, &response);
     std::cout << "DeleteDowntimeByStartTimeComment" << std::endl;
-  }
-  else if (strcmp(argv[1], "DeleteDowntimeByHostGroupName") == 0) {
+  } else if (strcmp(argv[1], "DeleteDowntimeByHostGroupName") == 0) {
     CommandSuccess response;
     std::string hostgroupname(argv[2]);
     std::string hostname;
@@ -2173,8 +2130,7 @@ int main(int argc, char** argv) {
     status = client.DeleteDowntimeByHostGroupName(
         hostgroupname, hostname, svcdsc, commentdata, start, &response);
     std::cout << "DeleteDowntimeByHostGroupName" << std::endl;
-  }
-  else if (strcmp(argv[1], "DeleteHostDowntimeFull") == 0) {
+  } else if (strcmp(argv[1], "DeleteHostDowntimeFull") == 0) {
     CommandSuccess response;
     std::string hostname;
     std::string author;
@@ -2221,8 +2177,7 @@ int main(int argc, char** argv) {
         client.DeleteHostDowntimeFull(hostname, start, end, fixed, triggeredby,
                                       duration, author, commentdata, &response);
     std::cout << "DeleteHostDowntimeFull" << std::endl;
-  }
-  else if (strcmp(argv[1], "DeleteServiceDowntimeFull") == 0) {
+  } else if (strcmp(argv[1], "DeleteServiceDowntimeFull") == 0) {
     CommandSuccess response;
     std::string hostname;
     std::string svcdsc;
@@ -2272,8 +2227,7 @@ int main(int argc, char** argv) {
                                               fixed, triggeredby, duration,
                                               author, commentdata, &response);
     std::cout << "DeleteServiceDowntimeFull" << std::endl;
-  }
-  else if (strcmp(argv[1], "DeleteDowntimeByHostName") == 0) {
+  } else if (strcmp(argv[1], "DeleteDowntimeByHostName") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     std::string svcdsc;
@@ -2292,24 +2246,21 @@ int main(int argc, char** argv) {
     status = client.DeleteDowntimeByHostName(hostname, svcdsc, start,
                                              commentdata, &response);
     std::cout << "DeleteDowntimeByHostName" << std::endl;
-  }
-  else if (strcmp(argv[1], "ScheduleHostCheck") == 0) {
+  } else if (strcmp(argv[1], "ScheduleHostCheck") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     uint32_t delaytime = atoi(argv[3]);
 
     status = client.ScheduleHostCheck(hostname, delaytime, &response);
     std::cout << "ScheduleHostCheck" << std::endl;
-  }
-  else if (strcmp(argv[1], "ScheduleHostServiceCheck") == 0) {
+  } else if (strcmp(argv[1], "ScheduleHostServiceCheck") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     uint32_t delaytime = atoi(argv[3]);
 
     status = client.ScheduleHostServiceCheck(hostname, delaytime, &response);
     std::cout << "ScheduleHostServiceCheck" << std::endl;
-  }
-  else if (strcmp(argv[1], "ScheduleServiceCheck") == 0) {
+  } else if (strcmp(argv[1], "ScheduleServiceCheck") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     std::string servicedesc(argv[3]);
@@ -2318,16 +2269,14 @@ int main(int argc, char** argv) {
     status = client.ScheduleServiceCheck(hostname, servicedesc, delaytime,
                                          &response);
     std::cout << "ScheduleServiceCheck" << std::endl;
-  }
-  else if (strcmp(argv[1], "SignalProcess") == 0) {
+  } else if (strcmp(argv[1], "SignalProcess") == 0) {
     CommandSuccess response;
     int process = atoi(argv[2]);
     uint32_t scheduledtime = atoi(argv[3]);
 
     status = client.SignalProcess(process, scheduledtime, &response);
     std::cout << "SignalProcess" << std::endl;
-  }
-  else if (strcmp(argv[1], "DelayHostNotification") == 0) {
+  } else if (strcmp(argv[1], "DelayHostNotification") == 0) {
     if (argc != 5) {
       std::cout
           << "RemoveHostAcknowledgement require arguments : "
@@ -2348,8 +2297,7 @@ int main(int argc, char** argv) {
       status = client.DelayHostNotificationById(hostid, delaytime, &response);
       std::cout << "DelayHostNotification" << std::endl;
     }
-  }
-  else if (strcmp(argv[1], "DelayServiceNotification") == 0) {
+  } else if (strcmp(argv[1], "DelayServiceNotification") == 0) {
     if (argc != 6) {
       std::cout << "RemoveHostAcknowledgement require arguments : "
                    "RemoveHostAcknowledgement [mode] [hostname or id] "
@@ -2373,8 +2321,7 @@ int main(int argc, char** argv) {
                                                     delaytime, &response);
       std::cout << "DelayServiceNotification" << std::endl;
     }
-  }
-  else if (strcmp(argv[1], "ChangeHostObjectIntVar") == 0) {
+  } else if (strcmp(argv[1], "ChangeHostObjectIntVar") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     uint32_t mode = atoi(argv[3]);
@@ -2384,8 +2331,7 @@ int main(int argc, char** argv) {
     status =
         client.ChangeHostObjectIntVar(hostname, mode, intval, dval, &response);
     std::cout << "ChangeHostObjectIntVar" << std::endl;
-  }
-  else if (strcmp(argv[1], "ChangeServiceObjectIntVar") == 0) {
+  } else if (strcmp(argv[1], "ChangeServiceObjectIntVar") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     std::string servicedesc(argv[3]);
@@ -2396,8 +2342,7 @@ int main(int argc, char** argv) {
     status = client.ChangeServiceObjectIntVar(hostname, servicedesc, mode,
                                               intval, dval, &response);
     std::cout << "ChangeServiceObjectIntVar" << std::endl;
-  }
-  else if (strcmp(argv[1], "ChangeContactObjectIntVar") == 0) {
+  } else if (strcmp(argv[1], "ChangeContactObjectIntVar") == 0) {
     CommandSuccess response;
     std::string contactname(argv[2]);
     uint32_t mode = atoi(argv[3]);
@@ -2407,8 +2352,7 @@ int main(int argc, char** argv) {
     status = client.ChangeContactObjectIntVar(contactname, mode, intval, dval,
                                               &response);
     std::cout << "ChangeContactObjectIntVar" << std::endl;
-  }
-  else if (strcmp(argv[1], "ChangeHostObjectCustomVar") == 0) {
+  } else if (strcmp(argv[1], "ChangeHostObjectCustomVar") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     std::string varname(argv[3]);
@@ -2417,8 +2361,7 @@ int main(int argc, char** argv) {
     status = client.ChangeHostObjectCustomVar(hostname, varname, varvalue,
                                               &response);
     std::cout << "ChangeHostObjectCustomVar" << std::endl;
-  }
-  else if (strcmp(argv[1], "ChangeServiceObjectCustomVar") == 0) {
+  } else if (strcmp(argv[1], "ChangeServiceObjectCustomVar") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     std::string servicedesc(argv[3]);
@@ -2428,8 +2371,7 @@ int main(int argc, char** argv) {
     status = client.ChangeServiceObjectCustomVar(hostname, servicedesc, varname,
                                                  varvalue, &response);
     std::cout << "ChangeServiceObjectCustomVar" << std::endl;
-  }
-  else if (strcmp(argv[1], "ChangeContactObjectCustomVar") == 0) {
+  } else if (strcmp(argv[1], "ChangeContactObjectCustomVar") == 0) {
     CommandSuccess response;
     std::string contact(argv[2]);
     std::string varname(argv[3]);
@@ -2438,8 +2380,7 @@ int main(int argc, char** argv) {
     status = client.ChangeContactObjectCustomVar(contact, varname, varvalue,
                                                  &response);
     std::cout << "ChangeContactObjectCustomVar" << std::endl;
-  }
-  else if (strcmp(argv[1], "ChangeHostObjectCharVar") == 0) {
+  } else if (strcmp(argv[1], "ChangeHostObjectCharVar") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     uint32_t mode = atoi(argv[3]);
@@ -2447,8 +2388,7 @@ int main(int argc, char** argv) {
 
     status = client.ChangeHostObjectCharVar(hostname, mode, charval, &response);
     std::cout << "ChangeHostObjectCharVar " << status << std::endl;
-  }
-  else if (strcmp(argv[1], "ChangeServiceObjectCharVar") == 0) {
+  } else if (strcmp(argv[1], "ChangeServiceObjectCharVar") == 0) {
     CommandSuccess response;
     std::string hostname(argv[2]);
     std::string servicedesc(argv[3]);
@@ -2458,8 +2398,7 @@ int main(int argc, char** argv) {
     status = client.ChangeServiceObjectCharVar(hostname, servicedesc, mode,
                                                charval, &response);
     std::cout << "ChangeServiceObjectCharVar " << status << std::endl;
-  }
-  else if (strcmp(argv[1], "ChangeContactObjectCharVar") == 0) {
+  } else if (strcmp(argv[1], "ChangeContactObjectCharVar") == 0) {
     CommandSuccess response;
     std::string contact(argv[2]);
     uint32_t mode = atoi(argv[3]);

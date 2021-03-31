@@ -629,7 +629,7 @@ std::ostream& operator<<(std::ostream& os, host const& obj) {
   {
     std::ostringstream oss;
     for (int i = 0; i < 6; i++) {
-      std::shared_ptr<notification> s{obj.get_current_notifications()[i]};
+      notification* s{obj.get_current_notifications()[i].get()};
       if (s)
         oss << "  notification_" << i << ": " << *s;
     }
@@ -1764,10 +1764,10 @@ bool host::schedule_check(time_t check_time, int options) {
   use_original_event = false;
 
 #ifdef PERFORMANCE_INCREASE_BUT_VERY_BAD_IDEA_INDEED
-  /* WARNING! 1/19/07 on-demand async host checks will end up causing mutliple
-   * scheduled checks of a host to appear in the queue if the code below is
-   * skipped */
-  /* if(use_large_installation_tweaks==false)... skip code below */
+/* WARNING! 1/19/07 on-demand async host checks will end up causing mutliple
+ * scheduled checks of a host to appear in the queue if the code below is
+ * skipped */
+/* if(use_large_installation_tweaks==false)... skip code below */
 #endif
 
   /* see if there are any other scheduled checks of this host in the queue */
@@ -1844,9 +1844,7 @@ bool host::schedule_check(time_t check_time, int options) {
                         0L, nullptr, true, (void*)this, nullptr, options);
 
     events::loop::instance().reschedule_event(new_event, events::loop::low);
-  }
-
-  else {
+  } else {
     /* reset the next check time (it may be out of sync) */
     if (temp_event != nullptr)
       set_next_check(temp_event->run_time);
@@ -3426,8 +3424,7 @@ bool host::authorized_by_dependencies(dependency::types dependency_type) const {
     if (dep->get_fail_on(state))
       return false;
 
-    if (state == host::state_up &&
-        !dep->master_host_ptr->has_been_checked() &&
+    if (state == host::state_up && !dep->master_host_ptr->has_been_checked() &&
         dep->get_fail_on_pending())
       return false;
 

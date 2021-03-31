@@ -60,11 +60,8 @@ class Connector : public ::testing::Test {
     init_config_state();
   }
 
-  void TearDown() override {
-    deinit_config_state();
-  }
+  void TearDown() override { deinit_config_state(); }
 };
-
 
 // Given an empty name
 // When the add_command method is called with it as argument,
@@ -131,7 +128,7 @@ TEST_F(Connector, RunWithConnectorSwitchedOff) {
     nagios_macros macros = nagios_macros();
     cmd_connector.set_listener(lstnr.get());
     cmd_connector.run("commande --kill=1", macros, 1);
-  
+
     int timeout = 0;
     int max_timeout{15};
     while (timeout < max_timeout && lstnr->get_result().output == "") {

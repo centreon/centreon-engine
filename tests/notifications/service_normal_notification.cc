@@ -524,7 +524,9 @@ TEST_F(ServiceNotification, SimpleCheck) {
       _svc->set_last_hard_state(_svc->get_current_state());
 
     std::time_t now{std::time(nullptr)};
-    std::string cmd{fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service down", now)};
+    std::string cmd{fmt::format(
+        "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service down",
+        now)};
     process_external_command(cmd.c_str());
     checks::checker::instance().reap();
   }
@@ -534,7 +536,9 @@ TEST_F(ServiceNotification, SimpleCheck) {
     // When i == 1, the state_up is still here (no change) => no notification
     set_time(56500 + i * 500);
     std::time_t now{std::time(nullptr)};
-    std::string cmd{fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok", now)};
+    std::string cmd{fmt::format(
+        "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok",
+        now)};
     process_external_command(cmd.c_str());
     checks::checker::instance().reap();
   }
@@ -578,8 +582,10 @@ TEST_F(ServiceNotification, CheckFirstNotificationDelay) {
     if (notifier::hard == _svc->get_state_type())
       _svc->set_last_hard_state(_svc->get_current_state());
     std::time_t now{std::time(nullptr)};
-    std::string cmd{fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service "
-                   "critical", now)};
+    std::string cmd{fmt::format(
+        "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service "
+        "critical",
+        now)};
     process_external_command(cmd.c_str());
     checks::checker::instance().reap();
   }
@@ -590,7 +596,9 @@ TEST_F(ServiceNotification, CheckFirstNotificationDelay) {
     std::cout << "New step " << i << std::endl;
     set_time(50600 + i * 60);
     std::time_t now{std::time(nullptr)};
-    std::string cmd{fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok", now)};
+    std::string cmd{fmt::format(
+        "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok",
+        now)};
     process_external_command(cmd.c_str());
     checks::checker::instance().reap();
   }
@@ -882,27 +890,6 @@ TEST_F(ServiceNotification, ServiceEscalationCG) {
                "NOTIFICATIONISESCALATED: 1 SERVICENOTIFICATIONNUMBER: 4",
                step11 + 1)};
   size_t step13{out.find("NOW = 53000", step12 + 1)};
-  size_t step14{
-      out.find("SERVICE NOTIFICATION: "
-               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
-               step13 + 1)};
-  size_t step15{
-      out.find("NOTIFICATIONTYPE: PROBLEM NOTIFICATIONNUMBER: 5 "
-               "NOTIFICATIONISESCALATED: 1 SERVICENOTIFICATIONNUMBER: 5",
-               step14 + 1)};
-  size_t step16{out.find("NOW = 53600", step15 + 1)};
-  size_t step17{
-      out.find("SERVICE NOTIFICATION: "
-               "test_contact;test_host;test_svc;CRITICAL;cmd;service critical",
-               step16 + 1)};
-  size_t step18{
-      out.find("NOTIFICATIONTYPE: PROBLEM NOTIFICATIONNUMBER: 6 "
-               "NOTIFICATIONISESCALATED: 1 SERVICENOTIFICATIONNUMBER: 6",
-               step17 + 1)};
-  size_t step19{
-      out.find("SERVICE NOTIFICATION: test_contact;test_host;test_svc;RECOVERY "
-               "(OK);cmd;service ok",
-               step18 + 1)};
   ASSERT_NE(step13, std::string::npos);
 }
 
@@ -929,7 +916,9 @@ TEST_F(ServiceNotification, NoServiceNotificationWhenHostDown) {
       _svc->set_last_hard_state(_svc->get_current_state());
 
     std::time_t now{std::time(nullptr)};
-    std::string cmd{fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service down", now)};
+    std::string cmd{fmt::format(
+        "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service down",
+        now)};
     process_external_command(cmd.c_str());
     checks::checker::instance().reap();
   }

@@ -38,7 +38,6 @@ extern "C" {
 mmapfile* mmap_fopen(char const* filename);
 int mmap_fclose(mmapfile* temp_mmapfile);
 char* mmap_fgets(mmapfile* temp_mmapfile);
-char* mmap_fgets_multiline(mmapfile* temp_mmapfile);
 
 #ifdef __cplusplus
 }

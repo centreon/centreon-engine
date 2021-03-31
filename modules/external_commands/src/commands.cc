@@ -271,23 +271,19 @@ int cmd_delete_all_comments(int cmd, char* args) {
       temp_service = found->second.get();
     if (temp_service == nullptr)
       return ERROR;
-  }
-  else {
+    /* delete comments */
+    comment::delete_service_comments(temp_service->get_host_id(),
+                                     temp_service->get_service_id());
+  } else {
     /* else verify that the host is valid */
     host_map::const_iterator it(host::hosts.find(host_name));
     if (it != host::hosts.end())
       temp_host = it->second.get();
     if (temp_host == nullptr)
       return ERROR;
-  }
-
-  /* delete comments */
-  if (cmd == CMD_DEL_ALL_HOST_COMMENTS)
+    /* delete comments */
     comment::delete_host_comments(temp_host->get_host_id());
-  else
-    comment::delete_service_comments(temp_service->get_host_id(),
-                                     temp_service->get_service_id());
-
+  }
   return OK;
 }
 
@@ -364,9 +360,7 @@ int cmd_schedule_check(int cmd, char* args) {
       temp_host = it->second.get();
     if (temp_host == nullptr)
       return ERROR;
-  }
-
-  else {
+  } else {
     /* get the service description */
     if ((svc_description = my_strtok(nullptr, ";")) == nullptr)
       return ERROR;
@@ -850,10 +844,8 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     if (it == hostgroup::hostgroups.end() || !it->second)
       return ERROR;
     hg = it->second.get();
-  }
-
-  else if (cmd == CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME ||
-           cmd == CMD_SCHEDULE_SERVICEGROUP_SVC_DOWNTIME) {
+  } else if (cmd == CMD_SCHEDULE_SERVICEGROUP_HOST_DOWNTIME ||
+             cmd == CMD_SCHEDULE_SERVICEGROUP_SVC_DOWNTIME) {
     /* get the servicegroup name */
     if ((servicegroup_name = my_strtok(args, ";")) == nullptr)
       return ERROR;
@@ -1089,17 +1081,14 @@ int cmd_delete_downtime_full(int cmd, char* args) {
   if (*temp_ptr)
     criterias.push_back(downtime_finder::criteria("host", temp_ptr));
   // Service description and downtime type.
-  downtime::type downtime_type;
   if (cmd == CMD_DEL_SVC_DOWNTIME_FULL) {
-    downtime_type = downtime::service_downtime;
     if (!(temp_ptr = my_strtok(nullptr, ";")))
       return ERROR;
     if (*temp_ptr)
       criterias.push_back(downtime_finder::criteria("service", temp_ptr));
-  } else {
-    downtime_type = downtime::host_downtime;
+  } else
     criterias.push_back(downtime_finder::criteria("service", ""));
-  }
+
   // Start time.
   if (!(temp_ptr = my_strtok(nullptr, ";")))
     return ERROR;
@@ -1195,8 +1184,7 @@ int cmd_delete_downtime_by_host_name(int cmd, char* args) {
   deleted =
       downtime_manager::instance()
           .delete_downtime_by_hostname_service_description_start_time_comment(
-              hostname, service_description, start_time,
-              downtime_comment);
+              hostname, service_description, start_time, downtime_comment);
   if (0 == deleted)
     return ERROR;
   return OK;
@@ -1283,8 +1271,7 @@ int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
     deleted =
         downtime_manager::instance()
             .delete_downtime_by_hostname_service_description_start_time_comment(
-                host_name, service_description, start_time,
-                downtime_comment);
+                host_name, service_description, start_time, downtime_comment);
   }
 
   if (0 == deleted)
@@ -1308,8 +1295,8 @@ int cmd_delete_downtime_by_start_time_comment(int cmd, char* args) {
   if (temp_ptr != nullptr)
     /* This will be set to 0 if no start_time is entered or data is bad. */
     start_time.second = strtoul(temp_ptr, &end_ptr, 10);
-    if (temp_ptr != end_ptr)
-      start_time.first = true;
+  if (temp_ptr != end_ptr)
+    start_time.first = true;
 
   /* Get comment - not sure if this should be also tokenised by ; */
   temp_ptr = my_strtok(nullptr, "\n");
@@ -1326,7 +1313,6 @@ int cmd_delete_downtime_by_start_time_comment(int cmd, char* args) {
 
   return OK;
 }
-
 
 /* changes a host or service (integer) variable */
 int cmd_change_object_int_var(int cmd, char* args) {
@@ -2518,9 +2504,9 @@ void acknowledge_host_problem(host* hst,
 
   /* add a comment for the acknowledgement */
   std::shared_ptr<comment> com{
-      new comment(comment::host, comment::acknowledgment,
-                  hst->get_host_id(), 0, current_time, ack_author,
-                  ack_data, persistent, comment::internal, false, (time_t)0)};
+      new comment(comment::host, comment::acknowledgment, hst->get_host_id(), 0,
+                  current_time, ack_author, ack_data, persistent,
+                  comment::internal, false, (time_t)0)};
   comment::comments.insert({com->get_comment_id(), com});
 }
 
@@ -2563,10 +2549,10 @@ void acknowledge_service_problem(service* svc,
   svc->update_status();
 
   /* add a comment for the acknowledgement */
-  std::shared_ptr<comment> com{new comment(
-      comment::service, comment::acknowledgment, svc->get_host_id(),
-      svc->get_service_id(), current_time, ack_author, ack_data, persistent,
-      comment::internal, false, (time_t)0)};
+  std::shared_ptr<comment> com{
+      new comment(comment::service, comment::acknowledgment, svc->get_host_id(),
+                  svc->get_service_id(), current_time, ack_author, ack_data,
+                  persistent, comment::internal, false, (time_t)0)};
   comment::comments.insert({com->get_comment_id(), com});
 }
 

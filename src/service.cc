@@ -295,7 +295,7 @@ std::ostream& operator<<(std::ostream& os,
   {
     std::ostringstream oss;
     for (int i = 0; i < 6; i++) {
-      std::shared_ptr<notification> s{obj.get_current_notifications()[i]};
+      notification* s{obj.get_current_notifications()[i].get()};
       if (s)
         oss << "  notification_" << i << ": " << *s;
     }
@@ -485,8 +485,7 @@ std::ostream& operator<<(std::ostream& os,
      << string::ctime(obj.get_last_time_unknown())
      << "\n  last_time_critical:                   "
      << string::ctime(obj.get_last_time_critical())
-     << "\n  has_been_checked:                     "
-     << obj.has_been_checked()
+     << "\n  has_been_checked:                     " << obj.has_been_checked()
      << "\n  is_being_freshened:                   "
      << obj.get_is_being_freshened()
      << "\n  notified_on_unknown:                  "
@@ -1222,7 +1221,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       first_host_check_initiated = true;
 
       hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
-                             nullptr);
+                           nullptr);
     }
   }
 
@@ -1478,8 +1477,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
              "make sure...";
 
       /* previous logic was to simply run a sync (serial) host check */
-        /* can we use the last cached host state? */
-        /* only use cached host state if no service state change has occurred */
+      /* can we use the last cached host state? */
+      /* only use cached host state if no service state change has occurred */
       if ((!state_change || state_changes_use_cached_state) &&
           hst->has_been_checked() &&
           (static_cast<unsigned long>(current_time - hst->get_last_check()) <=
@@ -1520,7 +1519,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
 
       /* the service wobbled between non-OK states, so check the host... */
       if ((state_change && !state_changes_use_cached_state) &&
-               _last_hard_state != service::state_ok) {
+          _last_hard_state != service::state_ok) {
         logger(dbg_checks, more)
             << "Service wobbled between non-OK states, so we'll recheck"
                " the host state...";
@@ -1816,8 +1815,7 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       queued_check_result->get_early_timeout(),
       queued_check_result->get_return_code(), nullptr, nullptr);
 
-  if (!(reschedule_check && get_should_be_scheduled() &&
-        has_been_checked()) ||
+  if (!(reschedule_check && get_should_be_scheduled() && has_been_checked()) ||
       !get_checks_enabled()) {
     /* set the checked flag */
     set_has_been_checked(true);

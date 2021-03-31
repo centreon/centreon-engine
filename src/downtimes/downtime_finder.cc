@@ -37,7 +37,7 @@ using namespace com::centreon::engine::downtimes;
  *                   on this list.
  */
 downtime_finder::downtime_finder(
-    std::multimap<time_t, std::shared_ptr<downtime>> const& map)
+    std::multimap<time_t, std::shared_ptr<downtime> > const& map)
     : _map(&map) {}
 
 /**
@@ -73,7 +73,7 @@ downtime_finder::result_set downtime_finder::find_matching_all(
     downtime_finder::criteria_set const& criterias) {
   result_set result;
   // Process all downtimes.
-  for (std::pair<time_t, std::shared_ptr<downtime>> const& dt : *_map) {
+  for (std::pair<time_t, std::shared_ptr<downtime> > const& dt : *_map) {
     // Process all criterias.
     bool matched_all{true};
     for (criteria_set::const_iterator it(criterias.begin()),
@@ -89,6 +89,10 @@ downtime_finder::result_set downtime_finder::find_matching_all(
           if (!_match_criteria(
                   *std::static_pointer_cast<service_downtime>(dt.second), *it))
             matched_all = false;
+          break;
+        case downtime::any_downtime:
+          /* This case does not need to be handled here. A downtime concerns a
+           * host or a service. */
           break;
       }
     }

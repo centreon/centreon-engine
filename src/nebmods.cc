@@ -22,7 +22,6 @@
 #include <cerrno>
 #include <cstdio>
 #include <cstdlib>
-#include "com/centreon/engine/broker/handle.hh"
 #include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -200,18 +199,15 @@ int neb_reload_module(void* mod) {
 int neb_unload_all_modules(int flags, int reason) {
   int retval;
   try {
-    broker::loader* loader(&broker::loader::instance());
-    if (loader) {
-      std::list<std::shared_ptr<broker::handle> > modules(
-          loader->get_modules());
-      for (std::list<std::shared_ptr<broker::handle> >::const_iterator
-               it(modules.begin()),
-           end(modules.end());
-           it != end; ++it)
-        neb_unload_module(&**it, flags, reason);
-      loader->unload_modules();
-      logger(dbg_eventbroker, basic) << "All modules got successfully unloaded";
-    }
+    broker::loader& loader(broker::loader::instance());
+    std::list<std::shared_ptr<broker::handle> > modules(loader.get_modules());
+    for (std::list<std::shared_ptr<broker::handle> >::const_iterator
+             it = modules.begin(),
+             end = modules.end();
+         it != end; ++it)
+      neb_unload_module((*it).get(), flags, reason);
+    loader.unload_modules();
+    logger(dbg_eventbroker, basic) << "All modules got successfully unloaded";
     retval = OK;
   } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
@@ -226,16 +222,14 @@ int neb_unload_all_modules(int flags, int reason) {
 }
 
 /* close (unload) a particular module */
-int neb_unload_module(void* mod, int flags, int reason) {
+int neb_unload_module(broker::handle* module, int flags, int reason) {
   (void)flags;
   (void)reason;
 
-  if (mod == NULL)
+  if (module == nullptr)
     return ERROR;
 
-  broker::handle* module = static_cast<broker::handle*>(mod);
-
-  if (module->is_loaded() == false)
+  if (!module->is_loaded())
     return OK;
 
   logger(dbg_eventbroker, basic)
@@ -376,17 +370,15 @@ int neb_register_callback(int callback_type,
 
 /* dregisters all callback functions for a given module */
 int neb_deregister_module_callbacks(void* mod) {
-  nebcallback* temp_callback;
-  nebcallback* next_callback{NULL};
-  int callback_type;
+  nebcallback* next_callback{nullptr};
 
   if (!mod)
     return NEBERROR_NOMODULE;
 
-  for (callback_type = 0; callback_type < NEBCALLBACK_NUMITEMS;
+  for (int callback_type = 0; callback_type < NEBCALLBACK_NUMITEMS;
        callback_type++) {
-    for (temp_callback = neb_callback_list[callback_type];
-         temp_callback != NULL; temp_callback = next_callback) {
+    for (nebcallback* temp_callback = neb_callback_list[callback_type];
+         temp_callback != nullptr; temp_callback = next_callback) {
       next_callback = temp_callback->next;
       if ((void*)temp_callback->module_handle == (void*)mod) {
         union {
@@ -429,13 +421,13 @@ int neb_deregister_callback(int callback_type,
   }
 
   /* we couldn't find the callback */
-  if (temp_callback == NULL)
+  if (temp_callback == nullptr)
     return NEBERROR_CALLBACKNOTFOUND;
 
   else {
     /* only one item in the list */
     if (temp_callback != last_callback->next)
-      neb_callback_list[callback_type] = NULL;
+      neb_callback_list[callback_type] = nullptr;
     else
       last_callback->next = next_callback;
     delete temp_callback;
@@ -471,8 +463,6 @@ int neb_make_callbacks(int callback_type, void* data) {
     } neb;
     neb.data = temp_callback->callback_func;
     cbresult = (*neb.func)(callback_type, data);
-
-    temp_callback = next_callback;
 
     total_callbacks++;
     if (callback_type != NEBCALLBACK_LOG_DATA) {

@@ -963,10 +963,6 @@ void timeperiod::get_next_valid_time_per_timeperiod(time_t preferred_time,
                                                     time_t* valid_time) {
   logger(dbg_functions, basic) << "get_next_valid_time_per_timeperiod()";
 
-  // If no time can be found, the original preferred time will be set
-  // in valid_time at the end of the loop.
-  time_t original_preferred_time(preferred_time);
-
   // Loop through the upcoming year a day at a time.
   time_t earliest_time((time_t)-1);
   time_info ti;

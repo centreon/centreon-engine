@@ -627,6 +627,7 @@ target_link_libraries(cce_core ${json11_LIBS}
   ${PTHREAD_LIBRARIES}
   ${SOCKET_LIBRARIES}
   ${CLIB_LIBRARIES}
+  ${fmt_LIBRARIES}
 )
 
 # centengine target.

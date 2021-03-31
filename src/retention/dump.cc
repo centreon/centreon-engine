@@ -47,8 +47,7 @@ using namespace com::centreon::engine::retention;
  */
 std::ostream& dump::comment(std::ostream& os,
                             com::centreon::engine::comment const& obj) {
-  logger(dbg_functions, basic)
-    << "dump::comment()";
+  logger(dbg_functions, basic) << "dump::comment()";
   char const* host_name;
   char const* service_description;
   if (obj.get_comment_type() == com::centreon::engine::comment::host) {
@@ -58,9 +57,9 @@ std::ostream& dump::comment(std::ostream& os,
     host_name = it->second->get_name().c_str();
     service_description = "";
     os << "hostcomment {\n";
-  }
-  else {
-    auto it = service::services_by_id.find({obj.get_host_id(), obj.get_service_id()});
+  } else {
+    auto it =
+        service::services_by_id.find({obj.get_host_id(), obj.get_service_id()});
     if (it == service::services_by_id.end())
       return os;
     host_name = it->second->get_hostname().c_str();
@@ -108,8 +107,7 @@ std::ostream& dump::comment(std::ostream& os,
  *  @return The output stream.
  */
 std::ostream& dump::comments(std::ostream& os) {
-  logger(dbg_functions, basic)
-    << "dump::comments()";
+  logger(dbg_functions, basic) << "dump::comments()";
   for (comment_map::iterator it(comment::comments.begin()),
        end(comment::comments.end());
        it != end; ++it)
@@ -198,7 +196,7 @@ std::ostream& dump::customvariables(std::ostream& os,
 
 std::ostream& dump::notifications(
     std::ostream& os,
-    std::array<std::shared_ptr<notification>, 6> const& obj) {
+    std::array<std::unique_ptr<notification>, 6> const& obj) {
   for (int i = 0; i < 6; i++)
     if (obj[i])
       os << "notification_" << i << "=" << *obj[i];
@@ -214,8 +212,7 @@ std::ostream& dump::notifications(
  *  @return The output stream.
  */
 std::ostream& dump::scheduled_downtime(std::ostream& os, downtime const& obj) {
-  logger(dbg_functions, basic)
-    << "dump::scheduled_downtime()";
+  logger(dbg_functions, basic) << "dump::scheduled_downtime()";
   obj.retention(os);
   return os;
 }
@@ -228,9 +225,8 @@ std::ostream& dump::scheduled_downtime(std::ostream& os, downtime const& obj) {
  *  @return The output stream.
  */
 std::ostream& dump::downtimes(std::ostream& os) {
-  logger(dbg_functions, basic)
-    << "dump::downtimes()";
-  for (std::pair<time_t, std::shared_ptr<downtime>> const& obj :
+  logger(dbg_functions, basic) << "dump::downtimes()";
+  for (std::pair<time_t, std::shared_ptr<downtime> > const& obj :
        downtimes::downtime_manager::instance().get_scheduled_downtimes())
     dump::scheduled_downtime(os, *obj.second);
   return os;

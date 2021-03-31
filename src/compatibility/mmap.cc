@@ -91,7 +91,7 @@ int mmap_fclose(mmapfile* temp_mmapfile) {
   /* free memory */
   delete[] temp_mmapfile->path;
   delete temp_mmapfile;
-  return (OK);
+  return OK;
 }
 
 /* gets one line of input from an mmap()'ed file */
@@ -126,77 +126,5 @@ char* mmap_fgets(mmapfile* temp_mmapfile) {
 
   /* increment the current line */
   temp_mmapfile->current_line++;
-  return (buf);
-}
-
-/* gets one line of input from an mmap()'ed file (may be contained on more than
- * one line in the source file) */
-char* mmap_fgets_multiline(mmapfile* temp_mmapfile) {
-  if (!temp_mmapfile)
-    return nullptr;
-
-  char* buf(NULL);
-  char* tempbuf(NULL);
-  char* stripped(NULL);
-  int len(0);
-  int len2(0);
-  int end(0);
-
-  while (1) {
-    delete[] tempbuf;
-    tempbuf = NULL;
-
-    if ((tempbuf = mmap_fgets(temp_mmapfile)) == NULL)
-      break;
-
-    if (buf == NULL) {
-      len = strlen(tempbuf);
-      buf = new char[len + 1];
-      memcpy(buf, tempbuf, len);
-      buf[len] = '\x0';
-    } else {
-      /* strip leading white space from continuation lines */
-      stripped = tempbuf;
-      while (*stripped == ' ' || *stripped == '\t')
-        stripped++;
-      len = strlen(stripped);
-      len2 = strlen(buf);
-      buf = resize_string(buf, len + len2 + 1);
-      strcat(buf, stripped);
-      len += len2;
-      buf[len] = '\x0';
-    }
-
-    if (len == 0)
-      break;
-
-    /* handle Windows/DOS CR/LF */
-    if (len >= 2 && buf[len - 2] == '\r')
-      end = len - 3;
-    /* normal Unix LF */
-    else if (len >= 1 && buf[len - 1] == '\n')
-      end = len - 2;
-    else
-      end = len - 1;
-
-    /* two backslashes found. unescape first backslash first and break */
-    if (end >= 1 && buf[end - 1] == '\\' && buf[end] == '\\') {
-      buf[end] = '\n';
-      buf[end + 1] = '\x0';
-      break;
-    }
-
-    /* one backslash found. continue reading the next line */
-    else if (end > 0 && buf[end] == '\\')
-      buf[end] = '\x0';
-
-    /* no continuation marker was found, so break */
-    else
-      break;
-  }
-
-  delete[] tempbuf;
-  tempbuf = NULL;
-
-  return (buf);
+  return buf;
 }
