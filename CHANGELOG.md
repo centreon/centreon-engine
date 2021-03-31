@@ -4,6 +4,11 @@
 
 ### Bugfixes
 
+*Retention*
+
+Last time changes are checked when they are read from the retention files. So
+if they have no meaning, they are replaced by a default value.
+
 *Host/service status*
 
 They could be sent twice. This new version fixes that.
@@ -16,9 +21,13 @@ $HOSTGROUPACTIONURL*$, $SERVICEGROUPNOTESURL*$, $SERVICEGROUPACTIONURL*$.
 
 *Notification Period*
 
-the timeperiod are now filtered for the contact 
-and now don't push the notification with time period empty.
-these macro are now available without parameters ($HOSTGROUPNAME$, $CONTACTGROUPNAME$, $SERVICEGROUPNAME$)
+Timeperiods are now filtered for contacts
+and notifications are not pushed with an empty one.
+
+*Macros*
+
+These macros are now available without parameters
+($HOSTGROUPNAME$, $CONTACTGROUPNAME$, $SERVICEGROUPNAME$)
 
 *Connectors*
 
