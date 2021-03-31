@@ -71,19 +71,29 @@ std::ostream& dump::comment(std::ostream& os,
     os << "service_description=" << service_description << "\n";
   os << "author=" << obj.get_author()
      << "\n"
-        "comment_data=" << obj.get_comment_data()
+        "comment_data="
+     << obj.get_comment_data()
      << "\n"
-        "comment_id=" << obj.get_comment_id()
+        "comment_id="
+     << obj.get_comment_id()
      << "\n"
-        "entry_time=" << static_cast<unsigned long>(obj.get_entry_time())
+        "entry_time="
+     << static_cast<unsigned long>(obj.get_entry_time())
      << "\n"
-        "expire_time=" << static_cast<unsigned long>(obj.get_expire_time())
+        "expire_time="
+     << static_cast<unsigned long>(obj.get_expire_time())
      << "\n"
-        "expires=" << obj.get_expires() << "\n"
-                                           "persistent=" << obj.get_persistent()
+        "expires="
+     << obj.get_expires()
      << "\n"
-        "source=" << obj.get_source() << "\n"
-                                         "entry_type=" << obj.get_entry_type()
+        "persistent="
+     << obj.get_persistent()
+     << "\n"
+        "source="
+     << obj.get_source()
+     << "\n"
+        "entry_type="
+     << obj.get_entry_type()
      << "\n"
         "}\n";
   return os;
@@ -100,8 +110,7 @@ std::ostream& dump::comments(std::ostream& os) {
   logger(dbg_functions, basic) << "dump::comments()";
   for (comment_map::iterator it(comment::comments.begin()),
        end(comment::comments.end());
-       it != end;
-       ++it)
+       it != end; ++it)
     dump::comment(os, *it->second);
   return os;
 }
@@ -117,11 +126,14 @@ std::ostream& dump::comments(std::ostream& os) {
 std::ostream& dump::contact(std::ostream& os,
                             com::centreon::engine::contact const& obj) {
   os << "contact {\n"
-        "contact_name=" << obj.get_name()
+        "contact_name="
+     << obj.get_name()
      << "\n"
-        "host_notification_period=" << obj.get_host_notification_period()
+        "host_notification_period="
+     << obj.get_host_notification_period()
      << "\n"
-        "host_notifications_enabled=" << obj.get_host_notifications_enabled()
+        "host_notifications_enabled="
+     << obj.get_host_notifications_enabled()
      << "\n"
         "last_host_notification="
      << static_cast<unsigned long>(obj.get_last_host_notification())
@@ -129,7 +141,8 @@ std::ostream& dump::contact(std::ostream& os,
         "last_service_notification="
      << static_cast<unsigned long>(obj.get_last_service_notification())
      << "\n"
-        "modified_attributes=" << (obj.get_modified_attributes() & ~0L)
+        "modified_attributes="
+     << (obj.get_modified_attributes() & ~0L)
      << "\n"
         "modified_host_attributes="
      << (obj.get_modified_host_attributes() &
@@ -139,7 +152,8 @@ std::ostream& dump::contact(std::ostream& os,
      << (obj.get_modified_service_attributes() &
          ~config->retained_contact_service_attribute_mask())
      << "\n"
-        "service_notification_period=" << obj.get_service_notification_period()
+        "service_notification_period="
+     << obj.get_service_notification_period()
      << "\n"
         "service_notifications_enabled="
      << obj.get_service_notifications_enabled() << "\n";
@@ -158,8 +172,7 @@ std::ostream& dump::contact(std::ostream& os,
 std::ostream& dump::contacts(std::ostream& os) {
   for (contact_map::const_iterator it{contact::contacts.begin()},
        end{contact::contacts.end()};
-       it != end;
-       ++it)
+       it != end; ++it)
     dump::contact(os, *it->second.get());
 
   return os;
@@ -247,55 +260,80 @@ std::ostream& dump::header(std::ostream& os) {
 std::ostream& dump::host(std::ostream& os,
                          com::centreon::engine::host const& obj) {
   os << "host {\n"
-        "host_name=" << obj.get_name() << "\n"
-                                          "host_id=" << obj.get_host_id()
+        "host_name="
+     << obj.get_name()
      << "\n"
-        "acknowledgement_type=" << obj.get_acknowledgement_type()
+        "host_id="
+     << obj.get_host_id()
      << "\n"
-        "active_checks_enabled=" << obj.get_checks_enabled()
+        "acknowledgement_type="
+     << obj.get_acknowledgement_type()
      << "\n"
-        "check_command=" << obj.get_check_command()
+        "active_checks_enabled="
+     << obj.get_checks_enabled()
      << "\n"
-        "check_execution_time=" << std::setprecision(3) << std::fixed
-     << obj.get_execution_time() << "\n"
-                                    "check_latency=" << std::setprecision(3)
-     << std::fixed << obj.get_latency()
+        "check_command="
+     << obj.get_check_command()
      << "\n"
-        "check_options=" << obj.get_check_options()
+        "check_execution_time="
+     << std::setprecision(3) << std::fixed << obj.get_execution_time()
      << "\n"
-        "check_period=" << obj.get_check_period()
+        "check_latency="
+     << std::setprecision(3) << std::fixed << obj.get_latency()
      << "\n"
-        "check_type=" << obj.get_check_type()
+        "check_options="
+     << obj.get_check_options()
      << "\n"
-        "current_attempt=" << obj.get_current_attempt()
+        "check_period="
+     << obj.get_check_period()
      << "\n"
-        "current_event_id=" << obj.get_current_event_id()
+        "check_type="
+     << obj.get_check_type()
      << "\n"
-        "current_notification_id=" << obj.get_current_notification_id()
+        "current_attempt="
+     << obj.get_current_attempt()
      << "\n"
-        "current_notification_number=" << obj.get_notification_number()
+        "current_event_id="
+     << obj.get_current_event_id()
      << "\n"
-        "current_problem_id=" << obj.get_current_problem_id()
+        "current_notification_id="
+     << obj.get_current_notification_id()
      << "\n"
-        "current_state=" << obj.get_current_state()
+        "current_notification_number="
+     << obj.get_notification_number()
      << "\n"
-        "event_handler=" << obj.get_event_handler()
+        "current_problem_id="
+     << obj.get_current_problem_id()
      << "\n"
-        "event_handler_enabled=" << obj.get_event_handler_enabled()
+        "current_state="
+     << obj.get_current_state()
      << "\n"
-        "flap_detection_enabled=" << obj.get_flap_detection_enabled()
+        "event_handler="
+     << obj.get_event_handler()
      << "\n"
-        "has_been_checked=" << obj.has_been_checked()
+        "event_handler_enabled="
+     << obj.get_event_handler_enabled()
      << "\n"
-        "is_flapping=" << obj.get_is_flapping()
+        "flap_detection_enabled="
+     << obj.get_flap_detection_enabled()
      << "\n"
-        "last_acknowledgement=" << obj.get_last_acknowledgement()
+        "has_been_checked="
+     << obj.has_been_checked()
      << "\n"
-        "last_check=" << static_cast<unsigned long>(obj.get_last_check())
+        "is_flapping="
+     << obj.get_is_flapping()
      << "\n"
-        "last_event_id=" << obj.get_last_event_id()
+        "last_acknowledgement="
+     << obj.get_last_acknowledgement()
      << "\n"
-        "last_hard_state=" << obj.get_last_hard_state()
+        "last_check="
+     << static_cast<unsigned long>(obj.get_last_check())
+     << "\n"
+        "last_event_id="
+     << obj.get_last_event_id()
+     << "\n"
+        "last_hard_state="
+     << obj.get_last_hard_state()
      << "\n"
         "last_hard_state_change="
      << static_cast<unsigned long>(obj.get_last_hard_state_change())
@@ -303,10 +341,13 @@ std::ostream& dump::host(std::ostream& os,
         "last_notification="
      << static_cast<unsigned long>(obj.get_last_notification())
      << "\n"
-        "last_problem_id=" << obj.get_last_problem_id()
+        "last_problem_id="
+     << obj.get_last_problem_id()
      << "\n"
-        "last_state=" << obj.get_last_state() << "\n"
-                                                 "last_state_change="
+        "last_state="
+     << obj.get_last_state()
+     << "\n"
+        "last_state_change="
      << static_cast<unsigned long>(obj.get_last_state_change())
      << "\n"
         "last_time_down="
@@ -315,52 +356,69 @@ std::ostream& dump::host(std::ostream& os,
         "last_time_unreachable="
      << static_cast<unsigned long>(obj.get_last_time_unreachable())
      << "\n"
-        "last_time_up=" << static_cast<unsigned long>(obj.get_last_time_up())
+        "last_time_up="
+     << static_cast<unsigned long>(obj.get_last_time_up())
      << "\n"
-        "long_plugin_output=" << obj.get_long_plugin_output()
+        "long_plugin_output="
+     << obj.get_long_plugin_output()
      << "\n"
-        "max_attempts=" << obj.get_max_attempts()
+        "max_attempts="
+     << obj.get_max_attempts()
      << "\n"
-        "modified_attributes=" << (obj.get_modified_attributes() &
-                                   ~config->retained_host_attribute_mask())
+        "modified_attributes="
+     << (obj.get_modified_attributes() &
+         ~config->retained_host_attribute_mask())
      << "\n"
-        "next_check=" << static_cast<unsigned long>(obj.get_next_check())
+        "next_check="
+     << static_cast<unsigned long>(obj.get_next_check())
      << "\n"
-        "normal_check_interval=" << obj.get_check_interval()
+        "normal_check_interval="
+     << obj.get_check_interval()
      << "\n"
-        "notification_period=" << obj.get_notification_period()
+        "notification_period="
+     << obj.get_notification_period()
      << "\n"
-        "notifications_enabled=" << obj.get_notifications_enabled()
+        "notifications_enabled="
+     << obj.get_notifications_enabled()
      << "\n"
-        "notified_on_down=" << obj.get_notified_on(notifier::down)
+        "notified_on_down="
+     << obj.get_notified_on(notifier::down)
      << "\n"
-        "notified_on_unreachable=" << obj.get_notified_on(notifier::unreachable)
+        "notified_on_unreachable="
+     << obj.get_notified_on(notifier::unreachable)
      << "\n"
-        "obsess_over_host=" << obj.get_obsess_over()
+        "obsess_over_host="
+     << obj.get_obsess_over()
      << "\n"
-        "passive_checks_enabled=" << obj.get_accept_passive_checks()
+        "passive_checks_enabled="
+     << obj.get_accept_passive_checks()
      << "\n"
-        "percent_state_change=" << std::setprecision(2) << std::fixed
-     << obj.get_percent_state_change()
+        "percent_state_change="
+     << std::setprecision(2) << std::fixed << obj.get_percent_state_change()
      << "\n"
-        "performance_data=" << obj.get_perf_data()
+        "performance_data="
+     << obj.get_perf_data()
      << "\n"
-        "plugin_output=" << obj.get_plugin_output()
+        "plugin_output="
+     << obj.get_plugin_output()
      << "\n"
         "problem_has_been_acknowledged="
      << obj.get_problem_has_been_acknowledged()
      << "\n"
-        "process_performance_data=" << obj.get_process_performance_data()
+        "process_performance_data="
+     << obj.get_process_performance_data()
      << "\n"
-        "retry_check_interval=" << obj.get_check_interval()
+        "retry_check_interval="
+     << obj.get_check_interval()
      << "\n"
-        "state_type=" << obj.get_state_type() << "\n";
+        "state_type="
+     << obj.get_state_type() << "\n";
 
   os << "state_history=";
   for (unsigned int x(0); x < obj.get_state_history().size(); ++x)
     os << (x > 0 ? "," : "")
-       << obj.get_state_history()
-              [(x + obj.get_state_history_index()) % MAX_STATE_HISTORY_ENTRIES];
+       << obj.get_state_history()[(x + obj.get_state_history_index()) %
+                                  MAX_STATE_HISTORY_ENTRIES];
   os << "\n";
 
   dump::notifications(os, obj.get_current_notifications());
@@ -379,8 +437,7 @@ std::ostream& dump::host(std::ostream& os,
 std::ostream& dump::hosts(std::ostream& os) {
   for (host_map::iterator it(com::centreon::engine::host::hosts.begin()),
        end(com::centreon::engine::host::hosts.end());
-       it != end;
-       ++it)
+       it != end; ++it)
     dump::host(os, *it->second);
   return os;
 }
@@ -394,8 +451,10 @@ std::ostream& dump::hosts(std::ostream& os) {
  */
 std::ostream& dump::info(std::ostream& os) {
   os << "info {\n"
-        "created=" << static_cast<unsigned long>(time(NULL)) << "\n"
-                                                                "}\n";
+        "created="
+     << static_cast<unsigned long>(time(NULL))
+     << "\n"
+        "}\n";
   return os;
 }
 
@@ -408,19 +467,26 @@ std::ostream& dump::info(std::ostream& os) {
  */
 std::ostream& dump::program(std::ostream& os) {
   os << "program {\n"
-        "active_host_checks_enabled=" << config->execute_host_checks()
+        "active_host_checks_enabled="
+     << config->execute_host_checks()
      << "\n"
-        "active_service_checks_enabled=" << config->execute_service_checks()
+        "active_service_checks_enabled="
+     << config->execute_service_checks()
      << "\n"
-        "check_host_freshness=" << config->check_host_freshness()
+        "check_host_freshness="
+     << config->check_host_freshness()
      << "\n"
-        "check_service_freshness=" << config->check_service_freshness()
+        "check_service_freshness="
+     << config->check_service_freshness()
      << "\n"
-        "enable_event_handlers=" << config->enable_event_handlers()
+        "enable_event_handlers="
+     << config->enable_event_handlers()
      << "\n"
-        "enable_flap_detection=" << config->enable_flap_detection()
+        "enable_flap_detection="
+     << config->enable_flap_detection()
      << "\n"
-        "enable_notifications=" << config->enable_notifications()
+        "enable_notifications="
+     << config->enable_notifications()
      << "\n"
         "global_host_event_handler="
      << config->global_host_event_handler().c_str()
@@ -436,24 +502,32 @@ std::ostream& dump::program(std::ostream& os) {
      << (modified_service_process_attributes &
          ~config->retained_process_host_attribute_mask())
      << "\n"
-        "next_comment_id=" << comment::get_next_comment_id()
+        "next_comment_id="
+     << comment::get_next_comment_id()
      << "\n"
-        "next_event_id=" << next_event_id
+        "next_event_id="
+     << next_event_id
      << "\n"
-        "next_notification_id=" << next_notification_id
+        "next_notification_id="
+     << next_notification_id
      << "\n"
-        "next_problem_id=" << next_problem_id
+        "next_problem_id="
+     << next_problem_id
      << "\n"
-        "obsess_over_hosts=" << config->obsess_over_hosts()
+        "obsess_over_hosts="
+     << config->obsess_over_hosts()
      << "\n"
-        "obsess_over_services=" << config->obsess_over_services()
+        "obsess_over_services="
+     << config->obsess_over_services()
      << "\n"
-        "passive_host_checks_enabled=" << config->accept_passive_host_checks()
+        "passive_host_checks_enabled="
+     << config->accept_passive_host_checks()
      << "\n"
         "passive_service_checks_enabled="
      << config->accept_passive_service_checks()
      << "\n"
-        "process_performance_data=" << config->process_performance_data()
+        "process_performance_data="
+     << config->process_performance_data()
      << "\n"
         "}\n";
   return os;
@@ -471,8 +545,8 @@ bool dump::save(std::string const& path) {
     return true;
 
   // send data to event broker
-  broker_retention_data(
-      NEBTYPE_RETENTIONDATA_STARTSAVE, NEBFLAG_NONE, NEBATTR_NONE, NULL);
+  broker_retention_data(NEBTYPE_RETENTIONDATA_STARTSAVE, NEBFLAG_NONE,
+                        NEBATTR_NONE, NULL);
 
   bool ret(false);
   try {
@@ -490,14 +564,13 @@ bool dump::save(std::string const& path) {
     dump::downtimes(stream);
 
     ret = true;
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     logger(log_runtime_error, basic) << e.what();
   }
 
   // send data to event broker.
-  broker_retention_data(
-      NEBTYPE_RETENTIONDATA_ENDSAVE, NEBFLAG_NONE, NEBATTR_NONE, NULL);
+  broker_retention_data(NEBTYPE_RETENTIONDATA_ENDSAVE, NEBFLAG_NONE,
+                        NEBATTR_NONE, NULL);
   return ret;
 }
 
@@ -515,63 +588,89 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
     hostname = obj.get_host_ptr()->get_name();
 
   os << "service {\n"
-        "host_name=" << obj.get_hostname()
+        "host_name="
+     << obj.get_hostname()
      << "\n"
-        "service_description=" << obj.get_description() << "\n"
-                                                           "host_id="
+        "service_description="
+     << obj.get_description()
+     << "\n"
+        "host_id="
      << service::services[{hostname, obj.get_description()}]->get_host_id()
      << "\n"
         "service_id="
      << service::services[{hostname, obj.get_description()}]->get_service_id()
      << "\n"
-        "acknowledgement_type=" << obj.get_acknowledgement_type()
+        "acknowledgement_type="
+     << obj.get_acknowledgement_type()
      << "\n"
-        "active_checks_enabled=" << obj.get_checks_enabled()
+        "active_checks_enabled="
+     << obj.get_checks_enabled()
      << "\n"
-        "check_command=" << obj.get_check_command()
+        "check_command="
+     << obj.get_check_command()
      << "\n"
-        "check_execution_time=" << std::setprecision(3) << std::fixed
-     << obj.get_execution_time() << "\n"
-                                    "check_flapping_recovery_notification="
+        "check_execution_time="
+     << std::setprecision(3) << std::fixed << obj.get_execution_time()
+     << "\n"
+        "check_flapping_recovery_notification="
      << obj.get_check_flapping_recovery_notification()
      << "\n"
-        "check_latency=" << std::setprecision(3) << std::fixed
-     << obj.get_latency() << "\n"
-                             "check_options=" << obj.get_check_options()
+        "check_latency="
+     << std::setprecision(3) << std::fixed << obj.get_latency()
      << "\n"
-        "check_period=" << obj.get_check_period()
+        "check_options="
+     << obj.get_check_options()
      << "\n"
-        "check_type=" << obj.get_check_type()
+        "check_period="
+     << obj.get_check_period()
      << "\n"
-        "current_attempt=" << obj.get_current_attempt()
+        "check_type="
+     << obj.get_check_type()
      << "\n"
-        "current_event_id=" << obj.get_current_event_id()
+        "current_attempt="
+     << obj.get_current_attempt()
      << "\n"
-        "current_notification_id=" << obj.get_current_notification_id()
+        "current_event_id="
+     << obj.get_current_event_id()
      << "\n"
-        "current_notification_number=" << obj.get_notification_number()
+        "current_notification_id="
+     << obj.get_current_notification_id()
      << "\n"
-        "current_problem_id=" << obj.get_current_problem_id()
+        "current_notification_number="
+     << obj.get_notification_number()
      << "\n"
-        "current_state=" << obj.get_current_state()
+        "current_problem_id="
+     << obj.get_current_problem_id()
      << "\n"
-        "event_handler=" << obj.get_event_handler()
+        "current_state="
+     << obj.get_current_state()
      << "\n"
-        "event_handler_enabled=" << obj.get_event_handler_enabled()
+        "event_handler="
+     << obj.get_event_handler()
      << "\n"
-        "flap_detection_enabled=" << obj.get_flap_detection_enabled()
+        "event_handler_enabled="
+     << obj.get_event_handler_enabled()
      << "\n"
-        "has_been_checked=" << obj.has_been_checked()
+        "flap_detection_enabled="
+     << obj.get_flap_detection_enabled()
      << "\n"
-        "is_flapping=" << obj.get_is_flapping()
+        "has_been_checked="
+     << obj.has_been_checked()
      << "\n"
-        "last_acknowledgement=" << obj.get_last_acknowledgement()
+        "is_flapping="
+     << obj.get_is_flapping()
      << "\n"
-        "last_check=" << static_cast<unsigned long>(obj.get_last_check())
+        "last_acknowledgement="
+     << obj.get_last_acknowledgement()
      << "\n"
-        "last_event_id=" << obj.get_last_event_id()
+        "last_check="
+     << static_cast<unsigned long>(obj.get_last_check())
      << "\n"
-        "last_hard_state=" << obj.get_last_hard_state()
+        "last_event_id="
+     << obj.get_last_event_id()
+     << "\n"
+        "last_hard_state="
+     << obj.get_last_hard_state()
      << "\n"
         "last_hard_state_change="
      << static_cast<unsigned long>(obj.get_last_hard_state_change())
@@ -579,16 +678,20 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
         "last_notification="
      << static_cast<unsigned long>(obj.get_last_notification())
      << "\n"
-        "last_problem_id=" << obj.get_last_problem_id()
+        "last_problem_id="
+     << obj.get_last_problem_id()
      << "\n"
-        "last_state=" << obj.get_last_state() << "\n"
-                                                 "last_state_change="
+        "last_state="
+     << obj.get_last_state()
+     << "\n"
+        "last_state_change="
      << static_cast<unsigned long>(obj.get_last_state_change())
      << "\n"
         "last_time_critical="
      << static_cast<unsigned long>(obj.get_last_time_critical())
      << "\n"
-        "last_time_ok=" << static_cast<unsigned long>(obj.get_last_time_ok())
+        "last_time_ok="
+     << static_cast<unsigned long>(obj.get_last_time_ok())
      << "\n"
         "last_time_unknown="
      << static_cast<unsigned long>(obj.get_last_time_unknown())
@@ -596,52 +699,69 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
         "last_time_warning="
      << static_cast<unsigned long>(obj.get_last_time_warning())
      << "\n"
-        "long_plugin_output=" << obj.get_long_plugin_output()
+        "long_plugin_output="
+     << obj.get_long_plugin_output()
      << "\n"
-        "max_attempts=" << obj.get_max_attempts()
+        "max_attempts="
+     << obj.get_max_attempts()
      << "\n"
-        "modified_attributes=" << (obj.get_modified_attributes() &
-                                   ~config->retained_host_attribute_mask())
+        "modified_attributes="
+     << (obj.get_modified_attributes() &
+         ~config->retained_host_attribute_mask())
      << "\n"
-        "next_check=" << static_cast<unsigned long>(obj.get_next_check())
+        "next_check="
+     << static_cast<unsigned long>(obj.get_next_check())
      << "\n"
-        "normal_check_interval=" << obj.get_check_interval()
+        "normal_check_interval="
+     << obj.get_check_interval()
      << "\n"
-        "notification_period=" << obj.get_notification_period()
+        "notification_period="
+     << obj.get_notification_period()
      << "\n"
-        "notifications_enabled=" << obj.get_notifications_enabled()
+        "notifications_enabled="
+     << obj.get_notifications_enabled()
      << "\n"
-        "notified_on_critical=" << obj.get_notified_on(notifier::critical)
+        "notified_on_critical="
+     << obj.get_notified_on(notifier::critical)
      << "\n"
-        "notified_on_unknown=" << obj.get_notified_on(notifier::unknown)
+        "notified_on_unknown="
+     << obj.get_notified_on(notifier::unknown)
      << "\n"
-        "notified_on_warning=" << obj.get_notified_on(notifier::warning)
+        "notified_on_warning="
+     << obj.get_notified_on(notifier::warning)
      << "\n"
-        "obsess_over_service=" << obj.get_obsess_over()
+        "obsess_over_service="
+     << obj.get_obsess_over()
      << "\n"
-        "passive_checks_enabled=" << obj.get_accept_passive_checks()
+        "passive_checks_enabled="
+     << obj.get_accept_passive_checks()
      << "\n"
-        "percent_state_change=" << std::setprecision(2) << std::fixed
-     << obj.get_percent_state_change()
+        "percent_state_change="
+     << std::setprecision(2) << std::fixed << obj.get_percent_state_change()
      << "\n"
-        "performance_data=" << obj.get_perf_data()
+        "performance_data="
+     << obj.get_perf_data()
      << "\n"
-        "plugin_output=" << obj.get_plugin_output()
+        "plugin_output="
+     << obj.get_plugin_output()
      << "\n"
         "problem_has_been_acknowledged="
      << obj.get_problem_has_been_acknowledged()
      << "\n"
-        "process_performance_data=" << obj.get_process_performance_data()
+        "process_performance_data="
+     << obj.get_process_performance_data()
      << "\n"
-        "retry_check_interval=" << obj.get_retry_interval()
+        "retry_check_interval="
+     << obj.get_retry_interval()
      << "\n"
-        "state_type=" << obj.get_state_type() << "\n";
+        "state_type="
+     << obj.get_state_type() << "\n";
 
   os << "state_history=";
   for (unsigned int x(0); x < MAX_STATE_HISTORY_ENTRIES; ++x)
     os << (x > 0 ? "," : "")
-       << obj.get_state_history()
-              [(x + obj.get_state_history_index()) % MAX_STATE_HISTORY_ENTRIES];
+       << obj.get_state_history()[(x + obj.get_state_history_index()) %
+                                  MAX_STATE_HISTORY_ENTRIES];
   os << "\n";
 
   dump::notifications(os, obj.get_current_notifications());
@@ -660,8 +780,7 @@ std::ostream& dump::service(std::ostream& os, class service const& obj) {
 std::ostream& dump::services(std::ostream& os) {
   for (service_map::iterator it(service::services.begin()),
        end(service::services.end());
-       it != end;
-       ++it)
+       it != end; ++it)
     dump::service(os, *it->second);
   return os;
 }

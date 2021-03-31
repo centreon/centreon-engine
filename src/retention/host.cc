@@ -20,12 +20,12 @@
 #include "com/centreon/engine/retention/host.hh"
 #include <array>
 #include "com/centreon/engine/common.hh"
-#include "com/centreon/engine/string.hh"
 #include "com/centreon/engine/logging.hh"
 #include "com/centreon/engine/logging/logger.hh"
+#include "com/centreon/engine/string.hh"
 
-using com::centreon::engine::opt;
 using com::centreon::engine::map_customvar;
+using com::centreon::engine::opt;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::retention;
 
@@ -108,7 +108,9 @@ host::host() : object(object::host) {}
  *
  *  @param[in] right Object to copy.
  */
-host::host(host const& right) : object(right) { operator=(right); }
+host::host(host const& right) : object(right) {
+  operator=(right);
+}
 
 /**
  *  Destructor.
@@ -341,7 +343,9 @@ opt<double> const& host::check_latency() const throw() {
  *
  *  @return The check_options.
  */
-opt<int> const& host::check_options() const throw() { return _check_options; }
+opt<int> const& host::check_options() const throw() {
+  return _check_options;
+}
 
 /**
  *  Get check_period.
@@ -357,7 +361,9 @@ opt<std::string> const& host::check_period() const throw() {
  *
  *  @return The check_type.
  */
-opt<int> const& host::check_type() const throw() { return _check_type; }
+opt<int> const& host::check_type() const throw() {
+  return _check_type;
+}
 
 /**
  *  Get current_attempt.
@@ -409,7 +415,9 @@ opt<uint64_t> const& host::current_problem_id() const throw() {
  *
  *  @return The current_state.
  */
-opt<int> const& host::current_state() const throw() { return _current_state; }
+opt<int> const& host::current_state() const throw() {
+  return _current_state;
+}
 
 /**
  *  Get customvariables.
@@ -461,21 +469,27 @@ opt<bool> const& host::has_been_checked() const throw() {
  *
  *  @return The host_id.
  */
-uint64_t host::host_id() const throw() { return _host_id; }
+uint64_t host::host_id() const throw() {
+  return _host_id;
+}
 
 /**
  *  Get host_name.
  *
  *  @return The host_name.
  */
-std::string const& host::host_name() const throw() { return _host_name; }
+std::string const& host::host_name() const throw() {
+  return _host_name;
+}
 
 /**
  *  Get is_flapping.
  *
  *  @return The is_flapping.
  */
-opt<bool> const& host::is_flapping() const throw() { return _is_flapping; }
+opt<bool> const& host::is_flapping() const throw() {
+  return _is_flapping;
+}
 
 /**
  *  Get last_acknowledgement.
@@ -491,7 +505,9 @@ opt<time_t> const& host::last_acknowledgement() const throw() {
  *
  *  @return The last_check.
  */
-opt<time_t> const& host::last_check() const throw() { return _last_check; }
+opt<time_t> const& host::last_check() const throw() {
+  return _last_check;
+}
 
 /**
  *  Get last_event_id.
@@ -543,7 +559,9 @@ opt<uint64_t> const& host::last_problem_id() const throw() {
  *
  *  @return The last_state.
  */
-opt<time_t> const& host::last_state() const throw() { return _last_state; }
+opt<time_t> const& host::last_state() const throw() {
+  return _last_state;
+}
 
 /**
  *  Get last_state_change.
@@ -577,7 +595,9 @@ opt<time_t> const& host::last_time_unreachable() const throw() {
  *
  *  @return The last_time_up.
  */
-opt<time_t> const& host::last_time_up() const throw() { return _last_time_up; }
+opt<time_t> const& host::last_time_up() const throw() {
+  return _last_time_up;
+}
 
 /**
  *  Get long_plugin_output.
@@ -611,7 +631,9 @@ opt<unsigned long> const& host::modified_attributes() const throw() {
  *
  *  @return The next_check.
  */
-opt<time_t> const& host::next_check() const throw() { return _next_check; }
+opt<time_t> const& host::next_check() const throw() {
+  return _next_check;
+}
 
 /**
  *  Get normal_check_interval.
@@ -744,7 +766,9 @@ opt<std::vector<int> > const& host::state_history() const throw() {
  *
  *  @return The state_type.
  */
-opt<int> const& host::state_type() const throw() { return _state_type; }
+opt<int> const& host::state_type() const throw() {
+  return _state_type;
+}
 
 /**
  *  Set acknowledgement_type.
@@ -1093,7 +1117,8 @@ bool host::_set_last_time_unreachable(time_t value) {
   if (value > now) {
     logger(log_verification_error, basic)
         << "Warning: Host last time unreachable cannot be in the future (bad "
-           "value: " << value << ")";
+           "value: "
+        << value << ")";
     value = now;
   }
   _last_time_unreachable = value;
@@ -1313,8 +1338,7 @@ bool host::_set_state_history(std::string const& value) noexcept {
   std::vector<int>& state_history(*_state_history);
   for (std::list<std::string>::const_iterator it(lst_history.begin()),
        end(lst_history.end());
-       it != end && x < MAX_STATE_HISTORY_ENTRIES;
-       ++it) {
+       it != end && x < MAX_STATE_HISTORY_ENTRIES; ++it) {
     int state(0);
     if (!string::to(it->c_str(), state)) {
       _state_history.reset();

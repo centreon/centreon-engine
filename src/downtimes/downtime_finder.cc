@@ -28,7 +28,7 @@ using namespace com::centreon::engine::downtimes;
 
 // Helper macro.
 #define ARE_STRINGS_MATCHING(stdstring, cstring) \
-  ((cstring&&(cstring == stdstring)) || (!cstring && stdstring.empty()))
+  ((cstring && (cstring == stdstring)) || (!cstring && stdstring.empty()))
 
 /**
  *  Constructor.
@@ -78,17 +78,16 @@ downtime_finder::result_set downtime_finder::find_matching_all(
     bool matched_all{true};
     for (criteria_set::const_iterator it(criterias.begin()),
          end(criterias.end());
-         it != end;
-         ++it) {
+         it != end; ++it) {
       switch (dt.second->get_type()) {
         case downtime::host_downtime:
           if (!_match_criteria(
-                   *std::static_pointer_cast<host_downtime>(dt.second), *it))
+                  *std::static_pointer_cast<host_downtime>(dt.second), *it))
             matched_all = false;
           break;
         case downtime::service_downtime:
           if (!_match_criteria(
-                   *std::static_pointer_cast<service_downtime>(dt.second), *it))
+                  *std::static_pointer_cast<service_downtime>(dt.second), *it))
             matched_all = false;
           break;
         case downtime::any_downtime:

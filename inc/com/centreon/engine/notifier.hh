@@ -238,8 +238,8 @@ class notifier : public checkable {
   int get_notification_number() const noexcept;
   void set_notification_number(int number);
 
-  virtual bool authorized_by_dependencies(dependency::types dependency_type)
-      const = 0;
+  virtual bool authorized_by_dependencies(
+      dependency::types dependency_type) const = 0;
   static uint64_t get_next_notification_id();
   virtual timeperiod* get_notification_timeperiod() const = 0;
   static notification_category get_category(reason_type type);
@@ -253,15 +253,15 @@ class notifier : public checkable {
       bool& escalated);
   notifier_type get_notifier_type() const noexcept;
   std::unordered_map<std::string, contact*>& get_contacts() noexcept;
-  std::unordered_map<std::string, contact*> const& get_contacts() const
-      noexcept;
+  std::unordered_map<std::string, contact*> const& get_contacts()
+      const noexcept;
   contactgroup_map_unsafe& get_contactgroups() noexcept;
   contactgroup_map_unsafe const& get_contactgroups() const noexcept;
   void resolve(int& w, int& e);
   std::array<int, MAX_STATE_HISTORY_ENTRIES> const& get_state_history() const;
   std::array<int, MAX_STATE_HISTORY_ENTRIES>& get_state_history();
   std::array<std::unique_ptr<notification>, 6> const&
-      get_current_notifications() const;
+  get_current_notifications() const;
   int get_pending_flex_downtime() const;
   void inc_pending_flex_downtime() noexcept;
   void dec_pending_flex_downtime() noexcept;

@@ -91,23 +91,39 @@ service::service(std::string const& hostname,
                  int freshness_threshold,
                  bool obsess_over,
                  std::string const& timezone)
-    : notifier{service_notification,     display_name,
-               check_command,            checks_enabled,
-               accept_passive_checks,    check_interval,
-               retry_interval,           notification_interval,
-               max_attempts,             0u,  // notify
-               0u,                            // stalk
-               first_notification_delay, recovery_notification_delay,
-               notification_period,      notifications_enabled,
-               check_period,             event_handler,
-               event_handler_enabled,    notes,
-               notes_url,                action_url,
-               icon_image,               icon_image_alt,
-               flap_detection_enabled,   low_flap_threshold,
-               high_flap_threshold,      check_freshness,
-               freshness_threshold,      obsess_over,
-               timezone,                 0,
-               0,                        is_volatile},
+    : notifier{service_notification,
+               display_name,
+               check_command,
+               checks_enabled,
+               accept_passive_checks,
+               check_interval,
+               retry_interval,
+               notification_interval,
+               max_attempts,
+               0u,  // notify
+               0u,  // stalk
+               first_notification_delay,
+               recovery_notification_delay,
+               notification_period,
+               notifications_enabled,
+               check_period,
+               event_handler,
+               event_handler_enabled,
+               notes,
+               notes_url,
+               action_url,
+               icon_image,
+               icon_image_alt,
+               flap_detection_enabled,
+               low_flap_threshold,
+               high_flap_threshold,
+               check_freshness,
+               freshness_threshold,
+               obsess_over,
+               timezone,
+               0,
+               0,
+               is_volatile},
       _host_id{0},
       _service_id{0},
       _hostname{hostname},
@@ -127,23 +143,33 @@ service::service(std::string const& hostname,
   set_current_attempt(initial_state == service::state_ok ? 1 : max_attempts);
 }
 
-time_t service::get_last_time_ok() const { return _last_time_ok; }
+time_t service::get_last_time_ok() const {
+  return _last_time_ok;
+}
 
-void service::set_last_time_ok(time_t last_time) { _last_time_ok = last_time; }
+void service::set_last_time_ok(time_t last_time) {
+  _last_time_ok = last_time;
+}
 
-time_t service::get_last_time_warning() const { return _last_time_warning; }
+time_t service::get_last_time_warning() const {
+  return _last_time_warning;
+}
 
 void service::set_last_time_warning(time_t last_time) {
   _last_time_warning = last_time;
 }
 
-time_t service::get_last_time_unknown() const { return _last_time_unknown; }
+time_t service::get_last_time_unknown() const {
+  return _last_time_unknown;
+}
 
 void service::set_last_time_unknown(time_t last_time) {
   _last_time_unknown = last_time;
 }
 
-time_t service::get_last_time_critical() const { return _last_time_critical; }
+time_t service::get_last_time_critical() const {
+  return _last_time_critical;
+}
 
 void service::set_last_time_critical(time_t last_time) {
   _last_time_critical = last_time;
@@ -197,7 +223,9 @@ void service::set_check_flapping_recovery_notification(bool check) {
   _check_flapping_recovery_notification = check;
 }
 
-bool service::recovered() const { return _current_state == service::state_ok; }
+bool service::recovered() const {
+  return _current_state == service::state_ok;
+}
 
 int service::get_current_state_int() const {
   return static_cast<int>(_current_state);
@@ -213,8 +241,7 @@ int service::get_current_state_int() const {
  */
 std::ostream& operator<<(std::ostream& os, service_map_unsafe const& obj) {
   for (service_map_unsafe::const_iterator it(obj.begin()), end(obj.end());
-       it != end;
-       ++it)
+       it != end; ++it)
     os << "(" << it->first.first << ", " << it->first.second
        << (std::next(it) != obj.end() ? "), " : ")");
   return os;
@@ -276,27 +303,38 @@ std::ostream& operator<<(std::ostream& os,
   }
 
   os << "service {\n"
-        "  host_name:                            " << obj.get_hostname()
+        "  host_name:                            "
+     << obj.get_hostname()
      << "\n"
-        "  description:                          " << obj.get_description()
+        "  description:                          "
+     << obj.get_description()
      << "\n"
-        "  display_name:                         " << obj.get_display_name()
+        "  display_name:                         "
+     << obj.get_display_name()
      << "\n"
-        "  service_check_command:                " << obj.get_check_command()
+        "  service_check_command:                "
+     << obj.get_check_command()
      << "\n"
-        "  event_handler:                        " << obj.get_event_handler()
+        "  event_handler:                        "
+     << obj.get_event_handler()
      << "\n"
-        "  initial_state:                        " << obj.get_initial_state()
+        "  initial_state:                        "
+     << obj.get_initial_state()
      << "\n"
-        "  check_interval:                       " << obj.get_check_interval()
+        "  check_interval:                       "
+     << obj.get_check_interval()
      << "\n"
-        "  retry_interval:                       " << obj.get_retry_interval()
+        "  retry_interval:                       "
+     << obj.get_retry_interval()
      << "\n"
-        "  max_attempts:                         " << obj.get_max_attempts()
+        "  max_attempts:                         "
+     << obj.get_max_attempts()
      << "\n"
-        "  contact_groups:                       " << cg_oss
+        "  contact_groups:                       "
+     << cg_oss
      << "\n"
-        "  contacts:                             " << c_oss
+        "  contacts:                             "
+     << c_oss
      << "\n"
         "  notification_interval:                "
      << obj.get_notification_interval()
@@ -343,10 +381,12 @@ std::ostream& operator<<(std::ostream& os,
         "  stalk_on_critical:                    "
      << obj.get_stalk_on(notifier::critical)
      << "\n"
-        "  is_volatile:                          " << obj.get_is_volatile()
+        "  is_volatile:                          "
+     << obj.get_is_volatile()
      << "\n"
         "  notification_period:                  "
-     << obj.get_notification_period() << "\n" << notifications
+     << obj.get_notification_period() << "\n"
+     << notifications
      << "  check_period:                         " << obj.get_check_period()
      << "\n"
         "  flap_detection_enabled:               "
@@ -373,7 +413,8 @@ std::ostream& operator<<(std::ostream& os,
         "  process_performance_data:             "
      << obj.get_process_performance_data()
      << "\n"
-        "  check_freshness:                      " << obj.get_check_freshness()
+        "  check_freshness:                      "
+     << obj.get_check_freshness()
      << "\n"
         "  freshness_threshold:                  "
      << obj.get_freshness_threshold()
@@ -633,22 +674,22 @@ com::centreon::engine::service* add_service(
     logger(log_config_error, basic) << "Error: Service description is not set";
     return nullptr;
   } else if (host_name.empty()) {
-    logger(log_config_error, basic) << "Error: Host name of service '"
-                                    << description << "' is not set";
+    logger(log_config_error, basic)
+        << "Error: Host name of service '" << description << "' is not set";
     return nullptr;
   } else if (check_command.empty()) {
-    logger(log_config_error, basic) << "Error: Check command of service '"
-                                    << description << "' on host '" << host_name
-                                    << "' is not set";
+    logger(log_config_error, basic)
+        << "Error: Check command of service '" << description << "' on host '"
+        << host_name << "' is not set";
     return nullptr;
   }
 
   uint64_t hid = get_host_id(host_name);
   if (!host_id) {
-    logger(log_config_error, basic) << "Error: The service '" << description
-                                    << "' cannot be created because"
-                                    << " host '" << host_name
-                                    << "' does not exist (host_id is null)";
+    logger(log_config_error, basic)
+        << "Error: The service '" << description
+        << "' cannot be created because"
+        << " host '" << host_name << "' does not exist (host_id is null)";
     return nullptr;
   } else if (host_id != hid) {
     logger(log_config_error, basic)
@@ -663,52 +704,30 @@ com::centreon::engine::service* add_service(
       notification_interval < 0) {
     logger(log_config_error, basic)
         << "Error: Invalid max_attempts, check_interval, retry_interval"
-           ", or notification_interval value for service '" << description
-        << "' on host '" << host_name << "'";
+           ", or notification_interval value for service '"
+        << description << "' on host '" << host_name << "'";
     return nullptr;
   }
   // Check if the service is already exist.
   std::pair<uint64_t, uint64_t> id(std::make_pair(host_id, service_id));
   if (is_service_exist(id)) {
-    logger(log_config_error, basic) << "Error: Service '" << description
-                                    << "' on host '" << host_name
-                                    << "' has already been defined";
+    logger(log_config_error, basic)
+        << "Error: Service '" << description << "' on host '" << host_name
+        << "' has already been defined";
     return nullptr;
   }
 
   // Allocate memory.
   std::shared_ptr<service> obj{std::make_shared<service>(
-      host_name,
-      description,
-      display_name.empty() ? description : display_name,
-      check_command,
-      checks_enabled,
-      accept_passive_checks,
-      initial_state,
-      check_interval,
-      retry_interval,
-      notification_interval,
-      max_attempts,
-      first_notification_delay,
-      recovery_notification_delay,
-      notification_period,
-      notifications_enabled,
-      is_volatile,
-      check_period,
-      event_handler,
-      event_handler_enabled,
-      notes,
-      notes_url,
-      action_url,
-      icon_image,
-      icon_image_alt,
-      flap_detection_enabled,
-      low_flap_threshold,
-      high_flap_threshold,
-      check_freshness,
-      freshness_threshold,
-      obsess_over_service,
-      timezone)};
+      host_name, description, display_name.empty() ? description : display_name,
+      check_command, checks_enabled, accept_passive_checks, initial_state,
+      check_interval, retry_interval, notification_interval, max_attempts,
+      first_notification_delay, recovery_notification_delay,
+      notification_period, notifications_enabled, is_volatile, check_period,
+      event_handler, event_handler_enabled, notes, notes_url, action_url,
+      icon_image, icon_image_alt, flap_detection_enabled, low_flap_threshold,
+      high_flap_threshold, check_freshness, freshness_threshold,
+      obsess_over_service, timezone)};
   try {
     obj->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
     obj->set_check_options(CHECK_OPTION_NONE);
@@ -754,8 +773,7 @@ com::centreon::engine::service* add_service(
     // Add new items to the list.
     service::services[{obj->get_hostname(), obj->get_description()}] = obj;
     service::services_by_id[{host_id, service_id}] = obj;
-  }
-  catch (...) {
+  } catch (...) {
     obj.reset();
   }
 
@@ -771,10 +789,10 @@ void service::check_for_expired_acknowledgement() {
     if (get_acknowledgement_timeout() > 0) {
       time_t now(time(nullptr));
       if (get_last_acknowledgement() + get_acknowledgement_timeout() >= now) {
-        logger(log_info_message, basic) << "Acknowledgement of service '"
-                                        << get_description() << "' on host '"
-                                        << this->get_host_ptr()->get_name()
-                                        << "' just expired";
+        logger(log_info_message, basic)
+            << "Acknowledgement of service '" << get_description()
+            << "' on host '" << this->get_host_ptr()->get_name()
+            << "' just expired";
         set_problem_has_been_acknowledged(false);
         this->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
         update_status();
@@ -827,8 +845,8 @@ std::pair<uint64_t, uint64_t> engine::get_host_and_service_id(
     std::string const& svc) {
   service_map::const_iterator found = service::services.find({host, svc});
   return found != service::services.end()
-      ? std::pair<uint64_t, uint64_t>{found->second->get_host_id(),
-                                      found->second->get_service_id()}
+             ? std::pair<uint64_t, uint64_t>{found->second->get_host_id(),
+                                             found->second->get_service_id()}
              : std::pair<uint64_t, uint64_t>{0u, 0u};
 }
 
@@ -854,43 +872,53 @@ void service::schedule_acknowledgement_expiration() {
       get_last_acknowledgement() != (time_t)0) {
     timed_event* evt = new timed_event(
         timed_event::EVENT_EXPIRE_SERVICE_ACK,
-        get_last_acknowledgement() + get_acknowledgement_timeout(),
-        false,
-        0,
-        nullptr,
-        true,
-        this,
-        nullptr,
-        0);
+        get_last_acknowledgement() + get_acknowledgement_timeout(), false, 0,
+        nullptr, true, this, nullptr, 0);
     events::loop::instance().schedule(evt, false);
   }
 }
 
-void service::set_host_id(uint64_t host_id) { _host_id = host_id; }
+void service::set_host_id(uint64_t host_id) {
+  _host_id = host_id;
+}
 
-uint64_t service::get_host_id() const { return _host_id; }
+uint64_t service::get_host_id() const {
+  return _host_id;
+}
 
-void service::set_service_id(uint64_t service_id) { _service_id = service_id; }
+void service::set_service_id(uint64_t service_id) {
+  _service_id = service_id;
+}
 
-uint64_t service::get_service_id() const { return _service_id; }
+uint64_t service::get_service_id() const {
+  return _service_id;
+}
 
-void service::set_hostname(std::string const& name) { _hostname = name; }
+void service::set_hostname(std::string const& name) {
+  _hostname = name;
+}
 
 /**
  * @brief Get the hostname of the host associated with this downtime.
  *
  * @return A string reference to the host name.
  */
-std::string const& service::get_hostname() const { return _hostname; }
+std::string const& service::get_hostname() const {
+  return _hostname;
+}
 
-void service::set_description(std::string const& desc) { _description = desc; }
+void service::set_description(std::string const& desc) {
+  _description = desc;
+}
 
 /**
  * @brief Get the description of the service.
  *
  * @return A string reference to the description.
  */
-std::string const& service::get_description() const { return _description; }
+std::string const& service::get_description() const {
+  return _description;
+}
 
 /**
  * @brief set the event handler arguments
@@ -965,9 +993,9 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   if (execution_time < 0.0)
     execution_time = 0.0;
 
-  logger(dbg_checks, basic) << "** Handling check result for service '"
-                            << _description << "' on host '" << _hostname
-                            << "'...";
+  logger(dbg_checks, basic)
+      << "** Handling check result for service '" << _description
+      << "' on host '" << _hostname << "'...";
   logger(dbg_checks, more)
       << "HOST: " << _hostname << ", SERVICE: " << _description
       << ", CHECK TYPE: "
@@ -1067,10 +1095,9 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    * shouldn't be happening)
    */
   if (!queued_check_result->get_exited_ok()) {
-    logger(log_runtime_warning, basic) << "Warning:  Check of service '"
-                                       << _description << "' on host '"
-                                       << _hostname
-                                       << "' did not exit properly!";
+    logger(log_runtime_warning, basic)
+        << "Warning:  Check of service '" << _description << "' on host '"
+        << _hostname << "' did not exit properly!";
 
     set_plugin_output("(Service check did not exit properly)");
     _current_state = service::state_unknown;
@@ -1096,7 +1123,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
                 ? " - plugin may not be executable"
                 : (queued_check_result->get_return_code() == 127
                        ? " - plugin may be missing"
-                       : "")) << ')';
+                       : ""))
+        << ')';
 
     set_plugin_output(oss.str());
     _current_state = service::state_unknown;
@@ -1111,8 +1139,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     std::string plugin_output;
     std::string long_plugin_output;
     std::string perf_data;
-    parse_check_output(
-        output, plugin_output, long_plugin_output, perf_data, true, false);
+    parse_check_output(output, plugin_output, long_plugin_output, perf_data,
+                       true, false);
 
     set_long_plugin_output(long_plugin_output);
     set_perf_data(perf_data);
@@ -1135,7 +1163,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         << (get_plugin_output().empty() ? "NULL" : get_plugin_output()) << "\n"
         << "Long Output:\n"
         << (get_long_plugin_output().empty() ? "NULL"
-                                             : get_long_plugin_output()) << "\n"
+                                             : get_long_plugin_output())
+        << "\n"
         << "Perf Data:\n"
         << (get_perf_data().empty() ? "NULL" : get_perf_data());
 
@@ -1172,10 +1201,9 @@ int service::handle_async_check_result(check_result* queued_check_result) {
    */
   if (get_check_type() == check_passive) {
     if (config->log_passive_checks())
-      logger(log_passive_check, basic) << "PASSIVE SERVICE CHECK: " << _hostname
-                                       << ";" << _description << ";"
-                                       << _current_state << ";"
-                                       << get_plugin_output();
+      logger(log_passive_check, basic)
+          << "PASSIVE SERVICE CHECK: " << _hostname << ";" << _description
+          << ";" << _current_state << ";" << get_plugin_output();
   }
 
   host* hst{get_host_ptr()};
@@ -1192,8 +1220,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       /* set a flag to remember that we launched a check */
       first_host_check_initiated = true;
 
-      hst->run_async_check(
-          CHECK_OPTION_NONE, 0.0, false, false, nullptr, nullptr);
+      hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
+                           nullptr);
     }
   }
 
@@ -1350,16 +1378,16 @@ int service::handle_async_check_result(check_result* queued_check_result) {
             hst->has_been_checked() &&
             (static_cast<unsigned long>(current_time - hst->get_last_check()) <=
              config->cached_host_check_horizon())) {
-          logger(dbg_checks, more) << "* Using cached host state: "
-                                   << hst->get_current_state();
+          logger(dbg_checks, more)
+              << "* Using cached host state: " << hst->get_current_state();
           update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
           update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS, current_time);
         }
 
         /* else launch an async (parallel) check of the host */
         else
-          hst->run_async_check(
-              CHECK_OPTION_NONE, 0.0, false, false, nullptr, nullptr);
+          hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
+                               nullptr);
       }
     }
 
@@ -1457,8 +1485,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
            config->cached_host_check_horizon())) {
         /* use current host state as route result */
         route_result = hst->get_current_state();
-        logger(dbg_checks, more) << "* Using cached host state: "
-                                 << hst->get_current_state();
+        logger(dbg_checks, more)
+            << "* Using cached host state: " << hst->get_current_state();
         update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
         update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS, current_time);
       }
@@ -1469,16 +1497,16 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       else if (state_change) {
         /* use current host state as route result */
         route_result = hst->get_current_state();
-        hst->run_async_check(
-            CHECK_OPTION_NONE, 0.0, false, false, nullptr, nullptr);
+        hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
+                             nullptr);
       }
 
       /* ADDED 02/15/08 */
       /* else assume same host state */
       else {
         route_result = hst->get_current_state();
-        logger(dbg_checks, more) << "* Using last known host state: "
-                                 << hst->get_current_state();
+        logger(dbg_checks, more)
+            << "* Using last known host state: " << hst->get_current_state();
         update_check_stats(ACTIVE_ONDEMAND_HOST_CHECK_STATS, current_time);
         update_check_stats(ACTIVE_CACHED_HOST_CHECK_STATS, current_time);
       }
@@ -1498,8 +1526,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         /* previous logic was to simply run a sync (serial) host check */
         /* use current host state as route result */
         route_result = hst->get_current_state();
-        hst->run_async_check(
-            CHECK_OPTION_NONE, 0.0, false, false, nullptr, nullptr);
+        hst->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
+                             nullptr);
         /*perform_on_demand_host_check(hst,&route_result,CHECK_OPTION_NONE,true,config->cached_host_check_horizon());
          */
       }
@@ -1575,9 +1603,9 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         set_current_attempt(1);
     }
 
-    logger(dbg_checks, more) << "Current/Max Attempt(s): "
-                             << get_current_attempt() << '/'
-                             << get_max_attempts();
+    logger(dbg_checks, more)
+        << "Current/Max Attempt(s): " << get_current_attempt() << '/'
+        << get_max_attempts();
 
     /* if we should retry the service check, do so (except it the host is down
      * or unreachable!) */
@@ -1640,18 +1668,16 @@ int service::handle_async_check_result(check_result* queued_check_result) {
         std::pair<std::string, std::string> id({_hostname, _description});
         auto p(servicedependency::servicedependencies.equal_range(id));
         for (servicedependency_mmap::const_iterator it{p.first}, end{p.second};
-             it != end;
-             ++it) {
+             it != end; ++it) {
           servicedependency* temp_dependency{it->second.get()};
 
           if (temp_dependency->dependent_service_ptr == this &&
               temp_dependency->master_service_ptr) {
             master_service = temp_dependency->master_service_ptr;
-            logger(dbg_checks, most) << "Predictive check of service '"
-                                     << master_service->get_description()
-                                     << "' on host '"
-                                     << master_service->get_hostname()
-                                     << "' queued.";
+            logger(dbg_checks, most)
+                << "Predictive check of service '"
+                << master_service->get_description() << "' on host '"
+                << master_service->get_hostname() << "' queued.";
             check_servicelist.push_back(master_service);
           }
         }
@@ -1742,8 +1768,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     {
       timezone_locker lock(get_timezone());
       preferred_time = get_next_check();
-      get_next_valid_time(
-          preferred_time, &next_valid_time, this->check_period_ptr);
+      get_next_valid_time(preferred_time, &next_valid_time,
+                          this->check_period_ptr);
       set_next_check(next_valid_time);
     }
 
@@ -1781,21 +1807,13 @@ int service::handle_async_check_result(check_result* queued_check_result) {
   }
 
   /* send data to event broker */
-  broker_service_check(NEBTYPE_SERVICECHECK_PROCESSED,
-                       NEBFLAG_NONE,
-                       NEBATTR_NONE,
-                       this,
-                       get_check_type(),
-                       queued_check_result->get_start_time(),
-                       queued_check_result->get_finish_time(),
-                       nullptr,
-                       get_latency(),
-                       get_execution_time(),
-                       config->service_check_timeout(),
-                       queued_check_result->get_early_timeout(),
-                       queued_check_result->get_return_code(),
-                       nullptr,
-                       nullptr);
+  broker_service_check(
+      NEBTYPE_SERVICECHECK_PROCESSED, NEBFLAG_NONE, NEBATTR_NONE, this,
+      get_check_type(), queued_check_result->get_start_time(),
+      queued_check_result->get_finish_time(), nullptr, get_latency(),
+      get_execution_time(), config->service_check_timeout(),
+      queued_check_result->get_early_timeout(),
+      queued_check_result->get_return_code(), nullptr, nullptr);
 
   if (!(reschedule_check && get_should_be_scheduled() && has_been_checked()) ||
       !get_checks_enabled()) {
@@ -1833,8 +1851,8 @@ int service::handle_async_check_result(check_result* queued_check_result) {
       run_async_check = false;
 
     if (run_async_check)
-      svc->run_async_check(
-          CHECK_OPTION_NONE, 0.0, false, false, nullptr, nullptr);
+      svc->run_async_check(CHECK_OPTION_NONE, 0.0, false, false, nullptr,
+                           nullptr);
   }
   return OK;
 }
@@ -1860,10 +1878,10 @@ int service::log_event() {
   }
   std::string const& state_type{tab_state_type[get_state_type()]};
 
-  logger(log_options, basic) << "SERVICE ALERT: " << _hostname << ";"
-                             << _description << ";" << state << ";"
-                             << state_type << ";" << get_current_attempt()
-                             << ";" << get_plugin_output();
+  logger(log_options, basic)
+      << "SERVICE ALERT: " << _hostname << ";" << _description << ";" << state
+      << ";" << state_type << ";" << get_current_attempt() << ";"
+      << get_plugin_output();
   return OK;
 }
 
@@ -1888,9 +1906,9 @@ void service::check_for_flapping(bool update,
 
   logger(dbg_functions, basic) << "check_for_flapping()";
 
-  logger(dbg_flapping, more) << "Checking service '" << _description
-                             << "' on host '" << _hostname
-                             << "' for flapping...";
+  logger(dbg_flapping, more)
+      << "Checking service '" << _description << "' on host '" << _hostname
+      << "' for flapping...";
 
   /* if this is a soft service state and not a soft recovery, don't record this
    * in the history */
@@ -1964,11 +1982,10 @@ void service::check_for_flapping(bool update,
 
   set_percent_state_change(curved_percent_change);
 
-  logger(dbg_flapping, most) << com::centreon::logging::setprecision(2)
-                             << "LFT=" << low_threshold
-                             << ", HFT=" << high_threshold
-                             << ", CPC=" << curved_percent_change
-                             << ", PSC=" << curved_percent_change << "%";
+  logger(dbg_flapping, most)
+      << com::centreon::logging::setprecision(2) << "LFT=" << low_threshold
+      << ", HFT=" << high_threshold << ", CPC=" << curved_percent_change
+      << ", PSC=" << curved_percent_change << "%";
 
   /* don't do anything if we don't have flap detection enabled on a program-wide
    * basis */
@@ -1993,16 +2010,14 @@ void service::check_for_flapping(bool update,
   else if (curved_percent_change >= high_threshold)
     is_flapping = true;
 
-  logger(dbg_flapping, more) << com::centreon::logging::setprecision(2)
-                             << "Service " << (is_flapping ? "is" : "is not")
-                             << " flapping (" << curved_percent_change
-                             << "% state change).";
+  logger(dbg_flapping, more)
+      << com::centreon::logging::setprecision(2) << "Service "
+      << (is_flapping ? "is" : "is not") << " flapping ("
+      << curved_percent_change << "% state change).";
 
   /* did the service just start flapping? */
   if (is_flapping && !get_is_flapping())
-    set_flap(curved_percent_change,
-             high_threshold,
-             low_threshold,
+    set_flap(curved_percent_change, high_threshold, low_threshold,
              allow_flapstart_notification);
 
   /* did the service just stop flapping? */
@@ -2017,16 +2032,10 @@ int service::handle_service_event() {
   logger(dbg_functions, basic) << "handle_service_event()";
 
   /* send event data to broker */
-  broker_statechange_data(NEBTYPE_STATECHANGE_END,
-                          NEBFLAG_NONE,
-                          NEBATTR_NONE,
-                          SERVICE_STATECHANGE,
-                          (void*)this,
-                          _current_state,
-                          get_state_type(),
-                          get_current_attempt(),
-                          get_max_attempts(),
-                          nullptr);
+  broker_statechange_data(NEBTYPE_STATECHANGE_END, NEBFLAG_NONE, NEBATTR_NONE,
+                          SERVICE_STATECHANGE, (void*)this, _current_state,
+                          get_state_type(), get_current_attempt(),
+                          get_max_attempts(), nullptr);
 
   /* bail out if we shouldn't be running event handlers */
   if (!config->enable_event_handlers())
@@ -2051,14 +2060,9 @@ int service::handle_service_event() {
   clear_volatile_macros_r(mac);
 
   /* send data to event broker */
-  broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK,
-                          NEBFLAG_NONE,
-                          NEBATTR_NONE,
-                          CMD_NONE,
-                          time(nullptr),
-                          nullptr,
-                          nullptr,
-                          nullptr);
+  broker_external_command(NEBTYPE_EXTERNALCOMMAND_CHECK, NEBFLAG_NONE,
+                          NEBATTR_NONE, CMD_NONE, time(nullptr), nullptr,
+                          nullptr, nullptr);
 
   return OK;
 }
@@ -2095,18 +2099,16 @@ int service::obsessive_compulsive_service_check_processor() {
   grab_service_macros_r(mac, this);
 
   /* get the raw command line */
-  get_raw_command_line_r(mac,
-                         ocsp_command_ptr,
-                         config->ocsp_command().c_str(),
-                         raw_command,
-                         macro_options);
+  get_raw_command_line_r(mac, ocsp_command_ptr, config->ocsp_command().c_str(),
+                         raw_command, macro_options);
   if (raw_command.empty()) {
     clear_volatile_macros_r(mac);
     return ERROR;
   }
 
   logger(dbg_checks, most) << "Raw obsessive compulsive service processor "
-                              "command line: " << raw_command;
+                              "command line: "
+                           << raw_command;
 
   /* process any macros in the raw command line */
   process_macros_r(mac, raw_command, processed_command, macro_options);
@@ -2116,20 +2118,15 @@ int service::obsessive_compulsive_service_check_processor() {
   }
 
   logger(dbg_checks, most) << "Processed obsessive compulsive service "
-                              "processor command line: " << processed_command;
+                              "processor command line: "
+                           << processed_command;
 
   /* run the command */
   try {
     std::string tmp;
-    my_system_r(mac,
-                processed_command,
-                config->ocsp_timeout(),
-                &early_timeout,
-                &exectime,
-                tmp,
-                0);
-  }
-  catch (std::exception const& e) {
+    my_system_r(mac, processed_command, config->ocsp_timeout(), &early_timeout,
+                &exectime, tmp, 0);
+  } catch (std::exception const& e) {
     logger(log_runtime_error, basic)
         << "Error: can't execute compulsive service processor command line '"
         << processed_command << "' : " << e.what();
@@ -2139,11 +2136,10 @@ int service::obsessive_compulsive_service_check_processor() {
 
   /* check to see if the command timed out */
   if (early_timeout == true)
-    logger(log_runtime_warning, basic) << "Warning: OCSP command '"
-                                       << processed_command << "' for service '"
-                                       << _description << "' on host '"
-                                       << _hostname << "' timed out after "
-                                       << config->ocsp_timeout() << " seconds";
+    logger(log_runtime_warning, basic)
+        << "Warning: OCSP command '" << processed_command << "' for service '"
+        << _description << "' on host '" << _hostname << "' timed out after "
+        << config->ocsp_timeout() << " seconds";
 
   return OK;
 }
@@ -2172,14 +2168,14 @@ int service::run_scheduled_check(int check_options, double latency) {
   bool time_is_valid = true;
 
   logger(dbg_functions, basic) << "run_scheduled_service_check()";
-  logger(dbg_checks, basic) << "Attempting to run scheduled check of service '"
-                            << _description << "' on host '" << _hostname
-                            << "': check options=" << check_options
-                            << ", latency=" << latency;
+  logger(dbg_checks, basic)
+      << "Attempting to run scheduled check of service '" << _description
+      << "' on host '" << _hostname << "': check options=" << check_options
+      << ", latency=" << latency;
 
   /* attempt to run the check */
-  result = run_async_check(
-      check_options, latency, true, true, &time_is_valid, &preferred_time);
+  result = run_async_check(check_options, latency, true, true, &time_is_valid,
+                           &preferred_time);
 
   /* an error occurred, so reschedule the check */
   if (result == ERROR) {
@@ -2207,13 +2203,13 @@ int service::run_scheduled_check(int check_options, double latency) {
       // Make sure we rescheduled the next service check at a valid time.
       {
         timezone_locker lock(get_timezone());
-        get_next_valid_time(
-            preferred_time, &next_valid_time, this->check_period_ptr);
+        get_next_valid_time(preferred_time, &next_valid_time,
+                            this->check_period_ptr);
 
         // The service could not be rescheduled properly.
         // Set the next check time for next week.
         if (!time_is_valid && !check_time_against_period(
-                                   next_valid_time, this->check_period_ptr)) {
+                                  next_valid_time, this->check_period_ptr)) {
           set_next_check((time_t)(next_valid_time + 60 * 60 * 24 * 7));
           logger(log_runtime_warning, basic)
               << "Warning: Check of service '" << _description << "' on host '"
@@ -2261,10 +2257,10 @@ int service::run_async_check(int check_options,
                              bool reschedule_check,
                              bool* time_is_valid,
                              time_t* preferred_time) noexcept {
-  logger(dbg_functions, basic) << "service::run_async_check, check_options="
-                               << check_options << ", latency=" << latency
-                               << ", scheduled_check=" << scheduled_check
-                               << ", reschedule_check=" << reschedule_check;
+  logger(dbg_functions, basic)
+      << "service::run_async_check, check_options=" << check_options
+      << ", latency=" << latency << ", scheduled_check=" << scheduled_check
+      << ", reschedule_check=" << reschedule_check;
 
   // Preamble.
   if (!get_check_command_ptr()) {
@@ -2275,9 +2271,9 @@ int service::run_async_check(int check_options,
     return ERROR;
   }
 
-  logger(dbg_checks, basic) << "** Running async check of service '"
-                            << get_description() << "' on host '"
-                            << get_hostname() << "'...";
+  logger(dbg_checks, basic)
+      << "** Running async check of service '" << get_description()
+      << "' on host '" << get_hostname() << "'...";
 
   // Check if the service is viable now.
   if (!verify_check_viability(check_options, time_is_valid, preferred_time))
@@ -2286,21 +2282,11 @@ int service::run_async_check(int check_options,
   // Send broker event.
   timeval start_time = {0, 0};
   timeval end_time = {0, 0};
-  int res = broker_service_check(NEBTYPE_SERVICECHECK_ASYNC_PRECHECK,
-                                 NEBFLAG_NONE,
-                                 NEBATTR_NONE,
-                                 this,
-                                 checkable::check_active,
-                                 start_time,
-                                 end_time,
-                                 get_check_command().c_str(),
-                                 get_latency(),
-                                 0.0,
-                                 0,
-                                 false,
-                                 0,
-                                 nullptr,
-                                 nullptr);
+  int res =
+      broker_service_check(NEBTYPE_SERVICECHECK_ASYNC_PRECHECK, NEBFLAG_NONE,
+                           NEBATTR_NONE, this, checkable::check_active,
+                           start_time, end_time, get_check_command().c_str(),
+                           get_latency(), 0.0, 0, false, 0, nullptr, nullptr);
 
   // Service check was cancelled by NEB module. reschedule check later.
   if (NEBERROR_CALLBACKCANCEL == res) {
@@ -2337,16 +2323,16 @@ int service::run_async_check(int check_options,
   grab_host_macros_r(macros, get_host_ptr());
   grab_service_macros_r(macros, this);
   std::string tmp;
-  get_raw_command_line_r(
-      macros, get_check_command_ptr(), get_check_command().c_str(), tmp, 0);
+  get_raw_command_line_r(macros, get_check_command_ptr(),
+                         get_check_command().c_str(), tmp, 0);
 
   // Time to start command.
   gettimeofday(&start_time, nullptr);
 
   // Update the number of running service checks.
   ++currently_running_service_checks;
-  logger(dbg_checks, basic) << "Current running service checks: "
-                            << currently_running_service_checks;
+  logger(dbg_checks, basic)
+      << "Current running service checks: " << currently_running_service_checks;
 
   // Set the execution flag.
   set_is_executing(true);
@@ -2356,21 +2342,12 @@ int service::run_async_check(int check_options,
   std::string processed_cmd(cmd->process_cmd(macros));
 
   // Send event broker.
-  res = broker_service_check(NEBTYPE_SERVICECHECK_INITIATE,
-                             NEBFLAG_NONE,
-                             NEBATTR_NONE,
-                             this,
-                             checkable::check_active,
-                             start_time,
-                             end_time,
-                             get_check_command().c_str(),
-                             get_latency(),
-                             0.0,
-                             config->service_check_timeout(),
-                             false,
-                             0,
-                             processed_cmd.c_str(),
-                             nullptr);
+  res =
+      broker_service_check(NEBTYPE_SERVICECHECK_INITIATE, NEBFLAG_NONE,
+                           NEBATTR_NONE, this, checkable::check_active,
+                           start_time, end_time, get_check_command().c_str(),
+                           get_latency(), 0.0, config->service_check_timeout(),
+                           false, 0, processed_cmd.c_str(), nullptr);
 
   // Restore latency.
   set_latency(old_latency);
@@ -2390,18 +2367,10 @@ int service::run_async_check(int check_options,
   std::unique_ptr<check_result> check_result_info;
   do {
     // Init check result info.
-    check_result_info.reset(new check_result(service_check,
-                                             this,
-                                             checkable::check_active,
-                                             check_options,
-                                             reschedule_check,
-                                             latency,
-                                             start_time,
-                                             start_time,
-                                             false,
-                                             true,
-                                             service::state_ok,
-                                             ""));
+    check_result_info.reset(
+        new check_result(service_check, this, checkable::check_active,
+                         check_options, reschedule_check, latency, start_time,
+                         start_time, false, true, service::state_ok, ""));
 
     retry = false;
     try {
@@ -2411,11 +2380,9 @@ int service::run_async_check(int check_options,
       if (id != 0)
         checks::checker::instance().add_check_result(
             id, check_result_info.release());
-    }
-    catch (com::centreon::exceptions::interruption const& e) {
+    } catch (com::centreon::exceptions::interruption const& e) {
       retry = true;
-    }
-    catch (std::exception const& e) {
+    } catch (std::exception const& e) {
       // Update check result.
       timeval tv;
       gettimeofday(&tv, nullptr);
@@ -2451,13 +2418,11 @@ int service::run_async_check(int check_options,
 bool service::schedule_check(time_t check_time, int options) {
   logger(dbg_functions, basic) << "schedule_service_check()";
 
-  logger(dbg_checks, basic) << "Scheduling a "
-                            << (options & CHECK_OPTION_FORCE_EXECUTION
-                                    ? "forced"
-                                    : "non-forced")
-                            << ", active check of service '" << _description
-                            << "' on host '" << _hostname << "' @ "
-                            << my_ctime(&check_time);
+  logger(dbg_checks, basic)
+      << "Scheduling a "
+      << (options & CHECK_OPTION_FORCE_EXECUTION ? "forced" : "non-forced")
+      << ", active check of service '" << _description << "' on host '"
+      << _hostname << "' @ " << my_ctime(&check_time);
 
   // Don't schedule a check if active checks
   // of this service are disabled.
@@ -2538,19 +2503,12 @@ bool service::schedule_check(time_t check_time, int options) {
       set_next_check(check_time);
 
       // Place the new event in the event queue.
-      timed_event* new_event = new timed_event(timed_event::EVENT_SERVICE_CHECK,
-                                               get_next_check(),
-                                               false,
-                                               0L,
-                                               nullptr,
-                                               true,
-                                               this,
-                                               nullptr,
-                                               options);
+      timed_event* new_event =
+          new timed_event(timed_event::EVENT_SERVICE_CHECK, get_next_check(),
+                          false, 0L, nullptr, true, this, nullptr, options);
 
       events::loop::instance().reschedule_event(new_event, events::loop::low);
-    }
-    catch (...) {
+    } catch (...) {
       // Update the status log.
       update_status();
       throw;
@@ -2591,22 +2549,16 @@ void service::set_flap(double percent_change,
       << "Notifications for this service are being suppressed because "
          "it was detected as "
       << "having been flapping between different "
-         "states (" << percent_change << "% change >= " << high_threshold
+         "states ("
+      << percent_change << "% change >= " << high_threshold
       << "% threshold).  When the service state stabilizes and the "
          "flapping "
       << "stops, notifications will be re-enabled.";
 
-  std::shared_ptr<comment> com{new comment(comment::service,
-                                           comment::flapping,
-                                           get_host_id(),
-                                           _service_id,
-                                           time(nullptr),
-                                           "(Centreon Engine Process)",
-                                           oss.str(),
-                                           false,
-                                           comment::internal,
-                                           false,
-                                           (time_t)0)};
+  std::shared_ptr<comment> com{
+      new comment(comment::service, comment::flapping, get_host_id(),
+                  _service_id, time(nullptr), "(Centreon Engine Process)",
+                  oss.str(), false, comment::internal, false, (time_t)0)};
 
   comment::comments.insert({com->get_comment_id(), com});
 
@@ -2616,15 +2568,9 @@ void service::set_flap(double percent_change,
   set_is_flapping(true);
 
   /* send data to event broker */
-  broker_flapping_data(NEBTYPE_FLAPPING_START,
-                       NEBFLAG_NONE,
-                       NEBATTR_NONE,
-                       SERVICE_FLAPPING,
-                       this,
-                       percent_change,
-                       high_threshold,
-                       low_threshold,
-                       nullptr);
+  broker_flapping_data(NEBTYPE_FLAPPING_START, NEBFLAG_NONE, NEBATTR_NONE,
+                       SERVICE_FLAPPING, this, percent_change, high_threshold,
+                       low_threshold, nullptr);
 
   /* send a notification */
   if (allow_flapstart_notification)
@@ -2656,15 +2602,9 @@ void service::clear_flap(double percent_change,
   set_is_flapping(false);
 
   /* send data to event broker */
-  broker_flapping_data(NEBTYPE_FLAPPING_STOP,
-                       NEBFLAG_NONE,
-                       NEBATTR_FLAPPING_STOP_NORMAL,
-                       SERVICE_FLAPPING,
-                       this,
-                       percent_change,
-                       high_threshold,
-                       low_threshold,
-                       nullptr);
+  broker_flapping_data(NEBTYPE_FLAPPING_STOP, NEBFLAG_NONE,
+                       NEBATTR_FLAPPING_STOP_NORMAL, SERVICE_FLAPPING, this,
+                       percent_change, high_threshold, low_threshold, nullptr);
 
   /* send a notification */
   notify(reason_flappingstop, "", "", notification_option_none);
@@ -2679,9 +2619,9 @@ void service::enable_flap_detection() {
 
   logger(dbg_functions, basic) << "service::enable_flap_detection()";
 
-  logger(dbg_flapping, more) << "Enabling flap detection for service '"
-                             << _description << "' on host '" << _hostname
-                             << "'.";
+  logger(dbg_flapping, more)
+      << "Enabling flap detection for service '" << _description
+      << "' on host '" << _hostname << "'.";
 
   /* nothing to do... */
   if (get_flap_detection_enabled())
@@ -2694,14 +2634,9 @@ void service::enable_flap_detection() {
   set_flap_detection_enabled(true);
 
   /* send data to event broker */
-  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               this,
-                               CMD_NONE,
-                               attr,
-                               get_modified_attributes(),
-                               nullptr);
+  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, this, CMD_NONE, attr,
+                               get_modified_attributes(), nullptr);
 
   /* check for flapping */
   check_for_flapping(false, true);
@@ -2716,9 +2651,9 @@ void service::disable_flap_detection() {
 
   logger(dbg_functions, basic) << "disable_service_flap_detection()";
 
-  logger(dbg_flapping, more) << "Disabling flap detection for service '"
-                             << _description << "' on host '" << _hostname
-                             << "'.";
+  logger(dbg_flapping, more)
+      << "Disabling flap detection for service '" << _description
+      << "' on host '" << _hostname << "'.";
 
   /* nothing to do... */
   if (!get_flap_detection_enabled())
@@ -2731,14 +2666,9 @@ void service::disable_flap_detection() {
   set_flap_detection_enabled(false);
 
   /* send data to event broker */
-  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               this,
-                               CMD_NONE,
-                               attr,
-                               get_modified_attributes(),
-                               nullptr);
+  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, this, CMD_NONE, attr,
+                               get_modified_attributes(), nullptr);
 
   /* handle the details... */
   handle_flap_detection_disabled();
@@ -2748,8 +2678,8 @@ void service::disable_flap_detection() {
  * @brief Updates service status info. Send data to event broker.
  */
 void service::update_status() {
-  broker_service_status(
-      NEBTYPE_SERVICESTATUS_UPDATE, NEBFLAG_NONE, NEBATTR_NONE, this, nullptr);
+  broker_service_status(NEBTYPE_SERVICESTATUS_UPDATE, NEBFLAG_NONE,
+                        NEBATTR_NONE, this, nullptr);
 }
 
 /* checks viability of performing a service check */
@@ -2844,8 +2774,8 @@ int service::notify_contact(nagios_macros* mac,
   int neb_result;
 
   logger(dbg_functions, basic) << "notify_contact_of_service()";
-  logger(dbg_notifications, most) << "** Notifying contact '"
-                                  << cntct->get_name() << "'";
+  logger(dbg_notifications, most)
+      << "** Notifying contact '" << cntct->get_name() << "'";
 
   /* get start time */
   gettimeofday(&start_time, nullptr);
@@ -2853,20 +2783,10 @@ int service::notify_contact(nagios_macros* mac,
   /* send data to event broker */
   end_time.tv_sec = 0L;
   end_time.tv_usec = 0L;
-  neb_result =
-      broker_contact_notification_data(NEBTYPE_CONTACTNOTIFICATION_START,
-                                       NEBFLAG_NONE,
-                                       NEBATTR_NONE,
-                                       service_notification,
-                                       type,
-                                       start_time,
-                                       end_time,
-                                       (void*)this,
-                                       cntct,
-                                       not_author.c_str(),
-                                       not_data.c_str(),
-                                       escalated,
-                                       nullptr);
+  neb_result = broker_contact_notification_data(
+      NEBTYPE_CONTACTNOTIFICATION_START, NEBFLAG_NONE, NEBATTR_NONE,
+      service_notification, type, start_time, end_time, (void*)this, cntct,
+      not_author.c_str(), not_data.c_str(), escalated, nullptr);
   if (NEBERROR_CALLBACKCANCEL == neb_result)
     return ERROR;
   else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
@@ -2882,36 +2802,23 @@ int service::notify_contact(nagios_macros* mac,
     method_end_time.tv_sec = 0L;
     method_end_time.tv_usec = 0L;
     neb_result = broker_contact_notification_method_data(
-        NEBTYPE_CONTACTNOTIFICATIONMETHOD_START,
-        NEBFLAG_NONE,
-        NEBATTR_NONE,
-        service_notification,
-        type,
-        method_start_time,
-        method_end_time,
-        (void*)this,
-        cntct,
-        cmd->get_command_line().c_str(),
-        not_author.c_str(),
-        not_data.c_str(),
-        escalated,
-        nullptr);
+        NEBTYPE_CONTACTNOTIFICATIONMETHOD_START, NEBFLAG_NONE, NEBATTR_NONE,
+        service_notification, type, method_start_time, method_end_time,
+        (void*)this, cntct, cmd->get_command_line().c_str(), not_author.c_str(),
+        not_data.c_str(), escalated, nullptr);
     if (NEBERROR_CALLBACKCANCEL == neb_result)
       break;
     else if (NEBERROR_CALLBACKOVERRIDE == neb_result)
       continue;
 
     /* get the raw command line */
-    get_raw_command_line_r(mac,
-                           cmd.get(),
-                           cmd->get_command_line().c_str(),
-                           raw_command,
-                           macro_options);
+    get_raw_command_line_r(mac, cmd.get(), cmd->get_command_line().c_str(),
+                           raw_command, macro_options);
     if (raw_command.empty())
       continue;
 
-    logger(dbg_notifications, most) << "Raw notification command: "
-                                    << raw_command;
+    logger(dbg_notifications, most)
+        << "Raw notification command: " << raw_command;
 
     /* process any macros contained in the argument */
     process_macros_r(mac, raw_command, processed_command, macro_options);
@@ -2920,8 +2827,8 @@ int service::notify_contact(nagios_macros* mac,
 
     /* run the notification command... */
 
-    logger(dbg_notifications, most) << "Processed notification command: "
-                                    << processed_command;
+    logger(dbg_notifications, most)
+        << "Processed notification command: " << processed_command;
 
     /* log the notification to program log file */
     if (config->log_notifications()) {
@@ -2958,15 +2865,9 @@ int service::notify_contact(nagios_macros* mac,
     /* run the notification command */
     try {
       std::string tmp;
-      my_system_r(mac,
-                  processed_command,
-                  config->notification_timeout(),
-                  &early_timeout,
-                  &exectime,
-                  tmp,
-                  0);
-    }
-    catch (std::exception const& e) {
+      my_system_r(mac, processed_command, config->notification_timeout(),
+                  &early_timeout, &exectime, tmp, 0);
+    } catch (std::exception const& e) {
       logger(log_runtime_error, basic)
           << "Error: can't execute service notification '" << cntct->get_name()
           << "' : " << e.what();
@@ -2986,20 +2887,10 @@ int service::notify_contact(nagios_macros* mac,
 
     /* send data to event broker */
     broker_contact_notification_method_data(
-        NEBTYPE_CONTACTNOTIFICATIONMETHOD_END,
-        NEBFLAG_NONE,
-        NEBATTR_NONE,
-        service_notification,
-        type,
-        method_start_time,
-        method_end_time,
-        (void*)this,
-        cntct,
-        cmd->get_command_line().c_str(),
-        not_author.c_str(),
-        not_data.c_str(),
-        escalated,
-        nullptr);
+        NEBTYPE_CONTACTNOTIFICATIONMETHOD_END, NEBFLAG_NONE, NEBATTR_NONE,
+        service_notification, type, method_start_time, method_end_time,
+        (void*)this, cntct, cmd->get_command_line().c_str(), not_author.c_str(),
+        not_data.c_str(), escalated, nullptr);
   }
 
   /* get end time */
@@ -3009,19 +2900,10 @@ int service::notify_contact(nagios_macros* mac,
   cntct->set_last_service_notification(start_time.tv_sec);
 
   /* send data to event broker */
-  broker_contact_notification_data(NEBTYPE_CONTACTNOTIFICATION_END,
-                                   NEBFLAG_NONE,
-                                   NEBATTR_NONE,
-                                   service_notification,
-                                   type,
-                                   start_time,
-                                   end_time,
-                                   (void*)this,
-                                   cntct,
-                                   not_author.c_str(),
-                                   not_data.c_str(),
-                                   escalated,
-                                   nullptr);
+  broker_contact_notification_data(
+      NEBTYPE_CONTACTNOTIFICATION_END, NEBFLAG_NONE, NEBATTR_NONE,
+      service_notification, type, start_time, end_time, (void*)this, cntct,
+      not_author.c_str(), not_data.c_str(), escalated, nullptr);
   return OK;
 }
 
@@ -3169,10 +3051,10 @@ bool service::is_result_fresh(time_t current_time, int log_this) {
 
   /* the results for the last check of this service are stale */
   if (expiration_time < current_time) {
-    get_time_breakdown(
-        (current_time - expiration_time), &days, &hours, &minutes, &seconds);
-    get_time_breakdown(
-        freshness_threshold, &tdays, &thours, &tminutes, &tseconds);
+    get_time_breakdown((current_time - expiration_time), &days, &hours,
+                       &minutes, &seconds);
+    get_time_breakdown(freshness_threshold, &tdays, &thours, &tminutes,
+                       &tseconds);
 
     /* log a warning */
     if (log_this)
@@ -3181,17 +3063,18 @@ bool service::is_result_fresh(time_t current_time, int log_this) {
           << "' on host '" << this->get_hostname() << "' are stale by " << days
           << "d " << hours << "h " << minutes << "m " << seconds
           << "s (threshold=" << tdays << "d " << thours << "h " << tminutes
-          << "m " << tseconds << "s).  I'm forcing an immediate check "
-                                 "of the service.";
+          << "m " << tseconds
+          << "s).  I'm forcing an immediate check "
+             "of the service.";
 
-    logger(dbg_checks, more) << "Check results for service '"
-                             << this->get_description() << "' on host '"
-                             << this->get_hostname() << "' are stale by "
-                             << days << "d " << hours << "h " << minutes << "m "
-                             << seconds << "s (threshold=" << tdays << "d "
-                             << thours << "h " << tminutes << "m " << tseconds
-                             << "s).  Forcing an immediate check of "
-                                "the service...";
+    logger(dbg_checks, more)
+        << "Check results for service '" << this->get_description()
+        << "' on host '" << this->get_hostname() << "' are stale by " << days
+        << "d " << hours << "h " << minutes << "m " << seconds
+        << "s (threshold=" << tdays << "d " << thours << "h " << tminutes
+        << "m " << tseconds
+        << "s).  Forcing an immediate check of "
+           "the service...";
 
     return false;
   }
@@ -3224,15 +3107,9 @@ void service::handle_flap_detection_disabled() {
         << ";DISABLED; Flap detection has been disabled";
 
     /* send data to event broker */
-    broker_flapping_data(NEBTYPE_FLAPPING_STOP,
-                         NEBFLAG_NONE,
-                         NEBATTR_FLAPPING_STOP_DISABLED,
-                         SERVICE_FLAPPING,
-                         this,
-                         get_percent_state_change(),
-                         0.0,
-                         0.0,
-                         nullptr);
+    broker_flapping_data(NEBTYPE_FLAPPING_STOP, NEBFLAG_NONE,
+                         NEBATTR_FLAPPING_STOP_DISABLED, SERVICE_FLAPPING, this,
+                         get_percent_state_change(), 0.0, 0.0, nullptr);
 
     /* send a notification */
     this->notify(reason_flappingdisabled, "", "", notification_option_none);
@@ -3268,15 +3145,14 @@ timeperiod* service::get_notification_timeperiod() const {
  *
  * @return true if it is authorized.
  */
-bool service::authorized_by_dependencies(dependency::types dependency_type)
-    const {
+bool service::authorized_by_dependencies(
+    dependency::types dependency_type) const {
   logger(dbg_functions, basic) << "service::authorized_by_dependencies()";
 
   auto p(servicedependency::servicedependencies.equal_range(
       {_hostname, _description}));
   for (servicedependency_mmap::const_iterator it{p.first}, end{p.second};
-       it != end;
-       ++it) {
+       it != end; ++it) {
     servicedependency* dep{it->second.get()};
     /* Only check dependencies of the desired type (notification or execution)
      */
@@ -3334,8 +3210,7 @@ void service::check_for_orphaned() {
   /* check all services... */
   for (service_map::iterator it(service::services.begin()),
        end(service::services.end());
-       it != end;
-       ++it) {
+       it != end; ++it) {
     /* skip services that are not currently executing */
     if (!it->second->get_is_executing())
       continue;
@@ -3394,8 +3269,7 @@ void service::check_result_freshness() {
   /* check all services... */
   for (service_map::iterator it(service::services.begin()),
        end(service::services.end());
-       it != end;
-       ++it) {
+       it != end; ++it) {
     /* skip services we shouldn't be checking for freshness */
     if (!it->second->get_check_freshness())
       continue;
@@ -3459,19 +3333,24 @@ bool service::is_in_downtime() const {
          _host_ptr->get_scheduled_downtime_depth() > 0;
 }
 
-void service::set_host_ptr(host* h) { _host_ptr = h; }
+void service::set_host_ptr(host* h) {
+  _host_ptr = h;
+}
 
-host const* service::get_host_ptr() const { return _host_ptr; }
+host const* service::get_host_ptr() const {
+  return _host_ptr;
+}
 
-host* service::get_host_ptr() { return _host_ptr; }
+host* service::get_host_ptr() {
+  return _host_ptr;
+}
 
 void service::resolve(int& w, int& e) {
   int warnings{0}, errors{0};
 
   try {
     notifier::resolve(warnings, errors);
-  }
-  catch (std::exception const& e) {
+  } catch (std::exception const& e) {
     logger(log_verification_error, basic)
         << "Error: Service description '" << _description << "' of host '"
         << _hostname << "' has problem in its notifier part: " << e.what();
@@ -3484,10 +3363,11 @@ void service::resolve(int& w, int& e) {
     /* we couldn't find an associated host! */
 
     if (it == host::hosts.end() || !it->second) {
-      logger(log_verification_error, basic) << "Error: Host '" << _hostname
-                                            << "' specified in service "
-                                               "'" << _description
-                                            << "' not defined anywhere!";
+      logger(log_verification_error, basic)
+          << "Error: Host '" << _hostname
+          << "' specified in service "
+             "'"
+          << _description << "' not defined anywhere!";
       errors++;
       set_host_ptr(nullptr);
     } else {
@@ -3501,14 +3381,8 @@ void service::resolve(int& w, int& e) {
 
       // Notify event broker.
       timeval tv(get_broker_timestamp(NULL));
-      broker_relation_data(NEBTYPE_PARENT_ADD,
-                           NEBFLAG_NONE,
-                           NEBATTR_NONE,
-                           get_host_ptr(),
-                           NULL,
-                           NULL,
-                           this,
-                           &tv);
+      broker_relation_data(NEBTYPE_PARENT_ADD, NEBFLAG_NONE, NEBATTR_NONE,
+                           get_host_ptr(), NULL, NULL, this, &tv);
     }
   }
 

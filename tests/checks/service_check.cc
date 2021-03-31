@@ -20,10 +20,10 @@
 #include <gtest/gtest.h>
 #include <time.h>
 
+#include <fmt/format.h>
 #include <cstring>
 #include <iostream>
 #include <memory>
-#include <fmt/format.h>
 
 #include "../test_engine.hh"
 #include "../timeperiod/utils.hh"
@@ -542,22 +542,18 @@ TEST_F(ServiceCheck, OkCriticalStalking) {
       out.find(
           "SERVICE ALERT: test_host;test_svc;OK;HARD;1;RAID array optimal"),
       std::string::npos);
-  ASSERT_NE(out.find(
-                "SERVICE ALERT: test_host;test_svc;WARNING;HARD;3;RAID "
-                "array degraded (1 drive bad, 1 hot spare rebuilding)"),
+  ASSERT_NE(out.find("SERVICE ALERT: test_host;test_svc;WARNING;HARD;3;RAID "
+                     "array degraded (1 drive bad, 1 hot spare rebuilding)"),
             std::string::npos);
-  ASSERT_NE(out.find(
-                "SERVICE ALERT: test_host;test_svc;CRITICAL;HARD;3;RAID "
-                "array degraded (2 drives bad, 1 host spare online, 1 hot "
-                "spare rebuilding)"),
+  ASSERT_NE(out.find("SERVICE ALERT: test_host;test_svc;CRITICAL;HARD;3;RAID "
+                     "array degraded (2 drives bad, 1 host spare online, 1 hot "
+                     "spare rebuilding)"),
             std::string::npos);
-  ASSERT_NE(out.find(
-                "SERVICE ALERT: test_host;test_svc;CRITICAL;HARD;3;RAID "
-                "array degraded (3 drives bad, 2 hot spares online"),
+  ASSERT_NE(out.find("SERVICE ALERT: test_host;test_svc;CRITICAL;HARD;3;RAID "
+                     "array degraded (3 drives bad, 2 hot spares online"),
             std::string::npos);
-  ASSERT_NE(out.find(
-                "SERVICE ALERT: test_host;test_svc;CRITICAL;HARD;3;RAID "
-                "array failed"),
+  ASSERT_NE(out.find("SERVICE ALERT: test_host;test_svc;CRITICAL;HARD;3;RAID "
+                     "array failed"),
             std::string::npos);
 }
 

@@ -1,16 +1,12 @@
 #include "com/centreon/engine/engine_impl.hh"
 
-#include <functional>
+#include <google/protobuf/util/time_util.h>
 #include <sys/types.h>
 #include <unistd.h>
-#include <google/protobuf/util/time_util.h>
-#include <future>
 #include <algorithm>
+#include <functional>
+#include <future>
 
-#include "com/centreon/engine/logging.hh"
-#include "com/centreon/engine/logging/logger.hh"
-#include "com/centreon/engine/version.hh"
-#include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/anomalydetection.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/command_manager.hh"
@@ -34,6 +30,7 @@
 #include "com/centreon/engine/servicegroup.hh"
 #include "com/centreon/engine/statistics.hh"
 #include "com/centreon/engine/statusdata.hh"
+#include "com/centreon/engine/version.hh"
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
@@ -63,11 +60,9 @@ grpc::Status engine_impl::GetStats(grpc::ServerContext* context
                                    const GenericString* request
                                    __attribute__((unused)),
                                    Stats* response) {
-  auto fn =
-      std::packaged_task<int(void)>(std::bind(&command_manager::get_stats,
-                                              &command_manager::instance(),
-                                              request->str_arg(),
-                                              response));
+  auto fn = std::packaged_task<int(void)>(
+      std::bind(&command_manager::get_stats, &command_manager::instance(),
+                request->str_arg(), response));
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
   int32_t res = result.get();
@@ -97,10 +92,7 @@ grpc::Status engine_impl::ProcessServiceCheckResult(grpc::ServerContext* context
                 &command_manager::instance(),
                 google::protobuf::util::TimeUtil::TimestampToSeconds(
                     request->check_time()),
-                host_name,
-                svc_desc,
-                request->code(),
-                request->output()));
+                host_name, svc_desc, request->code(), request->output()));
   command_manager::instance().enqueue(std::move(fn));
 
   return grpc::Status::OK;
@@ -121,9 +113,7 @@ grpc::Status engine_impl::ProcessHostCheckResult(grpc::ServerContext* context
                 &command_manager::instance(),
                 google::protobuf::util::TimeUtil::TimestampToSeconds(
                     request->check_time()),
-                host_name,
-                request->code(),
-                request->output()));
+                host_name, request->code(), request->output()));
   command_manager::instance().enqueue(std::move(fn));
 
   return grpc::Status::OK;
@@ -169,7 +159,7 @@ grpc::Status engine_impl::GetHost(grpc::ServerContext* context
                                   __attribute__((unused)),
                                   EngineHost* response) {
   auto fn =
-      std::packaged_task<int(void)>([ request, host = response ]()->int32_t {
+      std::packaged_task<int(void)>([request, host = response]() -> int32_t {
         std::shared_ptr<com::centreon::engine::host> selectedhost;
         /* checking identifier hostname (by name or by id) */
         switch (request->identifier_case()) {
@@ -215,20 +205,20 @@ grpc::Status engine_impl::GetHost(grpc::ServerContext* context
 }
 
 /**
-* @brief Return contact informations.
-*
-* @param context gRPC context
-* @param request Contact's identifier
-* @param response The filled fields
-*
-* @return Status::OK
-**/
+ * @brief Return contact informations.
+ *
+ * @param context gRPC context
+ * @param request Contact's identifier
+ * @param response The filled fields
+ *
+ * @return Status::OK
+ **/
 grpc::Status engine_impl::GetContact(grpc::ServerContext* context
                                      __attribute__((unused)),
                                      const ContactIdentifier* request,
                                      EngineContact* response) {
   auto fn =
-      std::packaged_task<int(void)>([ request, contact = response ]()->int32_t {
+      std::packaged_task<int(void)>([request, contact = response]() -> int32_t {
         std::shared_ptr<com::centreon::engine::contact> selectedcontact;
         /* get the contact by his name */
         auto itcontactname = contact::contacts.find(request->name());
@@ -252,20 +242,20 @@ grpc::Status engine_impl::GetContact(grpc::ServerContext* context
 }
 
 /**
-* @brief Return service informations.
-*
-* @param context gRPC context
-* @param request Service's identifier (it can be a hostname & servicename or a
-*        hostid & serviceid)
-* @param response The filled fields
-*
-*@return Status::OK
-*/
+ * @brief Return service informations.
+ *
+ * @param context gRPC context
+ * @param request Service's identifier (it can be a hostname & servicename or a
+ *        hostid & serviceid)
+ * @param response The filled fields
+ *
+ *@return Status::OK
+ */
 grpc::Status engine_impl::GetService(grpc::ServerContext* context,
                                      const ServiceIdentifier* request,
                                      EngineService* response) {
   auto fn =
-      std::packaged_task<int(void)>([ request, service = response ]()->int32_t {
+      std::packaged_task<int(void)>([request, service = response]() -> int32_t {
         std::shared_ptr<com::centreon::engine::service> selectedservice;
 
         /* checking identifier sesrname (by names or by ids) */
@@ -317,22 +307,21 @@ grpc::Status engine_impl::GetService(grpc::ServerContext* context,
 }
 
 /**
-* @brief Return the total number of hosts.
-*
-* @param context gRPC context
-* @param unused
-* @param response Map size
-*
-*@return Status::OK
-*/
+ * @brief Return the total number of hosts.
+ *
+ * @param context gRPC context
+ * @param unused
+ * @param response Map size
+ *
+ *@return Status::OK
+ */
 grpc::Status engine_impl::GetHostsCount(grpc::ServerContext* context
                                         __attribute__((unused)),
                                         const ::google::protobuf::Empty* request
                                         __attribute__((unused)),
                                         GenericValue* response) {
-  auto fn = std::packaged_task<int32_t(void)>([]()->int32_t {
-    return host::hosts.size();
-  });
+  auto fn = std::packaged_task<int32_t(void)>(
+      []() -> int32_t { return host::hosts.size(); });
 
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
@@ -343,22 +332,21 @@ grpc::Status engine_impl::GetHostsCount(grpc::ServerContext* context
 }
 
 /**
-* @brief Return the total number of contacts.
-*
-* @param context gRPC context
-* @param unused
-* @param response Map size
-*
-* @return Status::OK
-*/
+ * @brief Return the total number of contacts.
+ *
+ * @param context gRPC context
+ * @param unused
+ * @param response Map size
+ *
+ * @return Status::OK
+ */
 
 grpc::Status engine_impl::GetContactsCount(
     grpc::ServerContext* context __attribute__((unused)),
     const ::google::protobuf::Empty* request __attribute__((unused)),
     GenericValue* response) {
-  auto fn = std::packaged_task<int32_t(void)>([]()->int32_t {
-    return contact::contacts.size();
-  });
+  auto fn = std::packaged_task<int32_t(void)>(
+      []() -> int32_t { return contact::contacts.size(); });
 
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
@@ -369,21 +357,20 @@ grpc::Status engine_impl::GetContactsCount(
 }
 
 /**
-* @brief Return the total number of services.
-*
-* @param context gRPC context
-* @param unused
-* @param response Map size
-*
-* @return Status::OK
-*/
+ * @brief Return the total number of services.
+ *
+ * @param context gRPC context
+ * @param unused
+ * @param response Map size
+ *
+ * @return Status::OK
+ */
 grpc::Status engine_impl::GetServicesCount(
     grpc::ServerContext* context __attribute__((unused)),
     const ::google::protobuf::Empty* request __attribute__((unused)),
     GenericValue* response) {
-  auto fn = std::packaged_task<int32_t(void)>([]()->int32_t {
-    return service::services.size();
-  });
+  auto fn = std::packaged_task<int32_t(void)>(
+      []() -> int32_t { return service::services.size(); });
 
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
@@ -393,21 +380,20 @@ grpc::Status engine_impl::GetServicesCount(
 }
 
 /**
-* @brief Return the total number of service groups.
-*
-* @param context gRPC context
-* @param unused
-* @param response Map size
-*
-*@return Status::OK
-*/
+ * @brief Return the total number of service groups.
+ *
+ * @param context gRPC context
+ * @param unused
+ * @param response Map size
+ *
+ *@return Status::OK
+ */
 grpc::Status engine_impl::GetServiceGroupsCount(
     grpc::ServerContext* context __attribute__((unused)),
     const ::google::protobuf::Empty* request __attribute__((unused)),
     GenericValue* response) {
-  auto fn = std::packaged_task<int32_t(void)>([]()->int32_t {
-    return servicegroup::servicegroups.size();
-  });
+  auto fn = std::packaged_task<int32_t(void)>(
+      []() -> int32_t { return servicegroup::servicegroups.size(); });
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
@@ -416,21 +402,20 @@ grpc::Status engine_impl::GetServiceGroupsCount(
 }
 
 /**
-* @brief Return the total number of contact groups.
-*
-* @param context gRPC context
-* @param unused
-* @param response Map size
-*
-* @return Status::OK
-*/
+ * @brief Return the total number of contact groups.
+ *
+ * @param context gRPC context
+ * @param unused
+ * @param response Map size
+ *
+ * @return Status::OK
+ */
 grpc::Status engine_impl::GetContactGroupsCount(
     grpc::ServerContext* context __attribute__((unused)),
     const ::google::protobuf::Empty* request __attribute__((unused)),
     GenericValue* response) {
-  auto fn = std::packaged_task<int32_t(void)>([]()->int32_t {
-    return contactgroup::contactgroups.size();
-  });
+  auto fn = std::packaged_task<int32_t(void)>(
+      []() -> int32_t { return contactgroup::contactgroups.size(); });
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
@@ -439,21 +424,20 @@ grpc::Status engine_impl::GetContactGroupsCount(
 }
 
 /**
-* @brief Return the total number of host groups.
-*
-* @param context gRPC context
-* @param unused
-* @param response Map size
-*
-* @return Status::OK
-*/
+ * @brief Return the total number of host groups.
+ *
+ * @param context gRPC context
+ * @param unused
+ * @param response Map size
+ *
+ * @return Status::OK
+ */
 grpc::Status engine_impl::GetHostGroupsCount(
     grpc::ServerContext* context __attribute__((unused)),
     const ::google::protobuf::Empty* request __attribute__((unused)),
     GenericValue* response) {
-  auto fn = std::packaged_task<int32_t(void)>([]()->int32_t {
-    return hostgroup::hostgroups.size();
-  });
+  auto fn = std::packaged_task<int32_t(void)>(
+      []() -> int32_t { return hostgroup::hostgroups.size(); });
 
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
@@ -463,19 +447,19 @@ grpc::Status engine_impl::GetHostGroupsCount(
 }
 
 /**
-* @brief Return the total number of service dependencies.
-*
-* @param context gRPC context
-* @param unused
-* @param response Map size
-*
-* @return Status::OK
-*/
+ * @brief Return the total number of service dependencies.
+ *
+ * @param context gRPC context
+ * @param unused
+ * @param response Map size
+ *
+ * @return Status::OK
+ */
 grpc::Status engine_impl::GetServiceDependenciesCount(
     grpc::ServerContext* context __attribute__((unused)),
     const ::google::protobuf::Empty* request __attribute__((unused)),
     GenericValue* response) {
-  auto fn = std::packaged_task<int32_t(void)>([]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([]() -> int32_t {
     return servicedependency::servicedependencies.size();
   });
 
@@ -487,21 +471,20 @@ grpc::Status engine_impl::GetServiceDependenciesCount(
 }
 
 /**
-* @brief Return the total number of host dependencies.
-*
-* @param context gRPC context
-* @param unused
-* @param response Map size
-*
-* @return Status::OK
-*/
+ * @brief Return the total number of host dependencies.
+ *
+ * @param context gRPC context
+ * @param unused
+ * @param response Map size
+ *
+ * @return Status::OK
+ */
 grpc::Status engine_impl::GetHostDependenciesCount(
     grpc::ServerContext* context __attribute__((unused)),
     const ::google::protobuf::Empty* request __attribute__((unused)),
     GenericValue* response) {
-  auto fn = std::packaged_task<int32_t(void)>([]()->int32_t {
-    return hostdependency::hostdependencies.size();
-  });
+  auto fn = std::packaged_task<int32_t(void)>(
+      []() -> int32_t { return hostdependency::hostdependencies.size(); });
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
@@ -528,7 +511,7 @@ grpc::Status engine_impl::AddHostComment(grpc::ServerContext* context
                                          __attribute__((unused)),
                                          const EngineComment* request,
                                          CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     /* get the host */
     auto it = host::hosts.find(request->host_name());
@@ -537,17 +520,10 @@ grpc::Status engine_impl::AddHostComment(grpc::ServerContext* context
     if (temp_host == nullptr)
       return 1;
     /* add the comment */
-    auto cmt = std::make_shared<comment>(comment::host,
-                                         comment::user,
-                                         temp_host->get_host_id(),
-                                         0,
-                                         request->entry_time(),
-                                         request->user(),
-                                         request->comment_data(),
-                                         request->persistent(),
-                                         comment::external,
-                                         false,
-                                         (time_t)0);
+    auto cmt = std::make_shared<comment>(
+        comment::host, comment::user, temp_host->get_host_id(), 0,
+        request->entry_time(), request->user(), request->comment_data(),
+        request->persistent(), comment::external, false, (time_t)0);
     comment::comments.insert({cmt->get_comment_id(), cmt});
     return 0;
   });
@@ -579,7 +555,7 @@ grpc::Status engine_impl::AddServiceComment(grpc::ServerContext* context
                                             __attribute__((unused)),
                                             const EngineComment* request,
                                             CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     std::shared_ptr<engine::service> temp_service;
     /* get the service */
@@ -595,17 +571,11 @@ grpc::Status engine_impl::AddServiceComment(grpc::ServerContext* context
     if (temp_host == nullptr)
       return 1;
     /* add the comment */
-    auto cmt = std::make_shared<comment>(comment::service,
-                                         comment::user,
-                                         temp_host->get_host_id(),
-                                         temp_service->get_service_id(),
-                                         request->entry_time(),
-                                         request->user(),
-                                         request->comment_data(),
-                                         request->persistent(),
-                                         comment::external,
-                                         false,
-                                         (time_t)0);
+    auto cmt = std::make_shared<comment>(
+        comment::service, comment::user, temp_host->get_host_id(),
+        temp_service->get_service_id(), request->entry_time(), request->user(),
+        request->comment_data(), request->persistent(), comment::external,
+        false, (time_t)0);
     if (cmt == nullptr)
       return 1;
     comment::comments.insert({cmt->get_comment_id(), cmt});
@@ -637,7 +607,7 @@ grpc::Status engine_impl::DeleteComment(grpc::ServerContext* context
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "comment_id must not be set to 0");
 
-  auto fn = std::packaged_task<int32_t(void)>([&comment_id]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([&comment_id]() -> int32_t {
     if (comment::delete_comment(comment_id))
       return 0;
     else
@@ -664,7 +634,7 @@ grpc::Status engine_impl::DeleteAllHostComments(grpc::ServerContext* context
                                                 __attribute__((unused)),
                                                 const HostIdentifier* request,
                                                 CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     /* checking the host identifer (by name or id) */
     switch (request->identifier_case()) {
@@ -713,7 +683,7 @@ grpc::Status engine_impl::DeleteAllServiceComments(
     grpc::ServerContext* context __attribute__((unused)),
     const ServiceIdentifier* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
 
     /* checking the service identifer (by names or ids) */
@@ -766,7 +736,7 @@ grpc::Status engine_impl::RemoveHostAcknowledgement(
     grpc::ServerContext* context __attribute__((unused)),
     const HostIdentifier* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
 
     /* checking the host identifer (by name or id) */
@@ -822,7 +792,7 @@ grpc::Status engine_impl::RemoveServiceAcknowledgement(
     grpc::ServerContext* context __attribute__((unused)),
     const ServiceIdentifier* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
 
     /* checking the service identifer (by names or ids) */
@@ -872,7 +842,7 @@ grpc::Status engine_impl::AcknowledgementHostProblem(
     grpc::ServerContext* context __attribute__((unused)),
     const EngineAcknowledgement* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     /* get the host */
     auto it = host::hosts.find(request->host_name());
@@ -895,37 +865,23 @@ grpc::Status engine_impl::AcknowledgementHostProblem(
     temp_host->set_last_acknowledgement(current_time);
     temp_host->schedule_acknowledgement_expiration();
     /* send data to event broker */
-    broker_acknowledgement_data(NEBTYPE_ACKNOWLEDGEMENT_ADD,
-                                NEBFLAG_NONE,
-                                NEBATTR_NONE,
-                                HOST_ACKNOWLEDGEMENT,
-                                static_cast<void*>(temp_host.get()),
-                                request->ack_author().c_str(),
-                                request->ack_data().c_str(),
-                                request->type(),
-                                request->notify(),
-                                request->persistent(),
-                                nullptr);
+    broker_acknowledgement_data(
+        NEBTYPE_ACKNOWLEDGEMENT_ADD, NEBFLAG_NONE, NEBATTR_NONE,
+        HOST_ACKNOWLEDGEMENT, static_cast<void*>(temp_host.get()),
+        request->ack_author().c_str(), request->ack_data().c_str(),
+        request->type(), request->notify(), request->persistent(), nullptr);
     /* send out an acknowledgement notification */
     if (request->notify())
-      temp_host->notify(notifier::reason_acknowledgement,
-                        request->ack_author(),
+      temp_host->notify(notifier::reason_acknowledgement, request->ack_author(),
                         request->ack_data(),
                         notifier::notification_option_none);
     /* update the status log with the host info */
     temp_host->update_status();
     /* add a comment for the acknowledgement */
-    auto com = std::make_shared<comment>(comment::host,
-                                         comment::acknowledgment,
-                                         temp_host->get_host_id(),
-                                         0,
-                                         current_time,
-                                         request->ack_author(),
-                                         request->ack_data(),
-                                         request->persistent(),
-                                         comment::internal,
-                                         false,
-                                         (time_t)0);
+    auto com = std::make_shared<comment>(
+        comment::host, comment::acknowledgment, temp_host->get_host_id(), 0,
+        current_time, request->ack_author(), request->ack_data(),
+        request->persistent(), comment::internal, false, (time_t)0);
     comment::comments.insert({com->get_comment_id(), com});
 
     return 0;
@@ -942,7 +898,7 @@ grpc::Status engine_impl::AcknowledgementServiceProblem(
     grpc::ServerContext* context __attribute__((unused)),
     const EngineAcknowledgement* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
     auto it =
         service::services.find({request->host_name(), request->service_desc()});
@@ -965,38 +921,25 @@ grpc::Status engine_impl::AcknowledgementServiceProblem(
     temp_service->set_last_acknowledgement(current_time);
     temp_service->schedule_acknowledgement_expiration();
     /* send data to event broker */
-    broker_acknowledgement_data(NEBTYPE_ACKNOWLEDGEMENT_ADD,
-                                NEBFLAG_NONE,
-                                NEBATTR_NONE,
-                                SERVICE_ACKNOWLEDGEMENT,
-                                static_cast<void*>(temp_service.get()),
-                                request->ack_author().c_str(),
-                                request->ack_data().c_str(),
-                                request->type(),
-                                request->notify(),
-                                request->persistent(),
-                                nullptr);
+    broker_acknowledgement_data(
+        NEBTYPE_ACKNOWLEDGEMENT_ADD, NEBFLAG_NONE, NEBATTR_NONE,
+        SERVICE_ACKNOWLEDGEMENT, static_cast<void*>(temp_service.get()),
+        request->ack_author().c_str(), request->ack_data().c_str(),
+        request->type(), request->notify(), request->persistent(), nullptr);
     /* send out an acknowledgement notification */
     if (request->notify())
       temp_service->notify(notifier::reason_acknowledgement,
-                           request->ack_author(),
-                           request->ack_data(),
+                           request->ack_author(), request->ack_data(),
                            notifier::notification_option_none);
     /* update the status log with the service info */
     temp_service->update_status();
 
     /* add a comment for the acknowledgement */
-    auto com = std::make_shared<comment>(comment::service,
-                                         comment::acknowledgment,
-                                         temp_service->get_host_id(),
-                                         temp_service->get_service_id(),
-                                         current_time,
-                                         request->ack_author(),
-                                         request->ack_data(),
-                                         request->persistent(),
-                                         comment::internal,
-                                         false,
-                                         (time_t)0);
+    auto com = std::make_shared<comment>(
+        comment::service, comment::acknowledgment, temp_service->get_host_id(),
+        temp_service->get_service_id(), current_time, request->ack_author(),
+        request->ack_data(), request->persistent(), comment::internal, false,
+        (time_t)0);
     comment::comments.insert({com->get_comment_id(), com});
     return 0;
   });
@@ -1036,7 +979,7 @@ grpc::Status engine_impl::ScheduleHostDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     uint64_t downtime_id = 0;
     unsigned long duration;
@@ -1052,18 +995,10 @@ grpc::Status engine_impl::ScheduleHostDowntime(
       duration = static_cast<unsigned long>(request->duration());
     /* scheduling downtime */
     int res = downtime_manager::instance().schedule_downtime(
-        downtime::host_downtime,
-        request->host_name(),
-        "",
-        request->entry_time(),
-        request->author().c_str(),
-        request->comment_data().c_str(),
-        request->start(),
-        request->end(),
-        request->fixed(),
-        request->triggered_by(),
-        duration,
-        &downtime_id);
+        downtime::host_downtime, request->host_name(), "",
+        request->entry_time(), request->author().c_str(),
+        request->comment_data().c_str(), request->start(), request->end(),
+        request->fixed(), request->triggered_by(), duration, &downtime_id);
     if (res == ERROR)
       return 1;
     else
@@ -1106,7 +1041,7 @@ grpc::Status engine_impl::ScheduleServiceDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
     uint64_t downtime_id(0);
     unsigned long duration;
@@ -1124,18 +1059,11 @@ grpc::Status engine_impl::ScheduleServiceDowntime(
 
     /* scheduling downtime */
     int res = downtime_manager::instance().schedule_downtime(
-        downtime::service_downtime,
-        request->host_name(),
-        request->service_desc(),
-        request->entry_time(),
-        request->author().c_str(),
-        request->comment_data().c_str(),
-        request->start(),
-        request->end(),
-        request->fixed(),
-        request->triggered_by(),
-        duration,
-        &downtime_id);
+        downtime::service_downtime, request->host_name(),
+        request->service_desc(), request->entry_time(),
+        request->author().c_str(), request->comment_data().c_str(),
+        request->start(), request->end(), request->fixed(),
+        request->triggered_by(), duration, &downtime_id);
     if (res == ERROR)
       return 1;
     else
@@ -1177,7 +1105,7 @@ grpc::Status engine_impl::ScheduleHostServicesDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     uint64_t downtime_id(0);
     unsigned long duration;
@@ -1194,24 +1122,16 @@ grpc::Status engine_impl::ScheduleHostServicesDowntime(
 
     for (service_map_unsafe::iterator it(temp_host->services.begin()),
          end(temp_host->services.end());
-         it != end;
-         ++it) {
+         it != end; ++it) {
       if (!it->second)
         continue;
       /* scheduling downtime */
       downtime_manager::instance().schedule_downtime(
-          downtime::service_downtime,
-          request->host_name(),
-          it->second->get_description(),
-          request->entry_time(),
-          request->author().c_str(),
-          request->comment_data().c_str(),
-          request->start(),
-          request->end(),
-          request->fixed(),
-          request->triggered_by(),
-          duration,
-          &downtime_id);
+          downtime::service_downtime, request->host_name(),
+          it->second->get_description(), request->entry_time(),
+          request->author().c_str(), request->comment_data().c_str(),
+          request->start(), request->end(), request->fixed(),
+          request->triggered_by(), duration, &downtime_id);
     }
     return 0;
   });
@@ -1252,7 +1172,7 @@ grpc::Status engine_impl::ScheduleHostGroupHostsDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     uint64_t downtime_id = 0;
     unsigned long duration;
     hostgroup* hg{nullptr};
@@ -1270,22 +1190,13 @@ grpc::Status engine_impl::ScheduleHostGroupHostsDowntime(
     /* iterate through host group members(hosts) */
     for (host_map_unsafe::iterator it(hg->members.begin()),
          end(hg->members.end());
-         it != end;
-         ++it)
+         it != end; ++it)
       /* scheduling downtime */
       downtime_manager::instance().schedule_downtime(
-          downtime::host_downtime,
-          it->first,
-          "",
-          request->entry_time(),
-          request->author().c_str(),
-          request->comment_data().c_str(),
-          request->start(),
-          request->end(),
-          request->fixed(),
-          request->triggered_by(),
-          duration,
-          &downtime_id);
+          downtime::host_downtime, it->first, "", request->entry_time(),
+          request->author().c_str(), request->comment_data().c_str(),
+          request->start(), request->end(), request->fixed(),
+          request->triggered_by(), duration, &downtime_id);
     return 0;
   });
 
@@ -1326,7 +1237,7 @@ grpc::Status engine_impl::ScheduleHostGroupServicesDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     uint64_t downtime_id(0);
     unsigned long duration;
     hostgroup* hg{nullptr};
@@ -1344,31 +1255,22 @@ grpc::Status engine_impl::ScheduleHostGroupServicesDowntime(
     /* iterate through host group members(hosts) */
     for (host_map_unsafe::iterator it(hg->members.begin()),
          end(hg->members.end());
-         it != end;
-         ++it) {
+         it != end; ++it) {
       if (!it->second)
         continue;
       /* iterate through services of the current host */
       for (service_map_unsafe::iterator it2(it->second->services.begin()),
            end2(it->second->services.end());
-           it2 != end2;
-           ++it2) {
+           it2 != end2; ++it2) {
         if (!it2->second)
           continue;
         /* scheduling downtime */
         downtime_manager::instance().schedule_downtime(
-            downtime::service_downtime,
-            it2->second->get_hostname(),
-            it2->second->get_description(),
-            request->entry_time(),
-            request->author().c_str(),
-            request->comment_data().c_str(),
-            request->start(),
-            request->end(),
-            request->fixed(),
-            request->triggered_by(),
-            duration,
-            &downtime_id);
+            downtime::service_downtime, it2->second->get_hostname(),
+            it2->second->get_description(), request->entry_time(),
+            request->author().c_str(), request->comment_data().c_str(),
+            request->start(), request->end(), request->fixed(),
+            request->triggered_by(), duration, &downtime_id);
       }
     }
     return 0;
@@ -1410,7 +1312,7 @@ grpc::Status engine_impl::ScheduleServiceGroupHostsDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     host* temp_host{nullptr};
     host* last_host{nullptr};
     uint64_t downtime_id(0);
@@ -1427,8 +1329,7 @@ grpc::Status engine_impl::ScheduleServiceGroupHostsDowntime(
 
     for (service_map_unsafe::iterator it(sg_it->second->members.begin()),
          end(sg_it->second->members.end());
-         it != end;
-         ++it) {
+         it != end; ++it) {
       /* get the host to schedule */
       host_map::const_iterator found(host::hosts.find(it->first.first));
       if (found == host::hosts.end() || !found->second)
@@ -1438,18 +1339,10 @@ grpc::Status engine_impl::ScheduleServiceGroupHostsDowntime(
         continue;
       /* scheduling downtime */
       downtime_manager::instance().schedule_downtime(
-          downtime::host_downtime,
-          it->first.first,
-          "",
-          request->entry_time(),
-          request->author().c_str(),
-          request->comment_data().c_str(),
-          request->start(),
-          request->end(),
-          request->fixed(),
-          request->triggered_by(),
-          duration,
-          &downtime_id);
+          downtime::host_downtime, it->first.first, "", request->entry_time(),
+          request->author().c_str(), request->comment_data().c_str(),
+          request->start(), request->end(), request->fixed(),
+          request->triggered_by(), duration, &downtime_id);
       last_host = temp_host;
     }
     return 0;
@@ -1491,7 +1384,7 @@ grpc::Status engine_impl::ScheduleServiceGroupServicesDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     uint64_t downtime_id(0);
     unsigned long duration;
     servicegroup_map::const_iterator sg_it;
@@ -1507,22 +1400,13 @@ grpc::Status engine_impl::ScheduleServiceGroupServicesDowntime(
     /* iterate through the services of service group */
     for (service_map_unsafe::iterator it(sg_it->second->members.begin()),
          end(sg_it->second->members.end());
-         it != end;
-         ++it)
+         it != end; ++it)
       /* scheduling downtime */
       downtime_manager::instance().schedule_downtime(
-          downtime::service_downtime,
-          it->first.first,
-          it->first.second,
-          request->entry_time(),
-          request->author().c_str(),
-          request->comment_data().c_str(),
-          request->start(),
-          request->end(),
-          request->fixed(),
-          request->triggered_by(),
-          duration,
-          &downtime_id);
+          downtime::service_downtime, it->first.first, it->first.second,
+          request->entry_time(), request->author().c_str(),
+          request->comment_data().c_str(), request->start(), request->end(),
+          request->fixed(), request->triggered_by(), duration, &downtime_id);
     return 0;
   });
 
@@ -1561,7 +1445,7 @@ grpc::Status engine_impl::ScheduleAndPropagateHostDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     uint64_t downtime_id(0);
     unsigned long duration;
@@ -1578,30 +1462,16 @@ grpc::Status engine_impl::ScheduleAndPropagateHostDowntime(
 
     /* scheduling the parent host */
     downtime_manager::instance().schedule_downtime(
-        downtime::host_downtime,
-        request->host_name(),
-        "",
-        request->entry_time(),
-        request->author().c_str(),
-        request->comment_data().c_str(),
-        request->start(),
-        request->end(),
-        request->fixed(),
-        request->triggered_by(),
-        duration,
-        &downtime_id);
+        downtime::host_downtime, request->host_name(), "",
+        request->entry_time(), request->author().c_str(),
+        request->comment_data().c_str(), request->start(), request->end(),
+        request->fixed(), request->triggered_by(), duration, &downtime_id);
 
     /* schedule (non-triggered) downtime for all child hosts */
     command_manager::schedule_and_propagate_downtime(
-        temp_host.get(),
-        request->entry_time(),
-        request->author().c_str(),
-        request->comment_data().c_str(),
-        request->start(),
-        request->end(),
-        request->fixed(),
-        0,
-        duration);
+        temp_host.get(), request->entry_time(), request->author().c_str(),
+        request->comment_data().c_str(), request->start(), request->end(),
+        request->fixed(), 0, duration);
     return 0;
   });
 
@@ -1642,7 +1512,7 @@ grpc::Status engine_impl::ScheduleAndPropagateTriggeredHostDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     uint64_t downtime_id(0);
     unsigned long duration;
@@ -1659,29 +1529,15 @@ grpc::Status engine_impl::ScheduleAndPropagateTriggeredHostDowntime(
 
     /* scheduling the parent host */
     downtime_manager::instance().schedule_downtime(
-        downtime::host_downtime,
-        request->host_name(),
-        "",
-        request->entry_time(),
-        request->author().c_str(),
-        request->comment_data().c_str(),
-        request->start(),
-        request->end(),
-        request->fixed(),
-        request->triggered_by(),
-        duration,
-        &downtime_id);
+        downtime::host_downtime, request->host_name(), "",
+        request->entry_time(), request->author().c_str(),
+        request->comment_data().c_str(), request->start(), request->end(),
+        request->fixed(), request->triggered_by(), duration, &downtime_id);
     /* scheduling his childs */
     command_manager::schedule_and_propagate_downtime(
-        temp_host.get(),
-        request->entry_time(),
-        request->author().c_str(),
-        request->comment_data().c_str(),
-        request->start(),
-        request->end(),
-        request->fixed(),
-        downtime_id,
-        duration);
+        temp_host.get(), request->entry_time(), request->author().c_str(),
+        request->comment_data().c_str(), request->start(), request->end(),
+        request->fixed(), downtime_id, duration);
 
     return 0;
   });
@@ -1707,7 +1563,7 @@ grpc::Status engine_impl::DeleteDowntime(grpc::ServerContext* context
                                          const GenericValue* request,
                                          CommandSuccess* response) {
   uint32_t downtime_id = request->value();
-  auto fn = std::packaged_task<int32_t(void)>([&downtime_id]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([&downtime_id]() -> int32_t {
     /* deletes scheduled  downtime */
     if (downtime_manager::instance().unschedule_downtime(downtime_id) == ERROR)
       return 1;
@@ -1739,7 +1595,7 @@ grpc::Status engine_impl::DeleteHostDowntimeFull(
     grpc::ServerContext* context __attribute__((unused)),
     const DowntimeCriterias* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     downtime::type downtime_type = downtime::host_downtime;
     std::list<std::shared_ptr<downtimes::downtime> > dtlist;
     for (auto it = downtimes::downtime_manager::instance()
@@ -1748,8 +1604,7 @@ grpc::Status engine_impl::DeleteHostDowntimeFull(
               end = downtimes::downtime_manager::instance()
                         .get_scheduled_downtimes()
                         .end();
-         it != end;
-         ++it) {
+         it != end; ++it) {
       auto dt = it->second;
       if (!(request->host_name().empty()) &&
           dt->get_hostname() != request->host_name())
@@ -1805,7 +1660,7 @@ grpc::Status engine_impl::DeleteServiceDowntimeFull(
     grpc::ServerContext* context __attribute__((unused)),
     const DowntimeCriterias* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     downtime::type downtime_type = downtime::service_downtime;
     std::list<service_downtime*> dtlist;
     /* iterate through all current downtime(s) */
@@ -1815,8 +1670,7 @@ grpc::Status engine_impl::DeleteServiceDowntimeFull(
               end = downtimes::downtime_manager::instance()
                         .get_scheduled_downtimes()
                         .end();
-         it != end;
-         ++it) {
+         it != end; ++it) {
       service_downtime* dt = static_cast<service_downtime*>(it->second.get());
       /* we are checking if request criteria match with the downtime criteria */
       if (!(request->host_name().empty()) &&
@@ -1882,8 +1736,8 @@ grpc::Status engine_impl::DeleteDowntimeByHostName(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
 
-  auto fn = std::packaged_task<
-      int32_t(void)>([&host_name, request ]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([&host_name,
+                                               request]() -> int32_t {
     std::pair<bool, time_t> start_time;
     std::string service_desc;
     std::string comment_data;
@@ -1899,7 +1753,7 @@ grpc::Status engine_impl::DeleteDowntimeByHostName(
     uint32_t deleted =
         downtime_manager::instance()
             .delete_downtime_by_hostname_service_description_start_time_comment(
-                 host_name, service_desc, start_time, comment_data);
+                host_name, service_desc, start_time, comment_data);
     if (deleted == 0)
       return 1;
     return 0;
@@ -1932,8 +1786,8 @@ grpc::Status engine_impl::DeleteDowntimeByHostGroupName(
   if (host_group_name.empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_group_name must not be empty");
-  auto fn = std::packaged_task<
-      int32_t(void)>([&host_group_name, request ]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([&host_group_name,
+                                               request]() -> int32_t {
     std::pair<bool, time_t> start_time;
     std::string host_name;
     std::string service_desc;
@@ -1956,8 +1810,7 @@ grpc::Status engine_impl::DeleteDowntimeByHostGroupName(
 
     for (host_map_unsafe::iterator it_h(it->second->members.begin()),
          end_h(it->second->members.end());
-         it_h != end_h;
-         ++it_h) {
+         it_h != end_h; ++it_h) {
       if (!it_h->second)
         continue;
       if (!(host_name.empty()) && it_h->first != host_name)
@@ -1965,7 +1818,7 @@ grpc::Status engine_impl::DeleteDowntimeByHostGroupName(
       deleted =
           downtime_manager::instance()
               .delete_downtime_by_hostname_service_description_start_time_comment(
-                   host_name, service_desc, start_time, comment_data);
+                  host_name, service_desc, start_time, comment_data);
     }
 
     if (deleted == 0)
@@ -2009,12 +1862,12 @@ grpc::Status engine_impl::DeleteDowntimeByStartTimeComment(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "comment_data must not be empty");
 
-  auto fn = std::packaged_task<
-      int32_t(void)>([&comment_data, &start_time ]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([&comment_data,
+                                               &start_time]() -> int32_t {
     uint32_t deleted =
         downtime_manager::instance()
             .delete_downtime_by_hostname_service_description_start_time_comment(
-                 "", "", {true, start_time}, comment_data);
+                "", "", {true, start_time}, comment_data);
     if (0 == deleted)
       return 1;
     return 0;
@@ -2044,7 +1897,7 @@ grpc::Status engine_impl::ScheduleHostCheck(grpc::ServerContext* context
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     /* get the host */
     auto it = host::hosts.find(request->host_name());
@@ -2085,7 +1938,7 @@ grpc::Status engine_impl::ScheduleHostServiceCheck(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
 
     /* get the host */
@@ -2097,8 +1950,7 @@ grpc::Status engine_impl::ScheduleHostServiceCheck(
     /* iterate through services of the current host */
     for (service_map_unsafe::iterator it(temp_host->services.begin()),
          end(temp_host->services.end());
-         it != end;
-         ++it) {
+         it != end; ++it) {
       if (!it->second)
         continue;
       if (!request->force())
@@ -2139,7 +1991,7 @@ grpc::Status engine_impl::ScheduleServiceCheck(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "service description must not be empty");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
     /* get the service */
     auto it =
@@ -2177,30 +2029,18 @@ grpc::Status engine_impl::SignalProcess(grpc::ServerContext* context
                                         __attribute__((unused)),
                                         const EngineSignalProcess* request,
                                         CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     timed_event* evt;
     if (EngineSignalProcess::Process_Name(request->process()) == "SHUTDOWN") {
       /* add a scheduled program shutdown or restart to the event list */
       evt = new timed_event(timed_event::EVENT_PROGRAM_SHUTDOWN,
-                            request->scheduled_time(),
-                            false,
-                            0,
-                            nullptr,
-                            false,
-                            nullptr,
-                            nullptr,
-                            0);
+                            request->scheduled_time(), false, 0, nullptr, false,
+                            nullptr, nullptr, 0);
     } else if (EngineSignalProcess::Process_Name(request->process()) ==
                "RESTART") {
       evt = new timed_event(timed_event::EVENT_PROGRAM_RESTART,
-                            request->scheduled_time(),
-                            false,
-                            0,
-                            nullptr,
-                            false,
-                            nullptr,
-                            nullptr,
-                            0);
+                            request->scheduled_time(), false, 0, nullptr, false,
+                            nullptr, nullptr, 0);
     } else {
       return 1;
     }
@@ -2230,7 +2070,7 @@ grpc::Status engine_impl::DelayHostNotification(
     grpc::ServerContext* context __attribute__((unused)),
     const HostDelayIdentifier* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
 
     switch (request->identifier_case()) {
@@ -2278,7 +2118,7 @@ grpc::Status engine_impl::DelayServiceNotification(
     grpc::ServerContext* context __attribute__((unused)),
     const ServiceDelayIdentifier* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
 
     switch (request->identifier_case()) {
@@ -2320,7 +2160,7 @@ grpc::Status engine_impl::ChangeHostObjectIntVar(grpc::ServerContext* context
                                                  __attribute__((unused)),
                                                  const ChangeObjectInt* request,
                                                  CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     unsigned long attr = MODATTR_NONE;
 
@@ -2350,8 +2190,8 @@ grpc::Status engine_impl::ChangeHostObjectIntVar(grpc::ServerContext* context
         time(&preferred_time);
         if (!check_time_against_period(preferred_time,
                                        temp_host->check_period_ptr)) {
-          get_next_valid_time(
-              preferred_time, &next_valid_time, temp_host->check_period_ptr);
+          get_next_valid_time(preferred_time, &next_valid_time,
+                              temp_host->check_period_ptr);
           temp_host->set_next_check(next_valid_time);
         } else
           temp_host->set_next_check(preferred_time);
@@ -2386,14 +2226,9 @@ grpc::Status engine_impl::ChangeHostObjectIntVar(grpc::ServerContext* context
                                          attr);
 
     /* send data to event broker */
-    broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
-                              NEBFLAG_NONE,
-                              NEBATTR_NONE,
-                              temp_host.get(),
-                              CMD_NONE,
-                              attr,
-                              temp_host->get_modified_attributes(),
-                              nullptr);
+    broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE, NEBFLAG_NONE,
+                              NEBATTR_NONE, temp_host.get(), CMD_NONE, attr,
+                              temp_host->get_modified_attributes(), nullptr);
 
     /* update the status log with the host info */
     temp_host->update_status();
@@ -2411,7 +2246,7 @@ grpc::Status engine_impl::ChangeServiceObjectIntVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeObjectInt* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
     unsigned long attr = MODATTR_NONE;
 
@@ -2443,8 +2278,8 @@ grpc::Status engine_impl::ChangeServiceObjectIntVar(
         time(&preferred_time);
         if (!check_time_against_period(preferred_time,
                                        temp_service->check_period_ptr)) {
-          get_next_valid_time(
-              preferred_time, &next_valid_time, temp_service->check_period_ptr);
+          get_next_valid_time(preferred_time, &next_valid_time,
+                              temp_service->check_period_ptr);
           temp_service->set_next_check(next_valid_time);
         } else
           temp_service->set_next_check(preferred_time);
@@ -2478,13 +2313,9 @@ grpc::Status engine_impl::ChangeServiceObjectIntVar(
       temp_service->set_modified_attributes(
           temp_service->get_modified_attributes() | attr);
     /* send data to event broker */
-    broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
-                                 NEBFLAG_NONE,
-                                 NEBATTR_NONE,
-                                 temp_service.get(),
-                                 CMD_NONE,
-                                 attr,
-                                 temp_service->get_modified_attributes(),
+    broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
+                                 NEBATTR_NONE, temp_service.get(), CMD_NONE,
+                                 attr, temp_service->get_modified_attributes(),
                                  nullptr);
 
     /* update the status log with the service info */
@@ -2503,7 +2334,7 @@ grpc::Status engine_impl::ChangeContactObjectIntVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeContactObjectInt* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<com::centreon::engine::contact> temp_contact;
     unsigned long attr = MODATTR_NONE;
     unsigned long hattr = MODATTR_NONE;
@@ -2532,18 +2363,11 @@ grpc::Status engine_impl::ChangeContactObjectIntVar(
 
     /* send data to event broker */
     broker_adaptive_contact_data(
-        NEBTYPE_ADAPTIVECONTACT_UPDATE,
-        NEBFLAG_NONE,
-        NEBATTR_NONE,
-        temp_contact.get(),
-        CMD_NONE,
-        attr,
-        temp_contact->get_modified_attributes(),
-        hattr,
-        temp_contact->get_modified_host_attributes(),
-        sattr,
-        temp_contact->get_modified_service_attributes(),
-        nullptr);
+        NEBTYPE_ADAPTIVECONTACT_UPDATE, NEBFLAG_NONE, NEBATTR_NONE,
+        temp_contact.get(), CMD_NONE, attr,
+        temp_contact->get_modified_attributes(), hattr,
+        temp_contact->get_modified_host_attributes(), sattr,
+        temp_contact->get_modified_service_attributes(), nullptr);
 
     /* update the status log with the contact info */
     temp_contact->update_status_info(false);
@@ -2560,7 +2384,7 @@ grpc::Status engine_impl::ChangeHostObjectCharVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeObjectChar* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     timeperiod* temp_timeperiod{nullptr};
     command_map::iterator cmd_found;
@@ -2636,15 +2460,10 @@ grpc::Status engine_impl::ChangeHostObjectCharVar(
       modified_host_process_attributes |= attr;
 
       /* send data to event broker */
-      broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                                   NEBFLAG_NONE,
-                                   NEBATTR_NONE,
-                                   CMD_NONE,
-                                   attr,
-                                   modified_host_process_attributes,
-                                   MODATTR_NONE,
-                                   modified_service_process_attributes,
-                                   nullptr);
+      broker_adaptive_program_data(
+          NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE, NEBATTR_NONE, CMD_NONE,
+          attr, modified_host_process_attributes, MODATTR_NONE,
+          modified_service_process_attributes, nullptr);
       /* update program status */
       update_program_status(false);
     } else {
@@ -2652,14 +2471,9 @@ grpc::Status engine_impl::ChangeHostObjectCharVar(
       temp_host->add_modified_attributes(attr);
 
       /* send data to event broker */
-      broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
-                                NEBFLAG_NONE,
-                                NEBATTR_NONE,
-                                temp_host.get(),
-                                CMD_NONE,
-                                attr,
-                                temp_host->get_modified_attributes(),
-                                nullptr);
+      broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE, NEBFLAG_NONE,
+                                NEBATTR_NONE, temp_host.get(), CMD_NONE, attr,
+                                temp_host->get_modified_attributes(), nullptr);
 
       /* update the status log with the host info */
       temp_host->update_status();
@@ -2679,7 +2493,7 @@ grpc::Status engine_impl::ChangeServiceObjectCharVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeObjectChar* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
     timeperiod* temp_timeperiod{nullptr};
     command_map::iterator cmd_found;
@@ -2758,15 +2572,10 @@ grpc::Status engine_impl::ChangeServiceObjectCharVar(
       modified_service_process_attributes |= attr;
 
       /* send data to event broker */
-      broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                                   NEBFLAG_NONE,
-                                   NEBATTR_NONE,
-                                   CMD_NONE,
-                                   MODATTR_NONE,
-                                   modified_host_process_attributes,
-                                   attr,
-                                   modified_service_process_attributes,
-                                   nullptr);
+      broker_adaptive_program_data(
+          NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE, NEBATTR_NONE, CMD_NONE,
+          MODATTR_NONE, modified_host_process_attributes, attr,
+          modified_service_process_attributes, nullptr);
 
       /* update program status */
       update_program_status(false);
@@ -2775,14 +2584,10 @@ grpc::Status engine_impl::ChangeServiceObjectCharVar(
       temp_service->add_modified_attributes(attr);
 
       /* send data to event broker */
-      broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
-                                   NEBFLAG_NONE,
-                                   NEBATTR_NONE,
-                                   temp_service.get(),
-                                   CMD_NONE,
-                                   attr,
-                                   temp_service->get_modified_attributes(),
-                                   nullptr);
+      broker_adaptive_service_data(
+          NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE, NEBATTR_NONE,
+          temp_service.get(), CMD_NONE, attr,
+          temp_service->get_modified_attributes(), nullptr);
 
       /* update the status log with the service info */
       temp_service->update_status();
@@ -2805,7 +2610,7 @@ grpc::Status engine_impl::ChangeContactObjectCharVar(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "contact must not be empty");
 
-  auto fn = std::packaged_task<int32_t(void)>([request](void)->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request](void) -> int32_t {
     std::shared_ptr<engine::contact> temp_contact;
     timeperiod* temp_timeperiod{nullptr};
     unsigned long hattr{MODATTR_NONE};
@@ -2843,18 +2648,11 @@ grpc::Status engine_impl::ChangeContactObjectCharVar(
 
     /* send data to event broker */
     broker_adaptive_contact_data(
-        NEBTYPE_ADAPTIVECONTACT_UPDATE,
-        NEBFLAG_NONE,
-        NEBATTR_NONE,
-        temp_contact.get(),
-        CMD_NONE,
-        MODATTR_NONE,
-        temp_contact->get_modified_attributes(),
-        hattr,
-        temp_contact->get_modified_host_attributes(),
-        sattr,
-        temp_contact->get_modified_service_attributes(),
-        nullptr);
+        NEBTYPE_ADAPTIVECONTACT_UPDATE, NEBFLAG_NONE, NEBATTR_NONE,
+        temp_contact.get(), CMD_NONE, MODATTR_NONE,
+        temp_contact->get_modified_attributes(), hattr,
+        temp_contact->get_modified_host_attributes(), sattr,
+        temp_contact->get_modified_service_attributes(), nullptr);
 
     /* update the status log with the contact info */
     temp_contact->update_status_info(false);
@@ -2875,7 +2673,7 @@ grpc::Status engine_impl::ChangeHostObjectCustomVar(
   if (request->host_name().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     // std::shared_ptr<engine::host> temp_host;
     host* temp_host{nullptr};
     std::string varname(request->varname());
@@ -2916,7 +2714,7 @@ grpc::Status engine_impl::ChangeServiceObjectCustomVar(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "service description must not be empty");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     service* temp_service{nullptr};
     std::string varname(request->varname());
 
@@ -2953,7 +2751,7 @@ grpc::Status engine_impl::ChangeContactObjectCustomVar(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "contact must not be empty");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     contact* temp_contact{nullptr};
     std::string varname(request->varname());
 
@@ -2993,7 +2791,7 @@ grpc::Status engine_impl::ShutdownProgram(
     grpc::ServerContext* context __attribute__((unused)),
     const ::google::protobuf::Empty* request __attribute__((unused)),
     ::google::protobuf::Empty* response) {
-  auto fn = std::packaged_task<int32_t(void)>([]()->int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([]() -> int32_t {
     exit(0);
     return 0;
   });

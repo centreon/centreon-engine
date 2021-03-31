@@ -124,10 +124,9 @@ int process_external_commands_from_file(char const* file, int delete_file) {
   if (!file)
     return ERROR;
 
-  logger(dbg_external_command, more) << "Processing commands from file '"
-                                     << file << "'.  File will "
-                                     << (delete_file ? "be" : "NOT be")
-                                     << " deleted after processing.";
+  logger(dbg_external_command, more)
+      << "Processing commands from file '" << file << "'.  File will "
+      << (delete_file ? "be" : "NOT be") << " deleted after processing.";
 
   /* open the config file for reading */
   mmapfile* thefile(nullptr);
@@ -227,23 +226,15 @@ int cmd_add_comment(int cmd, time_t entry_time, char* args) {
   /* add the comment */
   std::shared_ptr<comment> com{new comment(
       (cmd == CMD_ADD_HOST_COMMENT) ? comment::host : comment::service,
-      comment::user,
-      temp_host->get_host_id(),
-      service_id,
-      entry_time,
-      user,
-      comment_data,
-      persistent,
-      comment::external,
-      false,
-      (time_t)0)};
+      comment::user, temp_host->get_host_id(), service_id, entry_time, user,
+      comment_data, persistent, comment::external, false, (time_t)0)};
   comment::comments.insert({com->get_comment_id(), com});
 
   return OK;
 }
 
 /* removes a host or service comment from the status log */
-int cmd_delete_comment(int cmd[[maybe_unused]], char* args) {
+int cmd_delete_comment(int cmd [[maybe_unused]], char* args) {
   uint64_t comment_id{0};
 
   /* get the comment id we should delete */
@@ -398,8 +389,7 @@ int cmd_schedule_check(int cmd, char* args) {
            cmd == CMD_SCHEDULE_FORCED_HOST_SVC_CHECKS) {
     for (service_map_unsafe::iterator it(temp_host->services.begin()),
          end(temp_host->services.end());
-         it != end;
-         ++it) {
+         it != end; ++it) {
       if (!it->second)
         continue;
       it->second->schedule_check(delay_time,
@@ -445,8 +435,7 @@ int cmd_schedule_host_service_checks(int cmd, char* args, int force) {
   /* reschedule all services on the specified host */
   for (service_map_unsafe::iterator it(temp_host->services.begin()),
        end(temp_host->services.end());
-       it != end;
-       ++it) {
+       it != end; ++it) {
     if (!it->second)
       continue;
     it->second->schedule_check(
@@ -468,17 +457,10 @@ void cmd_signal_process(int cmd, char* args) {
     scheduled_time = strtoul(temp_ptr, nullptr, 10);
 
   /* add a scheduled program shutdown or restart to the event list */
-  timed_event* evt = new timed_event((cmd == CMD_SHUTDOWN_PROCESS)
-                                         ? timed_event::EVENT_PROGRAM_SHUTDOWN
-                                         : timed_event::EVENT_PROGRAM_RESTART,
-                                     scheduled_time,
-                                     false,
-                                     0,
-                                     nullptr,
-                                     false,
-                                     nullptr,
-                                     nullptr,
-                                     0);
+  timed_event* evt = new timed_event(
+      (cmd == CMD_SHUTDOWN_PROCESS) ? timed_event::EVENT_PROGRAM_SHUTDOWN
+                                    : timed_event::EVENT_PROGRAM_RESTART,
+      scheduled_time, false, 0, nullptr, false, nullptr, nullptr, 0);
   events::loop::instance().schedule(evt, true);
 }
 
@@ -524,8 +506,8 @@ int cmd_process_service_check_result(int cmd, time_t check_time, char* args) {
   int return_code(strtol(delimiter, nullptr, 0));
 
   // Submit the passive check result.
-  return process_passive_service_check(
-      check_time, host_name, svc_description, return_code, output);
+  return process_passive_service_check(check_time, host_name, svc_description,
+                                       return_code, output);
 }
 
 /* submits a passive service check result for later processing */
@@ -551,8 +533,7 @@ int process_passive_service_check(time_t check_time,
     real_host_name = host_name;
   else {
     for (host_map::iterator itt(host::hosts.begin()), end(host::hosts.end());
-         itt != end;
-         ++itt) {
+         itt != end; ++itt) {
       if (itt->second && itt->second->get_address() == host_name) {
         real_host_name = itt->first.c_str();
         it = itt;
@@ -591,19 +572,11 @@ int process_passive_service_check(time_t check_time,
   timeval set_tv = {.tv_sec = check_time, .tv_usec = 0};
 
   check_result* result =
-      new check_result(service_check,
-                       found->second.get(),
-                       checkable::check_passive,
-                       CHECK_OPTION_NONE,
-                       false,
+      new check_result(service_check, found->second.get(),
+                       checkable::check_passive, CHECK_OPTION_NONE, false,
                        static_cast<double>(tv.tv_sec - check_time) +
                            static_cast<double>(tv.tv_usec / 1000000.0),
-                       set_tv,
-                       set_tv,
-                       false,
-                       true,
-                       return_code,
-                       output);
+                       set_tv, set_tv, false, true, return_code, output);
 
   /* make sure the return code is within bounds */
   if (result->get_return_code() < 0 || result->get_return_code() > 3) {
@@ -680,8 +653,7 @@ int process_passive_host_check(time_t check_time,
     real_host_name = host_name;
   else {
     for (host_map::iterator itt(host::hosts.begin()), end(host::hosts.end());
-         itt != end;
-         ++itt) {
+         itt != end; ++itt) {
       if (itt->second && itt->second->get_address() == host_name) {
         real_host_name = itt->first.c_str();
         it = itt;
@@ -707,19 +679,11 @@ int process_passive_host_check(time_t check_time,
   timeval tv_start = {.tv_sec = check_time, .tv_usec = 0};
 
   check_result* result =
-      new check_result(host_check,
-                       it->second.get(),
-                       checkable::check_passive,
-                       CHECK_OPTION_NONE,
-                       false,
+      new check_result(host_check, it->second.get(), checkable::check_passive,
+                       CHECK_OPTION_NONE, false,
                        static_cast<double>(tv.tv_sec - check_time) +
                            static_cast<double>(tv.tv_usec / 1000000.0),
-                       tv_start,
-                       tv_start,
-                       false,
-                       true,
-                       return_code,
-                       output);
+                       tv_start, tv_start, false, true, return_code, output);
 
   /* make sure the return code is within bounds */
   if (result->get_return_code() < 0 || result->get_return_code() > 3)
@@ -796,12 +760,12 @@ int cmd_acknowledge_problem(int cmd, char* args) {
 
   /* acknowledge the host problem */
   if (cmd == CMD_ACKNOWLEDGE_HOST_PROBLEM)
-    acknowledge_host_problem(
-        it->second.get(), ack_author, ack_data, type, notify, persistent);
+    acknowledge_host_problem(it->second.get(), ack_author, ack_data, type,
+                             notify, persistent);
   /* acknowledge the service problem */
   else
-    acknowledge_service_problem(
-        found->second.get(), ack_author, ack_data, type, notify, persistent);
+    acknowledge_service_problem(found->second.get(), ack_author, ack_data, type,
+                                notify, persistent);
 
   /* free memory */
   delete[] ack_author;
@@ -966,102 +930,57 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
   /* schedule downtime */
   switch (cmd) {
     case CMD_SCHEDULE_HOST_DOWNTIME:
-      downtime_manager::instance().schedule_downtime(downtime::host_downtime,
-                                                     host_name,
-                                                     "",
-                                                     entry_time,
-                                                     author,
-                                                     comment_data,
-                                                     start_time,
-                                                     end_time,
-                                                     fixed,
-                                                     triggered_by,
-                                                     duration,
-                                                     &downtime_id);
+      downtime_manager::instance().schedule_downtime(
+          downtime::host_downtime, host_name, "", entry_time, author,
+          comment_data, start_time, end_time, fixed, triggered_by, duration,
+          &downtime_id);
       break;
 
     case CMD_SCHEDULE_SVC_DOWNTIME:
-      downtime_manager::instance().schedule_downtime(downtime::service_downtime,
-                                                     host_name,
-                                                     svc_description,
-                                                     entry_time,
-                                                     author,
-                                                     comment_data,
-                                                     start_time,
-                                                     end_time,
-                                                     fixed,
-                                                     triggered_by,
-                                                     duration,
-                                                     &downtime_id);
+      downtime_manager::instance().schedule_downtime(
+          downtime::service_downtime, host_name, svc_description, entry_time,
+          author, comment_data, start_time, end_time, fixed, triggered_by,
+          duration, &downtime_id);
       break;
 
     case CMD_SCHEDULE_HOST_SVC_DOWNTIME:
       for (service_map_unsafe::iterator it(temp_host->services.begin()),
            end(temp_host->services.end());
-           it != end;
-           ++it) {
+           it != end; ++it) {
         if (!it->second)
           continue;
         downtime_manager::instance().schedule_downtime(
-            downtime::service_downtime,
-            host_name,
-            it->second->get_description(),
-            entry_time,
-            author,
-            comment_data,
-            start_time,
-            end_time,
-            fixed,
-            triggered_by,
-            duration,
-            &downtime_id);
+            downtime::service_downtime, host_name,
+            it->second->get_description(), entry_time, author, comment_data,
+            start_time, end_time, fixed, triggered_by, duration, &downtime_id);
       }
       break;
 
     case CMD_SCHEDULE_HOSTGROUP_HOST_DOWNTIME:
       for (host_map_unsafe::iterator it(hg->members.begin()),
            end(hg->members.end());
-           it != end;
-           ++it)
-        downtime_manager::instance().schedule_downtime(downtime::host_downtime,
-                                                       it->first,
-                                                       "",
-                                                       entry_time,
-                                                       author,
-                                                       comment_data,
-                                                       start_time,
-                                                       end_time,
-                                                       fixed,
-                                                       triggered_by,
-                                                       duration,
-                                                       &downtime_id);
+           it != end; ++it)
+        downtime_manager::instance().schedule_downtime(
+            downtime::host_downtime, it->first, "", entry_time, author,
+            comment_data, start_time, end_time, fixed, triggered_by, duration,
+            &downtime_id);
       break;
 
     case CMD_SCHEDULE_HOSTGROUP_SVC_DOWNTIME:
       for (host_map_unsafe::iterator it(hg->members.begin()),
            end(hg->members.end());
-           it != end;
-           ++it) {
+           it != end; ++it) {
         if (!it->second)
           continue;
         for (service_map_unsafe::iterator it2(it->second->services.begin()),
              end2(it->second->services.end());
-             it2 != end2;
-             ++it2) {
+             it2 != end2; ++it2) {
           if (!it2->second)
             continue;
           downtime_manager::instance().schedule_downtime(
-              downtime::service_downtime,
-              it2->second->get_hostname(),
-              it2->second->get_description(),
-              entry_time,
-              author,
-              comment_data,
-              start_time,
-              end_time,
-              fixed,
-              triggered_by,
-              duration,
+              downtime::service_downtime, it2->second->get_hostname(),
+              it2->second->get_description(), entry_time, author, comment_data,
+              start_time, end_time, fixed, triggered_by, duration,
               &downtime_id);
         }
       }
@@ -1071,8 +990,7 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
       last_host = nullptr;
       for (service_map_unsafe::iterator it(sg_it->second->members.begin()),
            end(sg_it->second->members.end());
-           it != end;
-           ++it) {
+           it != end; ++it) {
         temp_host = nullptr;
         host_map::const_iterator found(host::hosts.find(it->first.first));
         if (found == host::hosts.end() || !found->second)
@@ -1080,18 +998,10 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
         temp_host = found->second.get();
         if (last_host == temp_host)
           continue;
-        downtime_manager::instance().schedule_downtime(downtime::host_downtime,
-                                                       it->first.first,
-                                                       "",
-                                                       entry_time,
-                                                       author,
-                                                       comment_data,
-                                                       start_time,
-                                                       end_time,
-                                                       fixed,
-                                                       triggered_by,
-                                                       duration,
-                                                       &downtime_id);
+        downtime_manager::instance().schedule_downtime(
+            downtime::host_downtime, it->first.first, "", entry_time, author,
+            comment_data, start_time, end_time, fixed, triggered_by, duration,
+            &downtime_id);
         last_host = temp_host;
       }
       break;
@@ -1099,75 +1009,37 @@ int cmd_schedule_downtime(int cmd, time_t entry_time, char* args) {
     case CMD_SCHEDULE_SERVICEGROUP_SVC_DOWNTIME:
       for (service_map_unsafe::iterator it(sg_it->second->members.begin()),
            end(sg_it->second->members.end());
-           it != end;
-           ++it)
+           it != end; ++it)
         downtime_manager::instance().schedule_downtime(
-            downtime::service_downtime,
-            it->first.first,
-            it->first.second,
-            entry_time,
-            author,
-            comment_data,
-            start_time,
-            end_time,
-            fixed,
-            triggered_by,
-            duration,
-            &downtime_id);
+            downtime::service_downtime, it->first.first, it->first.second,
+            entry_time, author, comment_data, start_time, end_time, fixed,
+            triggered_by, duration, &downtime_id);
       break;
 
     case CMD_SCHEDULE_AND_PROPAGATE_HOST_DOWNTIME:
       /* schedule downtime for "parent" host */
-      downtime_manager::instance().schedule_downtime(downtime::host_downtime,
-                                                     host_name,
-                                                     "",
-                                                     entry_time,
-                                                     author,
-                                                     comment_data,
-                                                     start_time,
-                                                     end_time,
-                                                     fixed,
-                                                     triggered_by,
-                                                     duration,
-                                                     &downtime_id);
+      downtime_manager::instance().schedule_downtime(
+          downtime::host_downtime, host_name, "", entry_time, author,
+          comment_data, start_time, end_time, fixed, triggered_by, duration,
+          &downtime_id);
 
       /* schedule (non-triggered) downtime for all child hosts */
-      schedule_and_propagate_downtime(temp_host,
-                                      entry_time,
-                                      author,
-                                      comment_data,
-                                      start_time,
-                                      end_time,
-                                      fixed,
-                                      0,
-                                      duration);
+      schedule_and_propagate_downtime(temp_host, entry_time, author,
+                                      comment_data, start_time, end_time, fixed,
+                                      0, duration);
       break;
 
     case CMD_SCHEDULE_AND_PROPAGATE_TRIGGERED_HOST_DOWNTIME:
       /* schedule downtime for "parent" host */
-      downtime_manager::instance().schedule_downtime(downtime::host_downtime,
-                                                     host_name,
-                                                     "",
-                                                     entry_time,
-                                                     author,
-                                                     comment_data,
-                                                     start_time,
-                                                     end_time,
-                                                     fixed,
-                                                     triggered_by,
-                                                     duration,
-                                                     &downtime_id);
+      downtime_manager::instance().schedule_downtime(
+          downtime::host_downtime, host_name, "", entry_time, author,
+          comment_data, start_time, end_time, fixed, triggered_by, duration,
+          &downtime_id);
 
       /* schedule triggered downtime for all child hosts */
-      schedule_and_propagate_downtime(temp_host,
-                                      entry_time,
-                                      author,
-                                      comment_data,
-                                      start_time,
-                                      end_time,
-                                      fixed,
-                                      downtime_id,
-                                      duration);
+      schedule_and_propagate_downtime(temp_host, entry_time, author,
+                                      comment_data, start_time, end_time, fixed,
+                                      downtime_id, duration);
       break;
 
     default:
@@ -1259,8 +1131,7 @@ int cmd_delete_downtime_full(int cmd, char* args) {
   downtime_finder::result_set result(dtf.find_matching_all(criterias));
   for (downtime_finder::result_set::const_iterator it(result.begin()),
        end(result.end());
-       it != end;
-       ++it) {
+       it != end; ++it) {
     downtime_manager::instance().unschedule_downtime(*it);
   }
 
@@ -1313,7 +1184,7 @@ int cmd_delete_downtime_by_host_name(int cmd, char* args) {
   deleted =
       downtime_manager::instance()
           .delete_downtime_by_hostname_service_description_start_time_comment(
-               hostname, service_description, start_time, downtime_comment);
+              hostname, service_description, start_time, downtime_comment);
   if (0 == deleted)
     return ERROR;
   return OK;
@@ -1392,8 +1263,7 @@ int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
 
   for (host_map_unsafe::iterator it_h(it->second->members.begin()),
        end_h(it->second->members.end());
-       it_h != end_h;
-       ++it_h) {
+       it_h != end_h; ++it_h) {
     if (!it_h->second)
       continue;
     if (host_name != nullptr && it_h->first != host_name)
@@ -1401,7 +1271,7 @@ int cmd_delete_downtime_by_hostgroup_name(int cmd, char* args) {
     deleted =
         downtime_manager::instance()
             .delete_downtime_by_hostname_service_description_start_time_comment(
-                 host_name, service_description, start_time, downtime_comment);
+                host_name, service_description, start_time, downtime_comment);
   }
 
   if (0 == deleted)
@@ -1436,7 +1306,7 @@ int cmd_delete_downtime_by_start_time_comment(int cmd, char* args) {
   deleted =
       downtime_manager::instance()
           .delete_downtime_by_hostname_service_description_start_time_comment(
-               "", "", start_time, downtime_comment);
+              "", "", start_time, downtime_comment);
 
   if (0 == deleted)
     return ERROR;
@@ -1547,8 +1417,8 @@ int cmd_change_object_int_var(int cmd, char* args) {
         time(&preferred_time);
         if (!check_time_against_period(preferred_time,
                                        temp_host->check_period_ptr)) {
-          get_next_valid_time(
-              preferred_time, &next_valid_time, temp_host->check_period_ptr);
+          get_next_valid_time(preferred_time, &next_valid_time,
+                              temp_host->check_period_ptr);
           temp_host->set_next_check(next_valid_time);
         } else
           temp_host->set_next_check(preferred_time);
@@ -1595,8 +1465,7 @@ int cmd_change_object_int_var(int cmd, char* args) {
         time(&preferred_time);
         if (!check_time_against_period(preferred_time,
                                        found_svc->second->check_period_ptr)) {
-          get_next_valid_time(preferred_time,
-                              &next_valid_time,
+          get_next_valid_time(preferred_time, &next_valid_time,
                               found_svc->second->check_period_ptr);
           found_svc->second->set_next_check(next_valid_time);
         } else
@@ -1659,14 +1528,10 @@ int cmd_change_object_int_var(int cmd, char* args) {
             found_svc->second->get_modified_attributes() | attr);
 
       /* send data to event broker */
-      broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
-                                   NEBFLAG_NONE,
-                                   NEBATTR_NONE,
-                                   found_svc->second.get(),
-                                   cmd,
-                                   attr,
-                                   found_svc->second->get_modified_attributes(),
-                                   nullptr);
+      broker_adaptive_service_data(
+          NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE, NEBATTR_NONE,
+          found_svc->second.get(), cmd, attr,
+          found_svc->second->get_modified_attributes(), nullptr);
 
       /* update the status log with the service info */
       found_svc->second->update_status();
@@ -1684,14 +1549,9 @@ int cmd_change_object_int_var(int cmd, char* args) {
             temp_host->get_modified_attributes() | attr);
 
       /* send data to event broker */
-      broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
-                                NEBFLAG_NONE,
-                                NEBATTR_NONE,
-                                temp_host,
-                                cmd,
-                                attr,
-                                temp_host->get_modified_attributes(),
-                                nullptr);
+      broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE, NEBFLAG_NONE,
+                                NEBATTR_NONE, temp_host, cmd, attr,
+                                temp_host->get_modified_attributes(), nullptr);
 
       /* update the status log with the host info */
       temp_host->update_status();
@@ -1720,18 +1580,11 @@ int cmd_change_object_int_var(int cmd, char* args) {
 
       /* send data to event broker */
       broker_adaptive_contact_data(
-          NEBTYPE_ADAPTIVECONTACT_UPDATE,
-          NEBFLAG_NONE,
-          NEBATTR_NONE,
-          cnct->second.get(),
-          cmd,
-          attr,
-          cnct->second->get_modified_attributes(),
-          hattr,
-          cnct->second->get_modified_host_attributes(),
-          sattr,
-          cnct->second->get_modified_service_attributes(),
-          nullptr);
+          NEBTYPE_ADAPTIVECONTACT_UPDATE, NEBFLAG_NONE, NEBATTR_NONE,
+          cnct->second.get(), cmd, attr,
+          cnct->second->get_modified_attributes(), hattr,
+          cnct->second->get_modified_host_attributes(), sattr,
+          cnct->second->get_modified_service_attributes(), nullptr);
 
       /* update the status log with the contact info */
       cnct->second->update_status_info(false);
@@ -1980,15 +1833,10 @@ int cmd_change_object_char_var(int cmd, char* args) {
       modified_host_process_attributes |= attr;
 
       /* send data to event broker */
-      broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                                   NEBFLAG_NONE,
-                                   NEBATTR_NONE,
-                                   cmd,
-                                   attr,
-                                   modified_host_process_attributes,
-                                   MODATTR_NONE,
-                                   modified_service_process_attributes,
-                                   nullptr);
+      broker_adaptive_program_data(
+          NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE, NEBATTR_NONE, cmd, attr,
+          modified_host_process_attributes, MODATTR_NONE,
+          modified_service_process_attributes, nullptr);
       /* update program status */
       update_program_status(false);
       break;
@@ -1998,15 +1846,10 @@ int cmd_change_object_char_var(int cmd, char* args) {
       modified_service_process_attributes |= attr;
 
       /* send data to event broker */
-      broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                                   NEBFLAG_NONE,
-                                   NEBATTR_NONE,
-                                   cmd,
-                                   MODATTR_NONE,
-                                   modified_host_process_attributes,
-                                   attr,
-                                   modified_service_process_attributes,
-                                   nullptr);
+      broker_adaptive_program_data(
+          NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE, NEBATTR_NONE, cmd,
+          MODATTR_NONE, modified_host_process_attributes, attr,
+          modified_service_process_attributes, nullptr);
 
       /* update program status */
       update_program_status(false);
@@ -2021,14 +1864,10 @@ int cmd_change_object_char_var(int cmd, char* args) {
       found_svc->second->add_modified_attributes(attr);
 
       /* send data to event broker */
-      broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
-                                   NEBFLAG_NONE,
-                                   NEBATTR_NONE,
-                                   found_svc->second.get(),
-                                   cmd,
-                                   attr,
-                                   found_svc->second->get_modified_attributes(),
-                                   nullptr);
+      broker_adaptive_service_data(
+          NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE, NEBATTR_NONE,
+          found_svc->second.get(), cmd, attr,
+          found_svc->second->get_modified_attributes(), nullptr);
 
       /* update the status log with the service info */
       found_svc->second->update_status();
@@ -2042,14 +1881,9 @@ int cmd_change_object_char_var(int cmd, char* args) {
       temp_host->add_modified_attributes(attr);
 
       /* send data to event broker */
-      broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
-                                NEBFLAG_NONE,
-                                NEBATTR_NONE,
-                                temp_host,
-                                cmd,
-                                attr,
-                                temp_host->get_modified_attributes(),
-                                nullptr);
+      broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE, NEBFLAG_NONE,
+                                NEBATTR_NONE, temp_host, cmd, attr,
+                                temp_host->get_modified_attributes(), nullptr);
 
       /* update the status log with the host info */
       temp_host->update_status();
@@ -2065,18 +1899,11 @@ int cmd_change_object_char_var(int cmd, char* args) {
 
       /* send data to event broker */
       broker_adaptive_contact_data(
-          NEBTYPE_ADAPTIVECONTACT_UPDATE,
-          NEBFLAG_NONE,
-          NEBATTR_NONE,
-          cnct->second.get(),
-          cmd,
-          attr,
-          cnct->second->get_modified_attributes(),
-          hattr,
-          cnct->second->get_modified_host_attributes(),
-          sattr,
-          cnct->second->get_modified_service_attributes(),
-          nullptr);
+          NEBTYPE_ADAPTIVECONTACT_UPDATE, NEBFLAG_NONE, NEBATTR_NONE,
+          cnct->second.get(), cmd, attr,
+          cnct->second->get_modified_attributes(), hattr,
+          cnct->second->get_modified_host_attributes(), sattr,
+          cnct->second->get_modified_service_attributes(), nullptr);
 
       /* update the status log with the contact info */
       cnct->second->update_status_info(false);
@@ -2231,14 +2058,9 @@ void disable_service_checks(service* svc) {
   svc->set_should_be_scheduled(false);
 
   /* send data to event broker */
-  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               svc,
-                               CMD_NONE,
-                               attr,
-                               svc->get_modified_attributes(),
-                               nullptr);
+  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, svc, CMD_NONE, attr,
+                               svc->get_modified_attributes(), nullptr);
 
   /* update the status log to reflect the new service state */
   svc->update_status();
@@ -2268,8 +2090,8 @@ void enable_service_checks(service* svc) {
   /* schedule a check for right now (or as soon as possible) */
   time(&preferred_time);
   if (!check_time_against_period(preferred_time, svc->check_period_ptr)) {
-    get_next_valid_time(
-        preferred_time, &next_valid_time, svc->check_period_ptr);
+    get_next_valid_time(preferred_time, &next_valid_time,
+                        svc->check_period_ptr);
     svc->set_next_check(next_valid_time);
   } else
     svc->set_next_check(preferred_time);
@@ -2279,14 +2101,9 @@ void enable_service_checks(service* svc) {
     svc->schedule_check(svc->get_next_check(), CHECK_OPTION_NONE);
 
   /* send data to event broker */
-  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               svc,
-                               CMD_NONE,
-                               attr,
-                               svc->get_modified_attributes(),
-                               nullptr);
+  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, svc, CMD_NONE, attr,
+                               svc->get_modified_attributes(), nullptr);
 
   /* update the status log to reflect the new service state */
   svc->update_status();
@@ -2308,15 +2125,10 @@ void enable_all_notifications(void) {
   config->enable_notifications(true);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               attr,
-                               modified_host_process_attributes,
-                               attr,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, attr,
+                               modified_host_process_attributes, attr,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log */
   update_program_status(false);
@@ -2338,15 +2150,10 @@ void disable_all_notifications(void) {
   config->enable_notifications(false);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               attr,
-                               modified_host_process_attributes,
-                               attr,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, attr,
+                               modified_host_process_attributes, attr,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log */
   update_program_status(false);
@@ -2367,14 +2174,9 @@ void enable_service_notifications(service* svc) {
   svc->set_notifications_enabled(true);
 
   /* send data to event broker */
-  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               svc,
-                               CMD_NONE,
-                               attr,
-                               svc->get_modified_attributes(),
-                               nullptr);
+  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, svc, CMD_NONE, attr,
+                               svc->get_modified_attributes(), nullptr);
 
   /* update the status log to reflect the new service state */
   svc->update_status();
@@ -2395,14 +2197,9 @@ void disable_service_notifications(service* svc) {
   svc->set_notifications_enabled(false);
 
   /* send data to event broker */
-  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               svc,
-                               CMD_NONE,
-                               attr,
-                               svc->get_modified_attributes(),
-                               nullptr);
+  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, svc, CMD_NONE, attr,
+                               svc->get_modified_attributes(), nullptr);
 
   /* update the status log to reflect the new service state */
   svc->update_status();
@@ -2423,14 +2220,9 @@ void enable_host_notifications(host* hst) {
   hst->set_notifications_enabled(true);
 
   /* send data to event broker */
-  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
-                            NEBFLAG_NONE,
-                            NEBATTR_NONE,
-                            hst,
-                            CMD_NONE,
-                            attr,
-                            hst->get_modified_attributes(),
-                            nullptr);
+  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE, NEBFLAG_NONE,
+                            NEBATTR_NONE, hst, CMD_NONE, attr,
+                            hst->get_modified_attributes(), nullptr);
 
   /* update the status log to reflect the new host state */
   hst->update_status();
@@ -2451,14 +2243,9 @@ void disable_host_notifications(host* hst) {
   hst->set_notifications_enabled(false);
 
   /* send data to event broker */
-  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
-                            NEBFLAG_NONE,
-                            NEBATTR_NONE,
-                            hst,
-                            CMD_NONE,
-                            attr,
-                            hst->get_modified_attributes(),
-                            nullptr);
+  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE, NEBFLAG_NONE,
+                            NEBATTR_NONE, hst, CMD_NONE, attr,
+                            hst->get_modified_attributes(), nullptr);
 
   /* update the status log to reflect the new host state */
   hst->update_status();
@@ -2477,14 +2264,13 @@ void enable_and_propagate_notifications(host* hst,
   /* check all child hosts... */
   for (host_map_unsafe::iterator it(hst->child_hosts.begin()),
        end(hst->child_hosts.end());
-       it != end;
-       ++it) {
+       it != end; ++it) {
     if (it->second == nullptr)
       continue;
 
     /* recurse... */
-    enable_and_propagate_notifications(
-        it->second, level + 1, affect_top_host, affect_hosts, affect_services);
+    enable_and_propagate_notifications(it->second, level + 1, affect_top_host,
+                                       affect_hosts, affect_services);
 
     /* enable notifications for this host */
     if (affect_hosts)
@@ -2494,8 +2280,7 @@ void enable_and_propagate_notifications(host* hst,
     if (affect_services) {
       for (service_map_unsafe::iterator it2(it->second->services.begin()),
            end2(it->second->services.end());
-           it2 != end2;
-           ++it2) {
+           it2 != end2; ++it2) {
         if (!it2->second)
           continue;
         enable_service_notifications(it2->second);
@@ -2520,14 +2305,13 @@ void disable_and_propagate_notifications(host* hst,
   /* check all child hosts... */
   for (host_map_unsafe::iterator it(hst->child_hosts.begin()),
        end(hst->child_hosts.begin());
-       it != end;
-       ++it) {
+       it != end; ++it) {
     if (!it->second)
       continue;
 
     /* recurse... */
-    disable_and_propagate_notifications(
-        it->second, level + 1, affect_top_host, affect_hosts, affect_services);
+    disable_and_propagate_notifications(it->second, level + 1, affect_top_host,
+                                        affect_hosts, affect_services);
 
     /* disable notifications for this host */
     if (affect_hosts)
@@ -2537,8 +2321,7 @@ void disable_and_propagate_notifications(host* hst,
     if (affect_services) {
       for (service_map_unsafe::iterator it2(it->second->services.begin()),
            end2(it->second->services.end());
-           it2 != end2;
-           ++it2) {
+           it2 != end2; ++it2) {
         if (!it2->second)
           continue;
         disable_service_notifications(it2->second);
@@ -2563,18 +2346,11 @@ void enable_contact_host_notifications(contact* cntct) {
   cntct->set_host_notifications_enabled(true);
 
   /* send data to event broker */
-  broker_adaptive_contact_data(NEBTYPE_ADAPTIVECONTACT_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               cntct,
-                               CMD_NONE,
-                               MODATTR_NONE,
-                               cntct->get_modified_attributes(),
-                               attr,
-                               cntct->get_modified_host_attributes(),
-                               MODATTR_NONE,
-                               cntct->get_modified_service_attributes(),
-                               nullptr);
+  broker_adaptive_contact_data(
+      NEBTYPE_ADAPTIVECONTACT_UPDATE, NEBFLAG_NONE, NEBATTR_NONE, cntct,
+      CMD_NONE, MODATTR_NONE, cntct->get_modified_attributes(), attr,
+      cntct->get_modified_host_attributes(), MODATTR_NONE,
+      cntct->get_modified_service_attributes(), nullptr);
 
   /* update the status log to reflect the new contact state */
   cntct->update_status_info(false);
@@ -2596,18 +2372,11 @@ void disable_contact_host_notifications(contact* cntct) {
   cntct->set_host_notifications_enabled(false);
 
   /* send data to event broker */
-  broker_adaptive_contact_data(NEBTYPE_ADAPTIVECONTACT_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               cntct,
-                               CMD_NONE,
-                               MODATTR_NONE,
-                               cntct->get_modified_attributes(),
-                               attr,
-                               cntct->get_modified_host_attributes(),
-                               MODATTR_NONE,
-                               cntct->get_modified_service_attributes(),
-                               nullptr);
+  broker_adaptive_contact_data(
+      NEBTYPE_ADAPTIVECONTACT_UPDATE, NEBFLAG_NONE, NEBATTR_NONE, cntct,
+      CMD_NONE, MODATTR_NONE, cntct->get_modified_attributes(), attr,
+      cntct->get_modified_host_attributes(), MODATTR_NONE,
+      cntct->get_modified_service_attributes(), nullptr);
 
   /* update the status log to reflect the new contact state */
   cntct->update_status_info(false);
@@ -2629,18 +2398,11 @@ void enable_contact_service_notifications(contact* cntct) {
   cntct->set_service_notifications_enabled(true);
 
   /* send data to event broker */
-  broker_adaptive_contact_data(NEBTYPE_ADAPTIVECONTACT_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               cntct,
-                               CMD_NONE,
-                               MODATTR_NONE,
-                               cntct->get_modified_attributes(),
-                               MODATTR_NONE,
-                               cntct->get_modified_host_attributes(),
-                               attr,
-                               cntct->get_modified_service_attributes(),
-                               nullptr);
+  broker_adaptive_contact_data(
+      NEBTYPE_ADAPTIVECONTACT_UPDATE, NEBFLAG_NONE, NEBATTR_NONE, cntct,
+      CMD_NONE, MODATTR_NONE, cntct->get_modified_attributes(), MODATTR_NONE,
+      cntct->get_modified_host_attributes(), attr,
+      cntct->get_modified_service_attributes(), nullptr);
 
   /* update the status log to reflect the new contact state */
   cntct->update_status_info(false);
@@ -2662,18 +2424,11 @@ void disable_contact_service_notifications(contact* cntct) {
   cntct->set_service_notifications_enabled(false);
 
   /* send data to event broker */
-  broker_adaptive_contact_data(NEBTYPE_ADAPTIVECONTACT_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               cntct,
-                               CMD_NONE,
-                               MODATTR_NONE,
-                               cntct->get_modified_attributes(),
-                               MODATTR_NONE,
-                               cntct->get_modified_host_attributes(),
-                               attr,
-                               cntct->get_modified_service_attributes(),
-                               nullptr);
+  broker_adaptive_contact_data(
+      NEBTYPE_ADAPTIVECONTACT_UPDATE, NEBFLAG_NONE, NEBATTR_NONE, cntct,
+      CMD_NONE, MODATTR_NONE, cntct->get_modified_attributes(), MODATTR_NONE,
+      cntct->get_modified_host_attributes(), attr,
+      cntct->get_modified_service_attributes(), nullptr);
 
   /* update the status log to reflect the new contact state */
   cntct->update_status_info(false);
@@ -2692,35 +2447,20 @@ void schedule_and_propagate_downtime(host* temp_host,
   /* check all child hosts... */
   for (host_map_unsafe::iterator it(temp_host->child_hosts.begin()),
        end(temp_host->child_hosts.end());
-       it != end;
-       ++it) {
+       it != end; ++it) {
     if (it->second == nullptr)
       continue;
 
     /* recurse... */
-    schedule_and_propagate_downtime(it->second,
-                                    entry_time,
-                                    author,
-                                    comment_data,
-                                    start_time,
-                                    end_time,
-                                    fixed,
-                                    triggered_by,
-                                    duration);
+    schedule_and_propagate_downtime(it->second, entry_time, author,
+                                    comment_data, start_time, end_time, fixed,
+                                    triggered_by, duration);
 
     /* schedule downtime for this host */
-    downtime_manager::instance().schedule_downtime(downtime::host_downtime,
-                                                   it->first,
-                                                   "",
-                                                   entry_time,
-                                                   author,
-                                                   comment_data,
-                                                   start_time,
-                                                   end_time,
-                                                   fixed,
-                                                   triggered_by,
-                                                   duration,
-                                                   nullptr);
+    downtime_manager::instance().schedule_downtime(
+        downtime::host_downtime, it->first, "", entry_time, author,
+        comment_data, start_time, end_time, fixed, triggered_by, duration,
+        nullptr);
   }
 }
 
@@ -2749,40 +2489,24 @@ void acknowledge_host_problem(host* hst,
   hst->schedule_acknowledgement_expiration();
 
   /* send data to event broker */
-  broker_acknowledgement_data(NEBTYPE_ACKNOWLEDGEMENT_ADD,
-                              NEBFLAG_NONE,
-                              NEBATTR_NONE,
-                              HOST_ACKNOWLEDGEMENT,
-                              (void*)hst,
-                              ack_author,
-                              ack_data,
-                              type,
-                              notify,
-                              persistent,
+  broker_acknowledgement_data(NEBTYPE_ACKNOWLEDGEMENT_ADD, NEBFLAG_NONE,
+                              NEBATTR_NONE, HOST_ACKNOWLEDGEMENT, (void*)hst,
+                              ack_author, ack_data, type, notify, persistent,
                               nullptr);
 
   /* send out an acknowledgement notification */
   if (notify)
-    hst->notify(notifier::reason_acknowledgement,
-                ack_author,
-                ack_data,
+    hst->notify(notifier::reason_acknowledgement, ack_author, ack_data,
                 notifier::notification_option_none);
 
   /* update the status log with the host info */
   hst->update_status();
 
   /* add a comment for the acknowledgement */
-  std::shared_ptr<comment> com{new comment(comment::host,
-                                           comment::acknowledgment,
-                                           hst->get_host_id(),
-                                           0,
-                                           current_time,
-                                           ack_author,
-                                           ack_data,
-                                           persistent,
-                                           comment::internal,
-                                           false,
-                                           (time_t)0)};
+  std::shared_ptr<comment> com{
+      new comment(comment::host, comment::acknowledgment, hst->get_host_id(), 0,
+                  current_time, ack_author, ack_data, persistent,
+                  comment::internal, false, (time_t)0)};
   comment::comments.insert({com->get_comment_id(), com});
 }
 
@@ -2811,40 +2535,24 @@ void acknowledge_service_problem(service* svc,
   svc->schedule_acknowledgement_expiration();
 
   /* send data to event broker */
-  broker_acknowledgement_data(NEBTYPE_ACKNOWLEDGEMENT_ADD,
-                              NEBFLAG_NONE,
-                              NEBATTR_NONE,
-                              SERVICE_ACKNOWLEDGEMENT,
-                              (void*)svc,
-                              ack_author,
-                              ack_data,
-                              type,
-                              notify,
-                              persistent,
+  broker_acknowledgement_data(NEBTYPE_ACKNOWLEDGEMENT_ADD, NEBFLAG_NONE,
+                              NEBATTR_NONE, SERVICE_ACKNOWLEDGEMENT, (void*)svc,
+                              ack_author, ack_data, type, notify, persistent,
                               nullptr);
 
   /* send out an acknowledgement notification */
   if (notify)
-    svc->notify(notifier::reason_acknowledgement,
-                ack_author,
-                ack_data,
+    svc->notify(notifier::reason_acknowledgement, ack_author, ack_data,
                 notifier::notification_option_none);
 
   /* update the status log with the service info */
   svc->update_status();
 
   /* add a comment for the acknowledgement */
-  std::shared_ptr<comment> com{new comment(comment::service,
-                                           comment::acknowledgment,
-                                           svc->get_host_id(),
-                                           svc->get_service_id(),
-                                           current_time,
-                                           ack_author,
-                                           ack_data,
-                                           persistent,
-                                           comment::internal,
-                                           false,
-                                           (time_t)0)};
+  std::shared_ptr<comment> com{
+      new comment(comment::service, comment::acknowledgment, svc->get_host_id(),
+                  svc->get_service_id(), current_time, ack_author, ack_data,
+                  persistent, comment::internal, false, (time_t)0)};
   comment::comments.insert({com->get_comment_id(), com});
 }
 
@@ -2887,15 +2595,10 @@ void start_executing_service_checks(void) {
   config->execute_service_checks(true);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               MODATTR_NONE,
-                               modified_host_process_attributes,
-                               attr,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, MODATTR_NONE,
+                               modified_host_process_attributes, attr,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -2916,15 +2619,10 @@ void stop_executing_service_checks(void) {
   config->execute_service_checks(false);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               MODATTR_NONE,
-                               modified_host_process_attributes,
-                               attr,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, MODATTR_NONE,
+                               modified_host_process_attributes, attr,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -2945,15 +2643,10 @@ void start_accepting_passive_service_checks(void) {
   config->accept_passive_service_checks(true);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               MODATTR_NONE,
-                               modified_host_process_attributes,
-                               attr,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, MODATTR_NONE,
+                               modified_host_process_attributes, attr,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -2974,15 +2667,10 @@ void stop_accepting_passive_service_checks(void) {
   config->accept_passive_service_checks(false);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               MODATTR_NONE,
-                               modified_host_process_attributes,
-                               attr,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, MODATTR_NONE,
+                               modified_host_process_attributes, attr,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3003,14 +2691,9 @@ void enable_passive_service_checks(service* svc) {
   svc->set_accept_passive_checks(true);
 
   /* send data to event broker */
-  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               svc,
-                               CMD_NONE,
-                               attr,
-                               svc->get_modified_attributes(),
-                               nullptr);
+  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, svc, CMD_NONE, attr,
+                               svc->get_modified_attributes(), nullptr);
 
   /* update the status log with the service info */
   svc->update_status();
@@ -3031,14 +2714,9 @@ void disable_passive_service_checks(service* svc) {
   svc->set_accept_passive_checks(false);
 
   /* send data to event broker */
-  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               svc,
-                               CMD_NONE,
-                               attr,
-                               svc->get_modified_attributes(),
-                               nullptr);
+  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, svc, CMD_NONE, attr,
+                               svc->get_modified_attributes(), nullptr);
 
   /* update the status log with the service info */
   svc->update_status();
@@ -3059,15 +2737,10 @@ void start_executing_host_checks(void) {
   config->execute_host_checks(true);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               attr,
-                               modified_host_process_attributes,
-                               MODATTR_NONE,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, attr,
+                               modified_host_process_attributes, MODATTR_NONE,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3088,15 +2761,10 @@ void stop_executing_host_checks(void) {
   config->execute_host_checks(false);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               attr,
-                               modified_host_process_attributes,
-                               MODATTR_NONE,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, attr,
+                               modified_host_process_attributes, MODATTR_NONE,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3117,15 +2785,10 @@ void start_accepting_passive_host_checks(void) {
   config->accept_passive_host_checks(true);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               attr,
-                               modified_host_process_attributes,
-                               MODATTR_NONE,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, attr,
+                               modified_host_process_attributes, MODATTR_NONE,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3146,15 +2809,10 @@ void stop_accepting_passive_host_checks(void) {
   config->accept_passive_host_checks(false);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               attr,
-                               modified_host_process_attributes,
-                               MODATTR_NONE,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, attr,
+                               modified_host_process_attributes, MODATTR_NONE,
+                               modified_service_process_attributes, nullptr);
   /* update the status log with the program info */
   update_program_status(false);
 }
@@ -3174,14 +2832,9 @@ void enable_passive_host_checks(host* hst) {
   hst->set_accept_passive_checks(true);
 
   /* send data to event broker */
-  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
-                            NEBFLAG_NONE,
-                            NEBATTR_NONE,
-                            hst,
-                            CMD_NONE,
-                            attr,
-                            hst->get_modified_attributes(),
-                            nullptr);
+  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE, NEBFLAG_NONE,
+                            NEBATTR_NONE, hst, CMD_NONE, attr,
+                            hst->get_modified_attributes(), nullptr);
 
   /* update the status log with the host info */
   hst->update_status();
@@ -3202,14 +2855,9 @@ void disable_passive_host_checks(host* hst) {
   hst->set_accept_passive_checks(false);
 
   /* send data to event broker */
-  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
-                            NEBFLAG_NONE,
-                            NEBATTR_NONE,
-                            hst,
-                            CMD_NONE,
-                            attr,
-                            hst->get_modified_attributes(),
-                            nullptr);
+  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE, NEBFLAG_NONE,
+                            NEBATTR_NONE, hst, CMD_NONE, attr,
+                            hst->get_modified_attributes(), nullptr);
 
   /* update the status log with the host info */
   hst->update_status();
@@ -3231,15 +2879,10 @@ void start_using_event_handlers(void) {
   config->enable_event_handlers(true);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               attr,
-                               modified_host_process_attributes,
-                               attr,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, attr,
+                               modified_host_process_attributes, attr,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3261,15 +2904,10 @@ void stop_using_event_handlers(void) {
   config->enable_event_handlers(false);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               attr,
-                               modified_host_process_attributes,
-                               attr,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, attr,
+                               modified_host_process_attributes, attr,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3290,14 +2928,9 @@ void enable_service_event_handler(service* svc) {
   svc->set_event_handler_enabled(true);
 
   /* send data to event broker */
-  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               svc,
-                               CMD_NONE,
-                               attr,
-                               svc->get_modified_attributes(),
-                               nullptr);
+  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, svc, CMD_NONE, attr,
+                               svc->get_modified_attributes(), nullptr);
 
   /* update the status log with the service info */
   svc->update_status();
@@ -3318,14 +2951,9 @@ void disable_service_event_handler(service* svc) {
   svc->set_event_handler_enabled(false);
 
   /* send data to event broker */
-  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               svc,
-                               CMD_NONE,
-                               attr,
-                               svc->get_modified_attributes(),
-                               nullptr);
+  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, svc, CMD_NONE, attr,
+                               svc->get_modified_attributes(), nullptr);
 
   /* update the status log with the service info */
   svc->update_status();
@@ -3346,14 +2974,9 @@ void enable_host_event_handler(host* hst) {
   hst->set_event_handler_enabled(true);
 
   /* send data to event broker */
-  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
-                            NEBFLAG_NONE,
-                            NEBATTR_NONE,
-                            hst,
-                            CMD_NONE,
-                            attr,
-                            hst->get_modified_attributes(),
-                            nullptr);
+  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE, NEBFLAG_NONE,
+                            NEBATTR_NONE, hst, CMD_NONE, attr,
+                            hst->get_modified_attributes(), nullptr);
 
   /* update the status log with the host info */
   hst->update_status();
@@ -3374,14 +2997,9 @@ void disable_host_event_handler(host* hst) {
   hst->set_event_handler_enabled(false);
 
   /* send data to event broker */
-  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
-                            NEBFLAG_NONE,
-                            NEBATTR_NONE,
-                            hst,
-                            CMD_NONE,
-                            attr,
-                            hst->get_modified_attributes(),
-                            nullptr);
+  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE, NEBFLAG_NONE,
+                            NEBATTR_NONE, hst, CMD_NONE, attr,
+                            hst->get_modified_attributes(), nullptr);
 
   /* update the status log with the host info */
   hst->update_status();
@@ -3403,14 +3021,9 @@ void disable_host_checks(host* hst) {
   hst->set_should_be_scheduled(false);
 
   /* send data to event broker */
-  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
-                            NEBFLAG_NONE,
-                            NEBATTR_NONE,
-                            hst,
-                            CMD_NONE,
-                            attr,
-                            hst->get_modified_attributes(),
-                            nullptr);
+  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE, NEBFLAG_NONE,
+                            NEBATTR_NONE, hst, CMD_NONE, attr,
+                            hst->get_modified_attributes(), nullptr);
 
   /* update the status log with the host info */
   hst->update_status();
@@ -3440,8 +3053,8 @@ void enable_host_checks(host* hst) {
   /* schedule a check for right now (or as soon as possible) */
   time(&preferred_time);
   if (!check_time_against_period(preferred_time, hst->check_period_ptr)) {
-    get_next_valid_time(
-        preferred_time, &next_valid_time, hst->check_period_ptr);
+    get_next_valid_time(preferred_time, &next_valid_time,
+                        hst->check_period_ptr);
     hst->set_next_check(next_valid_time);
   } else
     hst->set_next_check(preferred_time);
@@ -3451,14 +3064,9 @@ void enable_host_checks(host* hst) {
     hst->schedule_check(hst->get_next_check(), CHECK_OPTION_NONE);
 
   /* send data to event broker */
-  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
-                            NEBFLAG_NONE,
-                            NEBATTR_NONE,
-                            hst,
-                            CMD_NONE,
-                            attr,
-                            hst->get_modified_attributes(),
-                            nullptr);
+  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE, NEBFLAG_NONE,
+                            NEBATTR_NONE, hst, CMD_NONE, attr,
+                            hst->get_modified_attributes(), nullptr);
 
   /* update the status log with the host info */
   hst->update_status();
@@ -3479,15 +3087,10 @@ void start_obsessing_over_service_checks(void) {
   config->obsess_over_services(true);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               MODATTR_NONE,
-                               modified_host_process_attributes,
-                               attr,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, MODATTR_NONE,
+                               modified_host_process_attributes, attr,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3508,15 +3111,10 @@ void stop_obsessing_over_service_checks(void) {
   config->obsess_over_services(false);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               MODATTR_NONE,
-                               modified_host_process_attributes,
-                               attr,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, MODATTR_NONE,
+                               modified_host_process_attributes, attr,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3537,15 +3135,10 @@ void start_obsessing_over_host_checks(void) {
   config->obsess_over_hosts(true);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               attr,
-                               modified_host_process_attributes,
-                               MODATTR_NONE,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, attr,
+                               modified_host_process_attributes, MODATTR_NONE,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3566,15 +3159,10 @@ void stop_obsessing_over_host_checks(void) {
   config->obsess_over_hosts(false);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               attr,
-                               modified_host_process_attributes,
-                               MODATTR_NONE,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, attr,
+                               modified_host_process_attributes, MODATTR_NONE,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3595,15 +3183,10 @@ void enable_service_freshness_checks(void) {
   config->check_service_freshness(true);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               MODATTR_NONE,
-                               modified_host_process_attributes,
-                               attr,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, MODATTR_NONE,
+                               modified_host_process_attributes, attr,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3624,15 +3207,10 @@ void disable_service_freshness_checks(void) {
   config->check_service_freshness(false);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               MODATTR_NONE,
-                               modified_host_process_attributes,
-                               attr,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, MODATTR_NONE,
+                               modified_host_process_attributes, attr,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3653,15 +3231,10 @@ void enable_host_freshness_checks(void) {
   config->check_host_freshness(true);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               attr,
-                               modified_host_process_attributes,
-                               MODATTR_NONE,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, attr,
+                               modified_host_process_attributes, MODATTR_NONE,
+                               modified_service_process_attributes, nullptr);
   /* update the status log with the program info */
   update_program_status(false);
 }
@@ -3681,15 +3254,10 @@ void disable_host_freshness_checks(void) {
   config->check_host_freshness(false);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               attr,
-                               modified_host_process_attributes,
-                               MODATTR_NONE,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, attr,
+                               modified_host_process_attributes, MODATTR_NONE,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log with the program info */
   update_program_status(false);
@@ -3710,15 +3278,10 @@ void enable_performance_data(void) {
   config->process_performance_data(true);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               attr,
-                               modified_host_process_attributes,
-                               attr,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, attr,
+                               modified_host_process_attributes, attr,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log */
   update_program_status(false);
@@ -3739,15 +3302,10 @@ void disable_performance_data(void) {
   config->process_performance_data(false);
 
   /* send data to event broker */
-  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               CMD_NONE,
-                               attr,
-                               modified_host_process_attributes,
-                               attr,
-                               modified_service_process_attributes,
-                               nullptr);
+  broker_adaptive_program_data(NEBTYPE_ADAPTIVEPROGRAM_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, CMD_NONE, attr,
+                               modified_host_process_attributes, attr,
+                               modified_service_process_attributes, nullptr);
 
   /* update the status log */
   update_program_status(false);
@@ -3768,14 +3326,9 @@ void start_obsessing_over_service(service* svc) {
   svc->set_obsess_over(true);
 
   /* send data to event broker */
-  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               svc,
-                               CMD_NONE,
-                               attr,
-                               svc->get_modified_attributes(),
-                               nullptr);
+  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, svc, CMD_NONE, attr,
+                               svc->get_modified_attributes(), nullptr);
 
   /* update the status log with the service info */
   svc->update_status();
@@ -3796,14 +3349,9 @@ void stop_obsessing_over_service(service* svc) {
   svc->set_obsess_over(false);
 
   /* send data to event broker */
-  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE,
-                               NEBFLAG_NONE,
-                               NEBATTR_NONE,
-                               svc,
-                               CMD_NONE,
-                               attr,
-                               svc->get_modified_attributes(),
-                               nullptr);
+  broker_adaptive_service_data(NEBTYPE_ADAPTIVESERVICE_UPDATE, NEBFLAG_NONE,
+                               NEBATTR_NONE, svc, CMD_NONE, attr,
+                               svc->get_modified_attributes(), nullptr);
 
   /* update the status log with the service info */
   svc->update_status();
@@ -3824,14 +3372,9 @@ void start_obsessing_over_host(host* hst) {
   hst->set_obsess_over(true);
 
   /* send data to event broker */
-  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
-                            NEBFLAG_NONE,
-                            NEBATTR_NONE,
-                            hst,
-                            CMD_NONE,
-                            attr,
-                            hst->get_modified_attributes(),
-                            nullptr);
+  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE, NEBFLAG_NONE,
+                            NEBATTR_NONE, hst, CMD_NONE, attr,
+                            hst->get_modified_attributes(), nullptr);
 
   /* update the status log with the host info */
   hst->update_status();
@@ -3852,14 +3395,9 @@ void stop_obsessing_over_host(host* hst) {
   hst->set_obsess_over(false);
 
   /* send data to event broker */
-  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE,
-                            NEBFLAG_NONE,
-                            NEBATTR_NONE,
-                            hst,
-                            CMD_NONE,
-                            attr,
-                            hst->get_modified_attributes(),
-                            nullptr);
+  broker_adaptive_host_data(NEBTYPE_ADAPTIVEHOST_UPDATE, NEBFLAG_NONE,
+                            NEBATTR_NONE, hst, CMD_NONE, attr,
+                            hst->get_modified_attributes(), nullptr);
 
   /* update the status log with the host info */
   hst->update_status();

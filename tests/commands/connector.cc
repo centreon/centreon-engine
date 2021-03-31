@@ -85,7 +85,9 @@ TEST_F(Connector, ForwardWithoutCmd) {
 // Given an already existing command
 // When the add_command method is called with the same name
 // Then it returns a NULL pointer.
-TEST_F(Connector, SimpleConnector) { commands::connector c("toto", "/bin/ls"); }
+TEST_F(Connector, SimpleConnector) {
+  commands::connector c("toto", "/bin/ls");
+}
 
 // This test is just a test of the run command in usual conditions.
 // We don't test timeout because time is replaced by a fake function
