@@ -17,13 +17,13 @@
  *
  */
 
+#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/configuration/applier/state.hh"
-#include "com/centreon/engine/downtimes/downtime_manager.hh"
 #include "com/centreon/engine/downtimes/host_downtime.hh"
 #include "com/centreon/engine/downtimes/service_downtime.hh"
-#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/events/loop.hh"
+#include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
 
@@ -43,12 +43,11 @@ void downtime_manager::delete_downtime(downtime::type type,
                                        uint64_t downtime_id) {
   /* find the downtime we should remove */
   for (auto it = _scheduled_downtimes.begin(), end = _scheduled_downtimes.end();
-       it != end;
-       ++it) {
+       it != end; ++it) {
     if (it->second->get_downtime_id() == downtime_id &&
         it->second->get_type() == type) {
       logger(dbg_downtime, basic)
-        << "delete downtime(type:" << type << ", id: " << downtime_id << ")";
+          << "delete downtime(type:" << type << ", id: " << downtime_id << ")";
       _scheduled_downtimes.erase(it);
       break;
     }
@@ -56,12 +55,13 @@ void downtime_manager::delete_downtime(downtime::type type,
 }
 
 /* unschedules a host or service downtime */
-int downtime_manager::unschedule_downtime(downtime::type type, uint64_t downtime_id) {
+int downtime_manager::unschedule_downtime(downtime::type type,
+                                          uint64_t downtime_id) {
   std::shared_ptr<downtime> temp_downtime{find_downtime(type, downtime_id)};
 
   logger(dbg_functions, basic) << "unschedule_downtime()";
   logger(dbg_downtime, basic)
-    << "unschedule downtime(type:" << type << ", id: " << downtime_id << ")";
+      << "unschedule downtime(type:" << type << ", id: " << downtime_id << ")";
 
   /* find the downtime entry in the list in memory */
   if (!temp_downtime)
@@ -82,13 +82,13 @@ int downtime_manager::unschedule_downtime(downtime::type type, uint64_t downtime
   /* unschedule all downtime entries that were triggered by this one */
   std::list<uint64_t> lst;
   for (auto it = _scheduled_downtimes.begin(), end = _scheduled_downtimes.end();
-      it != end; ++it) {
+       it != end; ++it) {
     if (it->second->get_triggered_by() == downtime_id)
       lst.push_back(it->second->get_downtime_id());
   }
   for (uint64_t id : lst) {
     logger(dbg_downtime, basic)
-      << "Unschedule triggered downtime (id: " << id << ")";
+        << "Unschedule triggered downtime (id: " << id << ")";
     unschedule_downtime(downtime::any_downtime, id);
   }
 
@@ -131,8 +131,9 @@ int downtime_manager::check_pending_flex_host_downtime(host* hst) {
            it{_scheduled_downtimes.begin()},
        end{_scheduled_downtimes.end()};
        it != end; ++it) {
-    if (it->second->get_type() != downtime::host_downtime || it->second->is_fixed() ||
-        it->second->is_in_effect() || it->second->get_triggered_by() != 0)
+    if (it->second->get_type() != downtime::host_downtime ||
+        it->second->is_fixed() || it->second->is_in_effect() ||
+        it->second->get_triggered_by() != 0)
       continue;
 
     /* this entry matches our host! */
@@ -178,8 +179,9 @@ int downtime_manager::check_pending_flex_service_downtime(service* svc) {
            it{_scheduled_downtimes.begin()},
        end{_scheduled_downtimes.end()};
        it != end; ++it) {
-    if (it->second->get_type() != downtime::service_downtime || it->second->is_fixed() ||
-        it->second->is_in_effect() || it->second->get_triggered_by() != 0)
+    if (it->second->get_type() != downtime::service_downtime ||
+        it->second->is_fixed() || it->second->is_in_effect() ||
+        it->second->get_triggered_by() != 0)
       continue;
 
     service_downtime& dt(
@@ -264,9 +266,9 @@ int downtime_manager::
         time_t start_time,
         std::string const& comment) {
   logger(dbg_downtime, basic)
-    << "Delete downtimes (host: '" << hostname << "', service description: '"
-    << service_description << "', start time: " << start_time
-    << ", comment: '" << comment << "')";
+      << "Delete downtimes (host: '" << hostname << "', service description: '"
+      << service_description << "', start time: " << start_time
+      << ", comment: '" << comment << "')";
   int deleted{0};
 
   /* Do not allow deletion of everything - must have at least 1 filter on. */
@@ -329,7 +331,7 @@ void downtime_manager::insert_downtime(std::shared_ptr<downtime> dt) {
  */
 void downtime_manager::initialize_downtime_data() {
   logger(dbg_functions, basic)
-    << "downtime_manager::initialize_downtime_data()";
+      << "downtime_manager::initialize_downtime_data()";
   /* clean up the old downtime data */
   xdddefault_validate_downtime_data();
 
@@ -341,8 +343,8 @@ int downtime_manager::xdddefault_validate_downtime_data() {
   bool save = true;
 
   /* remove stale downtimes */
-  for (auto it  = _scheduled_downtimes.begin(), end = _scheduled_downtimes.end();
-       it != end; ) {
+  for (auto it = _scheduled_downtimes.begin(), end = _scheduled_downtimes.end();
+       it != end;) {
     std::shared_ptr<com::centreon::engine::downtimes::downtime> temp_downtime(
         it->second);
 
@@ -356,7 +358,7 @@ int downtime_manager::xdddefault_validate_downtime_data() {
 
   /* remove triggered downtimes without valid parents */
   for (auto it = _scheduled_downtimes.begin(), end = _scheduled_downtimes.end();
-       it != end; ) {
+       it != end;) {
     save = true;
     downtimes::downtime& temp_downtime(*it->second);
 
@@ -365,7 +367,8 @@ int downtime_manager::xdddefault_validate_downtime_data() {
       continue;
     }
 
-    if (!find_downtime(downtime::any_downtime, temp_downtime.get_triggered_by()))
+    if (!find_downtime(downtime::any_downtime,
+                       temp_downtime.get_triggered_by()))
       save = false;
 
     /* delete the downtime */
@@ -424,9 +427,9 @@ downtime* downtime_manager::add_new_host_downtime(std::string const& host_name,
 
   /* send data to event broker */
   broker_downtime_data(NEBTYPE_DOWNTIME_ADD, NEBFLAG_NONE, NEBATTR_NONE,
-                       downtime::host_downtime, host_name.c_str(), nullptr, entry_time,
-                       author, comment_data, start_time, end_time, fixed,
-                       triggered_by, duration, new_downtime_id, nullptr);
+                       downtime::host_downtime, host_name.c_str(), nullptr,
+                       entry_time, author, comment_data, start_time, end_time,
+                       fixed, triggered_by, duration, new_downtime_id, nullptr);
   return retval;
 }
 
@@ -491,6 +494,26 @@ int downtime_manager::schedule_downtime(downtime::type type,
   if (start_time >= end_time || end_time <= time(nullptr))
     return ERROR;
 
+  if (start_time > 4102441200) {
+    logger(log_verification_error, basic)
+        << "SCHEDULE DOWNTIME ALERT : start time is out of range and setted to "
+           "4102441200";
+    start_time = 4102441200;
+  }
+
+  if (end_time > 4102441200) {
+    logger(log_verification_error, basic)
+        << "SCHEDULE DOWNTIME ALERT : end time is out of range and setted to "
+           "4102441200";
+    end_time = 4102441200;
+  }
+
+  if (duration > 31622400) {
+    logger(log_verification_error, basic)
+        << "SCHEDULE DOWNTIME ALERT : is too long and setted to 31622400";
+    duration = 31622400;
+  }
+
   /* add a new downtime entry */
   if (type == downtime::host_downtime)
     add_new_host_downtime(host_name, entry_time, author, comment_data,
@@ -515,7 +538,7 @@ int downtime_manager::register_downtime(downtime::type type,
                                         uint64_t downtime_id) {
   logger(dbg_functions, basic) << "downtime_manager::register_downtime()";
   logger(dbg_downtime, basic)
-    << "register downtime(type: " << type << ", id: " << downtime_id << ")";
+      << "register downtime(type: " << type << ", id: " << downtime_id << ")";
   /* find the downtime entry in memory */
   std::shared_ptr<downtime> temp_downtime{find_downtime(type, downtime_id)};
   if (!temp_downtime)
