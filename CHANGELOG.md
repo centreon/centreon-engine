@@ -45,6 +45,10 @@ restarted automatically. It is fixed now.
 *Check commands*
 
 When many commands are running, engine could crash when we stop it.
+
+*Downtime*
+
+Add Limit downtime start date, end date to 4102441200 (31/12/209 23:59) max and duration to 31622400 (366 days) max
 ## 20.10.2
 
 `January 20, 2021`
