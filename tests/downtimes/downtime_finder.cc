@@ -35,16 +35,20 @@ class DowntimeFinderFindMatchingAllTest : public ::testing::Test {
  public:
   void SetUp() override {
     init_config_state();
+    downtime_manager::instance().clear_scheduled_downtimes();
+    downtime_manager::instance().initialize_downtime_data();
+    new_downtime(0, "test_host", "", 234567891, 134567892, 1, 0, 84,
+                 "other_author", "test_comment");
     new_downtime(1, "first_host", "test_service", 123456789, 134567892, 1, 0,
                  42, "test_author", "other_comment");
-    new_downtime(2, "test_host", "", 234567891, 134567892, 1, 0, 84,
-                 "other_author", "test_comment");
-    new_downtime(3, "other_host", "other_service", 123456789, 345678921, 0, 2,
+    new_downtime(2, "other_host", "other_service", 123456789, 345678921, 0, 1,
                  42, "", "test_comment");
-    new_downtime(4, "test_host", "test_service", 234567891, 345678921, 0, 2, 84,
+    new_downtime(3, "test_host", "test_service", 234567891, 345678921, 0, 1, 84,
                  "test_author", "");
-    new_downtime(5, "other_host", "test_service", 123456789, 134567892, 1, 2,
+    new_downtime(4, "other_host", "test_service", 123456789, 134567892, 1, 1,
                  42, "test_author", "test_comment");
+    new_downtime(5, "out_host", "out_service", 7265943625, 7297479625, 1, 2,
+                 31626500, "out_author", "out_comment");
     _dtf.reset(new downtime_finder(
         downtime_manager::instance().get_scheduled_downtimes()));
   }
@@ -52,24 +56,24 @@ class DowntimeFinderFindMatchingAllTest : public ::testing::Test {
   void TearDown() override {
     _dtf.reset();
     downtime_manager::instance().clear_scheduled_downtimes();
+    downtime_manager::instance().initialize_downtime_data();
     deinit_config_state();
   }
 
-  downtime* new_downtime(unsigned long downtime_id,
-                         std::string const& host_name,
-                         std::string const& service_description,
-                         time_t start,
-                         time_t end,
-                         int fixed,
-                         unsigned long triggered_by,
-                         int32_t duration,
-                         std::string const& author,
-                         std::string const& comment) {
-    downtime* dt{static_cast<downtime*>(new service_downtime(
-        host_name, service_description, start, author, comment, start, end,
-        fixed, triggered_by, duration, downtime_id))};
-    dt->schedule();
-    return dt;
+  /*downtime**/ void new_downtime(unsigned long downtime_id,
+                                  std::string const& host_name,
+                                  std::string const& service_description,
+                                  time_t start,
+                                  time_t end,
+                                  int fixed,
+                                  unsigned long triggered_by,
+                                  int32_t duration,
+                                  std::string const& author,
+                                  std::string const& comment) {
+    downtime_manager::instance().schedule_downtime(
+        downtime::service_downtime, host_name, service_description, start,
+        author.c_str(), comment.c_str(), start, end, fixed, triggered_by,
+        duration, &downtime_id);
   }
 
  protected:
@@ -118,8 +122,7 @@ TEST_F(DowntimeFinderFindMatchingAllTest, NullServiceNotFound) {
 TEST_F(DowntimeFinderFindMatchingAllTest, NullServiceFound) {
   criterias.push_back(downtime_finder::criteria("service", ""));
   result = _dtf->find_matching_all(criterias);
-  expected.push_back(2);
-  ASSERT_EQ(result, expected);
+  ASSERT_TRUE(result.empty());
 }
 
 // Given a downtime_finder object with the test downtime list
@@ -139,7 +142,7 @@ TEST_F(DowntimeFinderFindMatchingAllTest, NullAuthorNotFound) {
 TEST_F(DowntimeFinderFindMatchingAllTest, NullAuthorFound) {
   criterias.push_back(downtime_finder::criteria("author", ""));
   result = _dtf->find_matching_all(criterias);
-  expected.push_back(3);
+  expected.push_back(2);
   ASSERT_EQ(result, expected);
 }
 
@@ -160,7 +163,7 @@ TEST_F(DowntimeFinderFindMatchingAllTest, NullCommentNotFound) {
 TEST_F(DowntimeFinderFindMatchingAllTest, NullCommentFound) {
   criterias.push_back(downtime_finder::criteria("comment", ""));
   result = _dtf->find_matching_all(criterias);
-  expected.push_back(4);
+  expected.push_back(3);
   ASSERT_EQ(result, expected);
 }
 
@@ -170,8 +173,7 @@ TEST_F(DowntimeFinderFindMatchingAllTest, NullCommentFound) {
 TEST_F(DowntimeFinderFindMatchingAllTest, MultipleHosts) {
   criterias.push_back(downtime_finder::criteria("host", "test_host"));
   result = _dtf->find_matching_all(criterias);
-  expected.push_back(2);
-  expected.push_back(4);
+  expected.push_back(3);
   ASSERT_EQ(result, expected);
 }
 
@@ -182,8 +184,8 @@ TEST_F(DowntimeFinderFindMatchingAllTest, MultipleServices) {
   criterias.push_back(downtime_finder::criteria("service", "test_service"));
   result = _dtf->find_matching_all(criterias);
   expected.push_back(1);
-  expected.push_back(5);
   expected.push_back(4);
+  expected.push_back(3);
   ASSERT_EQ(result, expected);
 }
 
@@ -194,8 +196,8 @@ TEST_F(DowntimeFinderFindMatchingAllTest, MultipleStart) {
   criterias.push_back(downtime_finder::criteria("start", "123456789"));
   result = _dtf->find_matching_all(criterias);
   expected.push_back(1);
-  expected.push_back(3);
-  expected.push_back(5);
+  expected.push_back(2);
+  expected.push_back(4);
   ASSERT_EQ(result, expected);
 }
 
@@ -206,8 +208,7 @@ TEST_F(DowntimeFinderFindMatchingAllTest, MultipleEnd) {
   criterias.push_back(downtime_finder::criteria("end", "134567892"));
   result = _dtf->find_matching_all(criterias);
   expected.push_back(1);
-  expected.push_back(5);
-  expected.push_back(2);
+  expected.push_back(4);
   ASSERT_EQ(result, expected);
 }
 
@@ -217,8 +218,8 @@ TEST_F(DowntimeFinderFindMatchingAllTest, MultipleEnd) {
 TEST_F(DowntimeFinderFindMatchingAllTest, MultipleFixed) {
   criterias.push_back(downtime_finder::criteria("fixed", "0"));
   result = _dtf->find_matching_all(criterias);
+  expected.push_back(2);
   expected.push_back(3);
-  expected.push_back(4);
   ASSERT_EQ(result, expected);
 }
 
@@ -229,7 +230,6 @@ TEST_F(DowntimeFinderFindMatchingAllTest, MultipleTriggeredBy) {
   criterias.push_back(downtime_finder::criteria("triggered_by", "0"));
   result = _dtf->find_matching_all(criterias);
   expected.push_back(1);
-  expected.push_back(2);
   ASSERT_EQ(result, expected);
 }
 
@@ -240,8 +240,8 @@ TEST_F(DowntimeFinderFindMatchingAllTest, MultipleDuration) {
   criterias.push_back(downtime_finder::criteria("duration", "42"));
   result = _dtf->find_matching_all(criterias);
   expected.push_back(1);
-  expected.push_back(3);
-  expected.push_back(5);
+  expected.push_back(2);
+  expected.push_back(4);
   ASSERT_EQ(result, expected);
 }
 
@@ -252,8 +252,8 @@ TEST_F(DowntimeFinderFindMatchingAllTest, MultipleAuthor) {
   criterias.push_back(downtime_finder::criteria("author", "test_author"));
   result = _dtf->find_matching_all(criterias);
   expected.push_back(1);
-  expected.push_back(5);
   expected.push_back(4);
+  expected.push_back(3);
   ASSERT_EQ(result, expected);
 }
 
@@ -263,9 +263,8 @@ TEST_F(DowntimeFinderFindMatchingAllTest, MultipleAuthor) {
 TEST_F(DowntimeFinderFindMatchingAllTest, MultipleComment) {
   criterias.push_back(downtime_finder::criteria("comment", "test_comment"));
   result = _dtf->find_matching_all(criterias);
-  expected.push_back(3);
-  expected.push_back(5);
   expected.push_back(2);
+  expected.push_back(4);
   ASSERT_EQ(result, expected);
 }
 
@@ -277,6 +276,36 @@ TEST_F(DowntimeFinderFindMatchingAllTest, MultipleCriterias) {
   criterias.push_back(downtime_finder::criteria("author", "test_author"));
   criterias.push_back(downtime_finder::criteria("duration", "42"));
   criterias.push_back(downtime_finder::criteria("comment", "test_comment"));
+  result = _dtf->find_matching_all(criterias);
+  expected.push_back(4);
+  ASSERT_EQ(result, expected);
+}
+
+// Given a downtime_finder object with the test downtime list
+// When find_matching_all() is called with the criteria ("end", "4102441200")
+// Then all downtimes with 4102441200 as end time are returned
+TEST_F(DowntimeFinderFindMatchingAllTest, OutOfRangeEnd) {
+  criterias.push_back(downtime_finder::criteria("end", "4102441200"));
+  result = _dtf->find_matching_all(criterias);
+  expected.push_back(5);
+  ASSERT_EQ(result, expected);
+}
+
+// Given a downtime_finder object with the test downtime list
+// When find_matching_all() is called with the criteria ("start", "4102441200")
+// Then all downtimes with 4102441200 as end time are returned
+TEST_F(DowntimeFinderFindMatchingAllTest, OutOfRangeStart) {
+  criterias.push_back(downtime_finder::criteria("start", "4102441200"));
+  result = _dtf->find_matching_all(criterias);
+  expected.push_back(5);
+  ASSERT_EQ(result, expected);
+}
+
+// Given a downtime_finder object with the test downtime list
+// When find_matching_all() is called with the criteria ("duration",
+// "4102441200") Then all downtimes with 31622400 as end time are returned
+TEST_F(DowntimeFinderFindMatchingAllTest, OutOfRangeDuration) {
+  criterias.push_back(downtime_finder::criteria("duration", "31622400"));
   result = _dtf->find_matching_all(criterias);
   expected.push_back(5);
   ASSERT_EQ(result, expected);
