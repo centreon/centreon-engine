@@ -22,6 +22,10 @@ The timeperiods work on contacts and notifications are not sent anymore if the
 time period is empty. The notification recovery are now sent when entering in
 timeperiod notification.
 
+*Downtime*
+
+Add Limit downtime start date, end date to 4102441200 (31/12/209 23:59) max and duration to 31622400 (366 days) max
+
 ## 20.04.9
 
 `January 20, 2021`
