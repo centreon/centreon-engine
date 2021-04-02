@@ -70,11 +70,6 @@ class DowntimeFinderFindMatchingAllTest : public ::testing::Test {
                                   int32_t duration,
                                   std::string const& author,
                                   std::string const& comment) {
-    // downtime* dt{static_cast<downtime*>(new service_downtime(
-    //     host_name, service_description, start, author, comment, start, end,
-    //     fixed, triggered_by, duration, downtime_id))};
-    // dt->schedule();
-    // return dt;
     downtime_manager::instance().schedule_downtime(
         downtime::service_downtime, host_name, service_description, start,
         author.c_str(), comment.c_str(), start, end, fixed, triggered_by,
