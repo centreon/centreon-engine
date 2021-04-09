@@ -13,6 +13,8 @@ if they have no meaning, they are replaced by a default value.
 
 They could be sent twice. This new version fixes that.
 
+fix update last_state_change and last_hard_state_change on host with no service
+
 *Notification macros*
 
 The url encode action is removed from macros $HOSTACTIONURL*$, $HOSTNOTESURL*$,
