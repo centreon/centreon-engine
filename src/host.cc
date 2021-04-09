@@ -1277,6 +1277,12 @@ int host::handle_async_check_result_3x(check_result* queued_check_result) {
     return OK;
   }
 
+  /* initialize the last host state change times if necessary */
+  if (get_last_state_change() == (time_t)0)
+    set_last_state_change(get_last_check());
+  if (get_last_hard_state_change() == (time_t)0)
+    set_last_hard_state_change(get_last_check());
+
   /* was this check passive or active? */
   set_check_type((queued_check_result->get_check_type() == check_active)
                      ? check_active
