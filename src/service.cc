@@ -1316,11 +1316,15 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     /*this->current_notification_number=0; */
   }
 
-  /* initialize the last service state change times if necessary */
+  /* initialize the last host and service state change times if necessary */
   if (get_last_state_change() == (time_t)0)
     set_last_state_change(get_last_check());
   if (get_last_hard_state_change() == (time_t)0)
     set_last_hard_state_change(get_last_check());
+  if (hst->get_last_state_change() == (time_t)0)
+    hst->set_last_state_change(get_last_check());
+  if (hst->get_last_hard_state_change() == (time_t)0)
+    hst->set_last_hard_state_change(get_last_check());
 
   /* update last service state change times */
   if (state_change)
