@@ -325,5 +325,9 @@ std::string& string::remove_thresholds(std::string& perfdata) noexcept {
   }
 
   perfdata.replace(pos1, pos3 - pos1, ";;");
+
+  size_t pos4 = perfdata.find(",");
+  if (pos4 != std::string::npos)
+    perfdata.replace(pos4, 1, ".");
   return perfdata;
 }

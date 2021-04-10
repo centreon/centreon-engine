@@ -19,9 +19,9 @@
 
 #include "com/centreon/engine/configuration/applier/anomalydetection.hh"
 
+#include <fmt/format.h>
 #include <gtest/gtest.h>
 #include <time.h>
-#include <fmt/format.h>
 
 #include <cstring>
 #include <memory>
@@ -199,8 +199,10 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   set_time(51000);
 
   now = std::time(nullptr);
-  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| "
-         "metric=50;25;60", now);
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| "
+      "metric=50;25;60",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
@@ -224,8 +226,10 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
 
   now = std::time(nullptr);
   time_t previous = now;
-  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service critical| "
-         "metric=110foo;25;60", now);
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service "
+      "critical| metric=110foo;25;60",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -249,8 +253,10 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
   set_time(52000);
 
   now = std::time(nullptr);
-  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| "
-         "metric=30%;25;60", now);
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| "
+      "metric=30%;25;60",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -275,8 +281,10 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
 
   previous = now;
   now = std::time(nullptr);
-  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| "
-         "metric=35%;25;60", now);
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warning| "
+      "metric=35%;25;60",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -302,8 +310,10 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
 
   previous = now;
   now = std::time(nullptr);
-  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
-         "metric=70%;80;90", now);
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
+      "metric=70%;80;90",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -326,8 +336,10 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
 
   previous = now;
   now = std::time(nullptr);
-  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
-         "metric=71%;80;90", now);
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
+      "metric=71%;80;90",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
@@ -350,7 +362,9 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
 
   previous = now;
   now = std::time(nullptr);
-  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;4;service unknown", now);
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;4;service unknown",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
@@ -372,8 +386,10 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
 
   previous = now;
   now = std::time(nullptr);
-  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
-         "metric=72%;80;90", now);
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
+      "metric=72%;80;90",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::soft);
@@ -396,8 +412,10 @@ TEST_F(AnomalydetectionCheck, StatusChanges) {
 
   previous = now;
   now = std::time(nullptr);
-  cmd = fmt::format("[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
-         "metric=71.7%;80;90;10;100", now);
+  cmd = fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok| "
+      "metric=71,7%;80;90;10;100",
+      now);
   process_external_command(cmd.c_str());
   checks::checker::instance().reap();
   ASSERT_EQ(_svc->get_state_type(), checkable::hard);
