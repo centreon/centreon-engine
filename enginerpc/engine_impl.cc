@@ -517,8 +517,11 @@ grpc::Status engine_impl::AddHostComment(grpc::ServerContext* context
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning:  AddHostComment could not found a host name!";
       return 1;
+    }
     /* add the comment */
     auto cmt = std::make_shared<comment>(
         comment::host, comment::user, temp_host->get_host_id(), 0,
@@ -563,21 +566,30 @@ grpc::Status engine_impl::AddServiceComment(grpc::ServerContext* context
         service::services.find({request->host_name(), request->svc_desc()});
     if (it != service::services.end())
       temp_service = it->second;
-    if (temp_service == nullptr)
+    if (temp_service == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning:  From AddServiceComment could not found a service!";
       return 1;
+    }
     auto it2 = host::hosts.find(request->host_name());
     if (it2 != host::hosts.end())
       temp_host = it2->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning:  From AddServiceComment could not found a host!";
       return 1;
+    }
     /* add the comment */
     auto cmt = std::make_shared<comment>(
         comment::service, comment::user, temp_host->get_host_id(),
         temp_service->get_service_id(), request->entry_time(), request->user(),
         request->comment_data(), request->persistent(), comment::external,
         false, (time_t)0);
-    if (cmt == nullptr)
+    if (cmt == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning:  From AddServiceComment could not insert the comment!";
       return 1;
+    }
     comment::comments.insert({cmt->get_comment_id(), cmt});
     return 0;
   });
@@ -603,15 +615,21 @@ grpc::Status engine_impl::DeleteComment(grpc::ServerContext* context
                                         const GenericValue* request,
                                         CommandSuccess* response) {
   uint32_t comment_id = request->value();
-  if (comment_id == 0)
+  if (comment_id == 0) {
+    logger(log_runtime_warning, basic)
+      << "Warning:  From DelteComment comment must not be set to 0!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "comment_id must not be set to 0");
-
+  }
+    
   auto fn = std::packaged_task<int32_t(void)>([&comment_id]() -> int32_t {
     if (comment::delete_comment(comment_id))
       return 0;
-    else
+    else {
+      logger(log_runtime_warning, basic)
+        << "Warning:  From DelteComment could not delete the comment!";
       return 1;
+    }
   });
 
   std::future<int32_t> result = fn.get_future();
@@ -643,16 +661,22 @@ grpc::Status engine_impl::DeleteAllHostComments(grpc::ServerContext* context
         auto it = host::hosts.find(request->name());
         if (it != host::hosts.end())
           temp_host = it->second;
-        if (temp_host == nullptr)
+        if (temp_host == nullptr) {
+          logger(log_runtime_warning, basic)
+           << "Warning:  From DeleteAllHostComment could not find the host!";
           return 1;
+        }
       } break;
       case HostIdentifier::kId: {
         /* get the host */
         auto it = host::hosts_by_id.find(request->id());
         if (it != host::hosts_by_id.end())
           temp_host = it->second;
-        if (temp_host == nullptr)
+        if (temp_host == nullptr) {
+          logger(log_runtime_warning, basic)
+           << "Warning:  From DeleteAllHostComment could not find the host!";
           return 1;
+        }
       } break;
       default:
         return 1;
@@ -695,8 +719,12 @@ grpc::Status engine_impl::DeleteAllServiceComments(
             service::services.find({names.host_name(), names.service_name()});
         if (it != service::services.end())
           temp_service = it->second;
-        if (temp_service == nullptr)
+        if (temp_service == nullptr) {
+          logger(log_runtime_warning, basic)
+           << "Warning:  From DeleteAllSerivceComment could not find the host!"
+           << "or the service";
           return 1;
+        }
       } break;
       case ServiceIdentifier::kIds: {
         IdIdentifier ids = request->ids();
@@ -705,8 +733,12 @@ grpc::Status engine_impl::DeleteAllServiceComments(
             service::services_by_id.find({ids.host_id(), ids.service_id()});
         if (it != service::services_by_id.end())
           temp_service = it->second;
-        if (temp_service == nullptr)
+        if (temp_service == nullptr) {
+          logger(log_runtime_warning, basic)
+           << "Warning:  From DeleteAllSerivceComment could not find the host!"
+           << "or the service";
           return 1;
+        }
       } break;
       default:
         return 1;
@@ -746,16 +778,22 @@ grpc::Status engine_impl::RemoveHostAcknowledgement(
         auto it = host::hosts.find(request->name());
         if (it != host::hosts.end())
           temp_host = it->second;
-        if (temp_host == nullptr)
+        if (temp_host == nullptr) {
+          logger(log_runtime_warning, basic)
+           << "Warning: From RemoveHostAcknowledgement could not find the host!";
           return 1;
+        }
       } break;
       case HostIdentifier::kId: {
         /* get the host */
         auto it = host::hosts_by_id.find(request->id());
         if (it != host::hosts_by_id.end())
           temp_host = it->second;
-        if (temp_host == nullptr)
+        if (temp_host == nullptr) {
+          logger(log_runtime_warning, basic)
+           << "Warning: From RemoveHostAcknowledgement could not find the host!";
           return 1;
+        }
       } break;
       default:
         return 1;
@@ -804,8 +842,12 @@ grpc::Status engine_impl::RemoveServiceAcknowledgement(
             service::services.find({names.host_name(), names.service_name()});
         if (it != service::services.end())
           temp_service = it->second;
-        if (temp_service == nullptr)
+        if (temp_service == nullptr) {
+          logger(log_runtime_warning, basic)
+            << "Warning: From RemoveHostAcknowledgement could not find the host!"
+            << "or the service";
           return 1;
+        }
       } break;
       case ServiceIdentifier::kIds: {
         IdIdentifier ids = request->ids();
@@ -814,8 +856,12 @@ grpc::Status engine_impl::RemoveServiceAcknowledgement(
             service::services_by_id.find({ids.host_id(), ids.service_id()});
         if (it != service::services_by_id.end())
           temp_service = it->second;
-        if (temp_service == nullptr)
+        if (temp_service == nullptr) {
+          logger(log_runtime_warning, basic)
+            << "Warning: From RemoveHostAcknowledgement could not find the host!"
+            << "or the service";
           return 1;
+        }
       } break;
       default:
         return 1;
@@ -848,11 +894,18 @@ grpc::Status engine_impl::AcknowledgementHostProblem(
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      logger(log_runtime_warning, basic)
+            << "Warning: From AcknowledgementHostProblem could not find the host!";
       return 1;
+    }
     /* cannot acknowledge a non-existent problem */
-    if (temp_host->get_current_state() == host::state_up)
+    if (temp_host->get_current_state() == host::state_up) {
+      logger(log_runtime_warning, basic)
+            << "Warning: From AcknowledgementHostProblem care current state of host!"
+            << "is UP";
       return 1;
+    }
     /* set the acknowledgement flag */
     temp_host->set_problem_has_been_acknowledged(true);
     /* set the acknowledgement type */
@@ -904,11 +957,19 @@ grpc::Status engine_impl::AcknowledgementServiceProblem(
         service::services.find({request->host_name(), request->service_desc()});
     if (it != service::services.end())
       temp_service = it->second;
-    if (temp_service == nullptr)
+    if (temp_service == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From AcknowledgementServiceProblem could not find host!"
+        << "or the service";
       return 1;
+    }
     /* cannot acknowledge a non-existent problem */
-    if (temp_service->get_current_state() == service::state_ok)
+    if (temp_service->get_current_state() == service::state_ok) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From AcknowledgementServiceProblem care current state of !"
+        << "service is OK";
       return 1;
+    }
     /* set the acknowledgement flag */
     temp_service->set_problem_has_been_acknowledged(true);
     /* set the acknowledgement type */
@@ -975,9 +1036,12 @@ grpc::Status engine_impl::ScheduleHostDowntime(
     const ScheduleDowntimeIdentifier* request,
     CommandSuccess* response) {
   if (request->host_name().empty() || request->author().empty() ||
-      request->comment_data().empty())
+      request->comment_data().empty()) {
+    logger(log_runtime_warning, basic) 
+        << "Warning: From ScheduleHostDowntime all fields must be defined!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
-                        "all fieds must be defined");
+                        "all fields must be defined");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
@@ -987,8 +1051,11 @@ grpc::Status engine_impl::ScheduleHostDowntime(
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleHostDowntime can't find host!";
       return 1;
+    }
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
     else
@@ -999,9 +1066,11 @@ grpc::Status engine_impl::ScheduleHostDowntime(
         request->entry_time(), request->author().c_str(),
         request->comment_data().c_str(), request->start(), request->end(),
         request->fixed(), request->triggered_by(), duration, &downtime_id);
-    if (res == ERROR)
+    if (res == ERROR) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleHostDowntime can't schedule downtime!";
       return 1;
-    else
+    } else
       return 0;
   });
 
@@ -1037,9 +1106,12 @@ grpc::Status engine_impl::ScheduleServiceDowntime(
     const ScheduleDowntimeIdentifier* request,
     CommandSuccess* response) {
   if (request->host_name().empty() || request->service_desc().empty() ||
-      request->author().empty() || request->comment_data().empty())
+      request->author().empty() || request->comment_data().empty()) {
+    logger(log_runtime_warning, basic) 
+        << "Warning: From ScheduleServiceDowntime all fields must be defined!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
-                        "all fieds must be defined");
+                        "all fields must be defined");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
@@ -1050,8 +1122,11 @@ grpc::Status engine_impl::ScheduleServiceDowntime(
         service::services.find({request->host_name(), request->service_desc()});
     if (it != service::services.end())
       temp_service = it->second;
-    if (temp_service == nullptr)
+    if (temp_service == nullptr) {
+      logger(log_runtime_warning, basic) 
+        << "Warning: From ScheduleServiceDowntime can't find host or service!";
       return 1;
+    }
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
     else
@@ -1064,9 +1139,11 @@ grpc::Status engine_impl::ScheduleServiceDowntime(
         request->author().c_str(), request->comment_data().c_str(),
         request->start(), request->end(), request->fixed(),
         request->triggered_by(), duration, &downtime_id);
-    if (res == ERROR)
+    if (res == ERROR) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleHostDowntime can't schedule downtime!";
       return 1;
-    else
+    } else
       return 0;
   });
 
@@ -1101,9 +1178,12 @@ grpc::Status engine_impl::ScheduleHostServicesDowntime(
     const ScheduleDowntimeIdentifier* request,
     CommandSuccess* response) {
   if (request->host_name().empty() || request->author().empty() ||
-      request->comment_data().empty())
+      request->comment_data().empty()) {
+    logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleHostServicesDowntime all fields must be defined!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
-                        "all fieds must be defined");
+                        "all fields must be defined");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
@@ -1113,8 +1193,11 @@ grpc::Status engine_impl::ScheduleHostServicesDowntime(
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleHostServicesDowntime cant find host!";
       return 1;
+    }
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
     else
@@ -1168,9 +1251,12 @@ grpc::Status engine_impl::ScheduleHostGroupHostsDowntime(
     const ScheduleDowntimeIdentifier* request,
     CommandSuccess* response) {
   if (request->host_group_name().empty() || request->author().empty() ||
-      request->comment_data().empty())
+      request->comment_data().empty()) {
+    logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleHostGroupHostsDowntime all fields must be defined!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     uint64_t downtime_id = 0;
@@ -1179,8 +1265,11 @@ grpc::Status engine_impl::ScheduleHostGroupHostsDowntime(
     /* get the host group */
     hostgroup_map::const_iterator it(
         hostgroup::hostgroups.find(request->host_group_name()));
-    if (it == hostgroup::hostgroups.end() || !it->second)
+    if (it == hostgroup::hostgroups.end() || !it->second) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleHostGroupHostsDowntime cant find host group!";
       return 1;
+    }
     hg = it->second.get();
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
@@ -1233,9 +1322,13 @@ grpc::Status engine_impl::ScheduleHostGroupServicesDowntime(
     const ScheduleDowntimeIdentifier* request,
     CommandSuccess* response) {
   if (request->host_group_name().empty() || request->author().empty() ||
-      request->comment_data().empty())
+      request->comment_data().empty()) {
+    logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleHostGroupServicesDowntime all fields must "
+        << "be defined!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
-                        "all fieds must be defined");
+                        "all fields must be defined");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     uint64_t downtime_id(0);
@@ -1244,8 +1337,11 @@ grpc::Status engine_impl::ScheduleHostGroupServicesDowntime(
     /* get the hostgroup */
     hostgroup_map::const_iterator it(
         hostgroup::hostgroups.find(request->host_group_name()));
-    if (it == hostgroup::hostgroups.end() || !it->second)
+    if (it == hostgroup::hostgroups.end() || !it->second) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleHostGroupServicesDowntime can't find host group";
       return 1;
+    }
     hg = it->second.get();
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
@@ -1308,9 +1404,13 @@ grpc::Status engine_impl::ScheduleServiceGroupHostsDowntime(
     const ScheduleDowntimeIdentifier* request,
     CommandSuccess* response) {
   if (request->service_group_name().empty() || request->author().empty() ||
-      request->comment_data().empty())
+      request->comment_data().empty()) {
+    logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleServiceGroupHostsDowntime all fields "
+        << "must be defined";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
-                        "all fieds must be defined");
+                        "all fields must be defined");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     host* temp_host{nullptr};
@@ -1320,8 +1420,11 @@ grpc::Status engine_impl::ScheduleServiceGroupHostsDowntime(
     servicegroup_map::const_iterator sg_it;
     /* verify that the servicegroup is valid */
     sg_it = servicegroup::servicegroups.find(request->service_group_name());
-    if (sg_it == servicegroup::servicegroups.end() || !sg_it->second)
+    if (sg_it == servicegroup::servicegroups.end() || !sg_it->second) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleServiceGroupHostsDowntime can't find service group";
       return 1;
+    }
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
     else
@@ -1380,9 +1483,13 @@ grpc::Status engine_impl::ScheduleServiceGroupServicesDowntime(
     const ScheduleDowntimeIdentifier* request,
     CommandSuccess* response) {
   if (request->service_group_name().empty() || request->author().empty() ||
-      request->comment_data().empty())
+      request->comment_data().empty()) {
+    logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleServiceGroupServicesDowntime all fields must be "  
+        << "defined";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
-                        "all fieds must be defined");
+                        "all fields must be defined");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     uint64_t downtime_id(0);
@@ -1390,8 +1497,12 @@ grpc::Status engine_impl::ScheduleServiceGroupServicesDowntime(
     servicegroup_map::const_iterator sg_it;
     /* verify that the servicegroup is valid */
     sg_it = servicegroup::servicegroups.find(request->service_group_name());
-    if (sg_it == servicegroup::servicegroups.end() || !sg_it->second)
+    if (sg_it == servicegroup::servicegroups.end() || !sg_it->second) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleServiceGroupServicesDowntime can't find "
+        << "service group"; 
       return 1;
+    }
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
     else
@@ -1441,9 +1552,13 @@ grpc::Status engine_impl::ScheduleAndPropagateHostDowntime(
     const ScheduleDowntimeIdentifier* request,
     CommandSuccess* response) {
   if (request->host_name().empty() || request->author().empty() ||
-      request->comment_data().empty())
+      request->comment_data().empty()) {
+    logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleAndProgateHostDowntime all fields "
+        << "must be defined!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
-                        "all fieds must be defined");
+                        "all fields must be defined");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
@@ -1453,8 +1568,11 @@ grpc::Status engine_impl::ScheduleAndPropagateHostDowntime(
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleAndProgateHostDowntime can't find host!";
       return 1;
+    }
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
     else
@@ -1508,9 +1626,13 @@ grpc::Status engine_impl::ScheduleAndPropagateTriggeredHostDowntime(
     const ScheduleDowntimeIdentifier* request,
     CommandSuccess* response) {
   if (request->host_name().empty() || request->author().empty() ||
-      request->comment_data().empty())
+      request->comment_data().empty()) {
+    logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleAndProgateTriggeredHostDowntime all fields "
+        << "must be defined!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
@@ -1520,8 +1642,11 @@ grpc::Status engine_impl::ScheduleAndPropagateTriggeredHostDowntime(
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleAndProgateTriggeredHostDowntime cant find host";
       return 1;
+    }
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
     else
@@ -1565,9 +1690,11 @@ grpc::Status engine_impl::DeleteDowntime(grpc::ServerContext* context
   uint32_t downtime_id = request->value();
   auto fn = std::packaged_task<int32_t(void)>([&downtime_id]() -> int32_t {
     /* deletes scheduled  downtime */
-    if (downtime_manager::instance().unschedule_downtime(downtime_id) == ERROR)
+    if (downtime_manager::instance().unschedule_downtime(downtime_id) == ERROR) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From DeleteDowntime can't delete downtime";
       return 1;
-    else
+    } else
       return 0;
   });
 
@@ -1730,11 +1857,15 @@ grpc::Status engine_impl::DeleteDowntimeByHostName(
     grpc::ServerContext* context __attribute__((unused)),
     const DowntimeHostIdentifier* request,
     CommandSuccess* response) {
+
   /*hostname must be defined to delete the downtime but not others arguments*/
   std::string const& host_name = request->host_name();
-  if (host_name.empty())
+  if (host_name.empty()) {
+    logger(log_runtime_warning, basic)
+        << "Warning: From DeleteDowntimeByHostName host_name field can't be empty!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([&host_name,
                                                request]() -> int32_t {
@@ -1754,8 +1885,11 @@ grpc::Status engine_impl::DeleteDowntimeByHostName(
         downtime_manager::instance()
             .delete_downtime_by_hostname_service_description_start_time_comment(
                 host_name, service_desc, start_time, comment_data);
-    if (deleted == 0)
+    if (deleted == 0) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From DeleteDowntimeByHostName can't deletes downtime!";
       return 1;
+    }
     return 0;
   });
 
@@ -1783,9 +1917,12 @@ grpc::Status engine_impl::DeleteDowntimeByHostGroupName(
     const DowntimeHostGroupIdentifier* request,
     CommandSuccess* response) {
   std::string const& host_group_name = request->host_group_name();
-  if (host_group_name.empty())
+  if (host_group_name.empty()) {
+    logger(log_runtime_warning, basic)
+        << "Warning: From DeleteDowntimeByHostGroupName can't deletes downtime!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_group_name must not be empty");
+  }
   auto fn = std::packaged_task<int32_t(void)>([&host_group_name,
                                                request]() -> int32_t {
     std::pair<bool, time_t> start_time;
@@ -1795,8 +1932,11 @@ grpc::Status engine_impl::DeleteDowntimeByHostGroupName(
     uint32_t deleted = 0;
 
     auto it = hostgroup::hostgroups.find(host_group_name);
-    if (it == hostgroup::hostgroups.end() || !it->second)
+    if (it == hostgroup::hostgroups.end() || !it->second) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From DeleteDowntimeByHostGroupName can't find host group!";
       return 1;
+    }
     if (!(request->host_name().empty()))
       host_name = request->host_name();
     if (!(request->service_desc().empty()))
@@ -1821,8 +1961,11 @@ grpc::Status engine_impl::DeleteDowntimeByHostGroupName(
                   host_name, service_desc, start_time, comment_data);
     }
 
-    if (deleted == 0)
+    if (deleted == 0) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From DeleteDowntimeByHostGroupName can't deletes downtime!";
       return 1;
+    }
     return 0;
   });
 
@@ -1851,16 +1994,23 @@ grpc::Status engine_impl::DeleteDowntimeByStartTimeComment(
     CommandSuccess* response) {
   time_t start_time;
   /*hostname must be defined to delete the downtime but not others arguments*/
-  if (!(request->has_start()))
+  if (!(request->has_start())) {
+    logger(log_runtime_warning, basic)
+        << "Warning: From DeleteDowntimeByStartTimeComment start_time must not "
+        << "be empty!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "start_time must not be empty");
-  else
+  } else
     start_time = request->start().value();
 
   std::string const& comment_data = request->comment_data();
-  if (comment_data.empty())
+  if (comment_data.empty()) {
+    logger(log_runtime_warning, basic)
+        << "Warning: From DeleteDowntimeByStartTimeComment comment_data must not "
+        << "be empty!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "comment_data must not be empty");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([&comment_data,
                                                &start_time]() -> int32_t {
@@ -1868,10 +2018,15 @@ grpc::Status engine_impl::DeleteDowntimeByStartTimeComment(
         downtime_manager::instance()
             .delete_downtime_by_hostname_service_description_start_time_comment(
                 "", "", {true, start_time}, comment_data);
-    if (0 == deleted)
+    if (0 == deleted) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From DeleteDowntimeByStartTimeComment can't deletes downtime!";
       return 1;
+    }
+
     return 0;
   });
+
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
@@ -1893,9 +2048,12 @@ grpc::Status engine_impl::ScheduleHostCheck(grpc::ServerContext* context
                                             __attribute__((unused)),
                                             const HostCheckIdentifier* request,
                                             CommandSuccess* response) {
-  if (request->host_name().empty())
+  if (request->host_name().empty()) {
+    logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleHostCheck host_name must not be empty!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
@@ -1903,8 +2061,12 @@ grpc::Status engine_impl::ScheduleHostCheck(grpc::ServerContext* context
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleHostCheck can't find host!";
       return 1;
+    }
+
     if (!request->force())
       temp_host->schedule_check(request->delay_time(), CHECK_OPTION_NONE);
     else
@@ -1934,9 +2096,12 @@ grpc::Status engine_impl::ScheduleHostServiceCheck(
     grpc::ServerContext* context __attribute__((unused)),
     const HostCheckIdentifier* request,
     CommandSuccess* response) {
-  if (request->host_name().empty())
+  if (request->host_name().empty()) {
+    logger(log_runtime_warning, basic)
+      << "Warning: From ScheduleHostServiceCheck host_name must not be empty!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
@@ -1945,8 +2110,11 @@ grpc::Status engine_impl::ScheduleHostServiceCheck(
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleHostServiceCheck can't find host!";
       return 1;
+    }
     /* iterate through services of the current host */
     for (service_map_unsafe::iterator it(temp_host->services.begin()),
          end(temp_host->services.end());
@@ -1983,13 +2151,19 @@ grpc::Status engine_impl::ScheduleServiceCheck(
     grpc::ServerContext* context __attribute__((unused)),
     const ServiceCheckIdentifier* request,
     CommandSuccess* response) {
-  if (request->host_name().empty())
+  if (request->host_name().empty()) {
+    logger(log_runtime_warning, basic)
+      << "Warning: From ScheduleServiceCheck host_name must not be empty!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
+  }
 
-  if (request->service_desc().empty())
+  if (request->service_desc().empty()) {
+    logger(log_runtime_warning, basic)
+      << "Warning: From ScheduleServiceCheck service descrption must not be empty!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "service description must not be empty");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
@@ -1998,8 +2172,12 @@ grpc::Status engine_impl::ScheduleServiceCheck(
         service::services.find({request->host_name(), request->service_desc()});
     if (it != service::services.end())
       temp_service = it->second;
-    if (temp_service == nullptr)
+    if (temp_service == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ScheduleServiceCheck can't find service!";
       return 1;
+    }
+
     if (!request->force())
       temp_service->schedule_check(request->delay_time(), CHECK_OPTION_NONE);
     else
@@ -2042,6 +2220,8 @@ grpc::Status engine_impl::SignalProcess(grpc::ServerContext* context
                             request->scheduled_time(), false, 0, nullptr, false,
                             nullptr, nullptr, 0);
     } else {
+      logger(log_runtime_warning, basic)
+        << "Warning: From SignalProcess has no event informed!";
       return 1;
     }
 
@@ -2078,15 +2258,21 @@ grpc::Status engine_impl::DelayHostNotification(
         auto it = host::hosts.find(request->name());
         if (it != host::hosts.end())
           temp_host = it->second;
-        if (temp_host == nullptr)
+        if (temp_host == nullptr) {
+          logger(log_runtime_warning, basic)
+            << "Warning: From DelayHostNotification can't find host!";
           return 1;
+        }
       } break;
       case HostDelayIdentifier::kId: {
         auto it = host::hosts_by_id.find(request->id());
         if (it != host::hosts_by_id.end())
           temp_host = it->second;
-        if (temp_host == nullptr)
+        if (temp_host == nullptr) {
+          logger(log_runtime_warning, basic)
+            << "Warning: From DelayHostNotification can't find host!";
           return 1;
+        }
       } break;
       default:
         return 1;
@@ -2128,8 +2314,12 @@ grpc::Status engine_impl::DelayServiceNotification(
             service::services.find({names.host_name(), names.service_name()});
         if (it != service::services.end())
           temp_service = it->second;
-        if (temp_service == nullptr)
+        if (temp_service == nullptr) {
+          logger(log_runtime_warning, basic)
+            << "Warning: From DelayServiceNotification can't find host "
+            << "or service";
           return 1;
+        }
       } break;
       case ServiceDelayIdentifier::kIds: {
         IdIdentifier ids = request->ids();
@@ -2137,8 +2327,12 @@ grpc::Status engine_impl::DelayServiceNotification(
             service::services_by_id.find({ids.host_id(), ids.service_id()});
         if (it != service::services_by_id.end())
           temp_service = it->second;
-        if (temp_service == nullptr)
+        if (temp_service == nullptr) {
+          logger(log_runtime_warning, basic)
+            << "Warning: From DelayServiceNotification can't find host "
+            << "or service";
           return 1;
+        }
       } break;
       default:
         return 1;
@@ -2167,8 +2361,11 @@ grpc::Status engine_impl::ChangeHostObjectIntVar(grpc::ServerContext* context
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ChangeHostObjectIntVar can't find host";
       return 1;
+    }
     if (ChangeObjectInt::Mode_Name(request->mode()) ==
         "NORMAL_CHECK_INTERVAL") {
       /* save the old check interval */
@@ -2216,8 +2413,11 @@ grpc::Status engine_impl::ChangeHostObjectIntVar(grpc::ServerContext* context
         temp_host->set_current_attempt(temp_host->get_max_attempts());
     } else if (ChangeObjectInt::Mode_Name(request->mode()) == "MODATTR") {
       attr = request->intval();
-    } else
+    } else {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ChangeHostObjectIntVar has not evet informed!";
       return 1;
+    }
 
     if (ChangeObjectInt::Mode_Name(request->mode()) == "MODATTR")
       temp_host->set_modified_attributes(attr);
@@ -2254,8 +2454,12 @@ grpc::Status engine_impl::ChangeServiceObjectIntVar(
         service::services.find({request->host_name(), request->service_desc()});
     if (it != service::services.end())
       temp_service = it->second;
-    if (temp_service == nullptr)
+    if (temp_service == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ChangeServiceObjectIntVar can't find host or "
+        << "the service!";
       return 1;
+    }
     if (ChangeObjectInt::Mode_Name(request->mode()) ==
         "NORMAL_CHECK_INTERVAL") {
       /* save the old check interval */
@@ -2304,8 +2508,11 @@ grpc::Status engine_impl::ChangeServiceObjectIntVar(
         temp_service->set_current_attempt(temp_service->get_max_attempts());
     } else if (ChangeObjectInt::Mode_Name(request->mode()) == "MODATTR")
       attr = request->intval();
-    else
+    else {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ChangeServiceObjectIntVar has no event informed!";
       return 1;
+    }
 
     if (ChangeObjectInt::Mode_Name(request->mode()) == "MODATTR")
       temp_service->set_modified_attributes(attr);
@@ -2344,6 +2551,8 @@ grpc::Status engine_impl::ChangeContactObjectIntVar(
     if (itcontactname != contact::contacts.end())
       temp_contact = itcontactname->second;
     else {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ChangeContactObjectIntVar can't find contact";
       return 1;
     }
 
@@ -2358,8 +2567,11 @@ grpc::Status engine_impl::ChangeContactObjectIntVar(
                "MODSATTR") {
       sattr = request->intval();
       temp_contact->set_modified_service_attributes(sattr);
-    } else
+    } else {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ChangeContactObjectIntVar has no event informed";
       return 1;
+    }
 
     /* send data to event broker */
     broker_adaptive_contact_data(
@@ -2402,8 +2614,11 @@ grpc::Status engine_impl::ChangeHostObjectCharVar(
       auto it = host::hosts.find(request->host_name());
       if (it != host::hosts.end())
         temp_host = it->second;
-      if (temp_host == nullptr)
+      if (temp_host == nullptr) {
+        logger(log_runtime_warning, basic)
+          << "Warning: From ChangeHostObjectCharVar can't find host!";
         return 1;
+      }
     }
 
     /* make sure the timeperiod is valid */
@@ -2414,14 +2629,20 @@ grpc::Status engine_impl::ChangeHostObjectCharVar(
       auto found = timeperiod::timeperiods.find(request->charval());
       if (found != timeperiod::timeperiods.end())
         temp_timeperiod = found->second.get();
-      if (temp_timeperiod == nullptr)
+      if (temp_timeperiod == nullptr) {
+        logger(log_runtime_warning, basic)
+          << "Warning: From ChangeHostObjectCharVar can't find timeperiod!";
         return 1;
+      }
     }
     /* make sure the command exists */
     else {
       cmd_found = commands::command::commands.find(request->charval());
-      if (cmd_found == commands::command::commands.end() || !cmd_found->second)
+      if (cmd_found == commands::command::commands.end() || !cmd_found->second) {
+        logger(log_runtime_warning, basic)
+          << "Warning: From ChangeHostObjectCharVar command not found!";
         return 1;
+      }
     }
 
     /* update the variable */
@@ -2450,8 +2671,11 @@ grpc::Status engine_impl::ChangeHostObjectCharVar(
       temp_host->set_notification_period(request->charval());
       temp_host->set_notification_period_ptr(temp_timeperiod);
       attr = MODATTR_NOTIFICATION_TIMEPERIOD;
-    } else
+    } else {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ChangeHostObjectCharVar no event informed!";
       return 1;
+    }
 
     /* send data to event broker and update status file */
     if (ChangeObjectChar::Mode_Name(request->mode()) ==
@@ -2513,8 +2737,12 @@ grpc::Status engine_impl::ChangeServiceObjectCharVar(
           {request->host_name(), request->service_desc()});
       if (it != service::services.end())
         temp_service = it->second;
-      if (temp_service == nullptr)
+      if (temp_service == nullptr) {
+        logger(log_runtime_warning, basic)
+          << "Warning: From ChangeServiceObjectCharVar can't find host or "
+          << " the service !";
         return 1;
+      }
     }
     /* make sure the timeperiod is valid */
     if (ChangeObjectChar::Mode_Name(request->mode()) ==
@@ -2524,14 +2752,19 @@ grpc::Status engine_impl::ChangeServiceObjectCharVar(
       auto found = timeperiod::timeperiods.find(request->charval());
       if (found != timeperiod::timeperiods.end())
         temp_timeperiod = found->second.get();
-      if (temp_timeperiod == nullptr)
+      if (temp_timeperiod == nullptr) {
+        logger(log_runtime_warning, basic)
+          << "Warning: From ChangeServiceObjectCharVar can't find timeperiod!";
         return 1;
+      }
     }
     /* make sure the command exists */
     else {
       cmd_found = commands::command::commands.find(request->charval());
       if (cmd_found == commands::command::commands.end() ||
           !cmd_found->second) {
+        logger(log_runtime_warning, basic)
+          << "Warning: From ChangeServiceObjectCharVar command not found!";
         return 1;
       }
     }
@@ -2562,8 +2795,11 @@ grpc::Status engine_impl::ChangeServiceObjectCharVar(
       temp_service->set_notification_period(request->charval());
       temp_service->set_notification_period_ptr(temp_timeperiod);
       attr = MODATTR_NOTIFICATION_TIMEPERIOD;
-    } else
+    } else {
+      logger(log_runtime_warning, basic)
+          << "Warning: From ChangeServiceObjectCharVar event not informed!";
       return 1;
+    }
 
     /* send data to event broker and update status file */
     if (ChangeObjectChar::Mode_Name(request->mode()) ==
@@ -2606,9 +2842,12 @@ grpc::Status engine_impl::ChangeContactObjectCharVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeContactObjectChar* request,
     CommandSuccess* response) {
-  if (request->contact().empty())
+  if (request->contact().empty()) {
+    logger(log_runtime_warning, basic)
+      << "Warning: From ChangeContactObjectCharVar contact must not be empty!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "contact must not be empty");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([request](void) -> int32_t {
     std::shared_ptr<engine::contact> temp_contact;
@@ -2619,14 +2858,20 @@ grpc::Status engine_impl::ChangeContactObjectCharVar(
     auto it = contact::contacts.find(request->contact());
     if (it != contact::contacts.end())
       temp_contact = it->second;
-    if (temp_contact == nullptr)
+    if (temp_contact == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ChangeContactObjectCharVar can't find contact!";
       return 1;
+    }
 
     auto found = timeperiod::timeperiods.find(request->charval());
     if (found != timeperiod::timeperiods.end())
       temp_timeperiod = found->second.get();
-    if (temp_timeperiod == nullptr)
+    if (temp_timeperiod == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ChangeContactObjectCharVar can't find contact!";
       return 1;
+    }
     if (ChangeContactObjectChar::Mode_Name(request->mode()) ==
         "CHANGE_HOST_NOTIFICATION_TIMEPERIOD") {
       temp_contact->set_host_notification_period(request->charval());
@@ -2637,8 +2882,11 @@ grpc::Status engine_impl::ChangeContactObjectCharVar(
       temp_contact->set_service_notification_period(request->charval());
       temp_contact->set_service_notification_period_ptr(temp_timeperiod);
       hattr = MODATTR_NOTIFICATION_TIMEPERIOD;
-    } else
+    } else {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ChangeContactObjectCharVar has not event informed!";
       return 1;
+    }
 
     /* set the modified attributes */
     temp_contact->set_modified_host_attributes(
@@ -2670,9 +2918,12 @@ grpc::Status engine_impl::ChangeHostObjectCustomVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeObjectCustomVar* request,
     CommandSuccess* response) {
-  if (request->host_name().empty())
+  if (request->host_name().empty()) {
+    logger(log_runtime_warning, basic)
+      << "Warning: From ChangeHostObjectCustomVar host_name must not be empty!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
+  }
   auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     // std::shared_ptr<engine::host> temp_host;
     host* temp_host{nullptr};
@@ -2682,8 +2933,11 @@ grpc::Status engine_impl::ChangeHostObjectCustomVar(
     host_map::const_iterator it_h(host::hosts.find(request->host_name()));
     if (it_h != host::hosts.end())
       temp_host = it_h->second.get();
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ChangeHostObjectCustomVar can't find host";
       return 1;
+    }
     map_customvar::iterator it(temp_host->custom_variables.find(varname));
     if (it == temp_host->custom_variables.end())
       temp_host->custom_variables[varname] =
@@ -2707,12 +2961,19 @@ grpc::Status engine_impl::ChangeServiceObjectCustomVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeObjectCustomVar* request,
     CommandSuccess* response) {
-  if (request->host_name().empty())
+  if (request->host_name().empty()) { 
+    logger(log_runtime_warning, basic)
+      << "Warning: From ChangeServiceObjectCustomVar host_name must not be empty!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
-  if (request->service_desc().empty())
+  }
+  if (request->service_desc().empty()) {
+    logger(log_runtime_warning, basic)
+      << "Warning: From ChangeServiceObjectCustomVar service description must not"
+      << "be empty";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "service description must not be empty");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     service* temp_service{nullptr};
@@ -2723,14 +2984,19 @@ grpc::Status engine_impl::ChangeServiceObjectCustomVar(
         {request->host_name(), request->service_desc()}));
     if (it_s != service::services.end())
       temp_service = it_s->second.get();
-    if (temp_service == nullptr)
+    if (temp_service == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ChangeServiceObjectCustomVar can't find host or service!";
       return 1;
+    }
+
     map_customvar::iterator it(temp_service->custom_variables.find(varname));
     if (it == temp_service->custom_variables.end())
       temp_service->custom_variables[varname] =
           customvariable(request->varvalue());
     else
       it->second.update(request->varvalue());
+
     temp_service->add_modified_attributes(MODATTR_CUSTOM_VARIABLE);
     temp_service->update_status();
     return 0;
@@ -2747,9 +3013,12 @@ grpc::Status engine_impl::ChangeContactObjectCustomVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeObjectCustomVar* request,
     CommandSuccess* response) {
-  if (request->contact().empty())
+  if (request->contact().empty()) {
+    logger(log_runtime_warning, basic)
+      << "Warning: From ChangeCOntactObjectCustomVar contact must not be empty!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "contact must not be empty");
+  }
 
   auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
     contact* temp_contact{nullptr};
@@ -2759,8 +3028,12 @@ grpc::Status engine_impl::ChangeContactObjectCustomVar(
     contact_map::iterator cnct_it = contact::contacts.find(request->contact());
     if (cnct_it != contact::contacts.end())
       temp_contact = cnct_it->second.get();
-    if (temp_contact == nullptr)
+    if (temp_contact == nullptr) {
+      logger(log_runtime_warning, basic)
+        << "Warning: From ChangeCOntactObjectCustomVar contact must not be empty!";
       return 1;
+    }
+
     map_customvar::iterator it(
         temp_contact->get_custom_variables().find(varname));
     if (it == temp_contact->get_custom_variables().end())
