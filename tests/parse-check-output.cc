@@ -166,3 +166,19 @@ TEST(ParseCheckOutput, multipleLineWithMultiplePerfdata1ReturnEscaped) {
       "/=2643MB;5948;5958;0;5968 /boot=68MB;88;93;0;98 "
       "/home=69357MB;253404;253409;0;253414 /var/log=818MB;970;975;0;980");
 }
+
+TEST(ParseCheckOutput, CheckDummy) {
+  std::string buf{
+      "Fake output | v3metric1=1 v3metric2=18;1 v3metric3=12;1;2;0;"};
+  std::string short_output;
+  std::string long_output;
+  std::string perf_data;
+  bool escape_newlines{false};
+  bool newlines_are_escaped{true};
+
+  parse_check_output(buf, short_output, long_output, perf_data, escape_newlines,
+                     newlines_are_escaped);
+  ASSERT_EQ(short_output, "Fake output");
+  ASSERT_EQ(long_output, "");
+  ASSERT_EQ(perf_data, "v3metric1=1 v3metric2=18;1 v3metric3=12;1;2;0;");
+}
