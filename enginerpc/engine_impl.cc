@@ -31,10 +31,23 @@
 #include "com/centreon/engine/statistics.hh"
 #include "com/centreon/engine/statusdata.hh"
 #include "com/centreon/engine/version.hh"
+#include <google/protobuf/util/json_util.h>
 
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::downtimes;
+
+void engine_impl::logger_info(std::string method_name, 
+                              const google::protobuf::Descriptor* desc) {
+  logger(log_runtime_warning, basic) << "Processing command " << method_name;
+  uint16_t field_count = desc->field_count();
+  fprintf(stderr, "The fullname of the message is %s \n", desc->full_name().c_str());
+  for(uint16_t i = 0; i < field_count; i++) {
+    const google::protobuf::FieldDescriptor *field = desc->field(i);
+    fprintf(stderr, "The name of the %i th element is %s and the type is  %s \n",
+            i, field->name().c_str(), field->type_name());
+  }
+}
 
 /**
  * @brief Return the Engine's version.
@@ -93,7 +106,8 @@ grpc::Status engine_impl::ProcessServiceCheckResult(grpc::ServerContext* context
                 google::protobuf::util::TimeUtil::TimestampToSeconds(
                     request->check_time()),
                 host_name, svc_desc, request->code(), request->output()));
-  command_manager::instance().enqueue(std::move(fn));
+
+    command_manager::instance().enqueue(std::move(fn));
 
   return grpc::Status::OK;
 }
@@ -532,6 +546,8 @@ grpc::Status engine_impl::AddHostComment(grpc::ServerContext* context
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("AddHostComment", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -595,6 +611,8 @@ grpc::Status engine_impl::AddServiceComment(grpc::ServerContext* context
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("AddServiceComment", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -633,6 +651,8 @@ grpc::Status engine_impl::DeleteComment(grpc::ServerContext* context
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("DeleteComment", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -687,6 +707,8 @@ grpc::Status engine_impl::DeleteAllHostComments(grpc::ServerContext* context
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("DeleteAllHostComments", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -749,6 +771,8 @@ grpc::Status engine_impl::DeleteAllServiceComments(
     return 0;
   });
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("DeleteAllServiceComments", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -810,6 +834,8 @@ grpc::Status engine_impl::RemoveHostAcknowledgement(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("RemoveHostAcknowledgement", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -878,6 +904,8 @@ grpc::Status engine_impl::RemoveServiceAcknowledgement(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("RemoveServiceAcknowledgement", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -941,6 +969,8 @@ grpc::Status engine_impl::AcknowledgementHostProblem(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("AcknowledgementHostProblem", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1006,6 +1036,8 @@ grpc::Status engine_impl::AcknowledgementServiceProblem(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("AcknowledgementServiceProblem", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1075,6 +1107,8 @@ grpc::Status engine_impl::ScheduleHostDowntime(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ScheduleHostDowntime", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1148,6 +1182,8 @@ grpc::Status engine_impl::ScheduleServiceDowntime(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ScheduleServiceDowntime", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1220,6 +1256,8 @@ grpc::Status engine_impl::ScheduleHostServicesDowntime(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ScheduleHostServicesDowntime", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1290,6 +1328,8 @@ grpc::Status engine_impl::ScheduleHostGroupHostsDowntime(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ScheduleHostGroupHostsDowntime", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1373,6 +1413,8 @@ grpc::Status engine_impl::ScheduleHostGroupServicesDowntime(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ScheduleHostGroupServicesDowntime", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1452,6 +1494,8 @@ grpc::Status engine_impl::ScheduleServiceGroupHostsDowntime(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ScheduleServiceGroupHostsDowntime", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1522,6 +1566,8 @@ grpc::Status engine_impl::ScheduleServiceGroupServicesDowntime(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ScheduleServiceGroupServicesDowntime", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1594,6 +1640,8 @@ grpc::Status engine_impl::ScheduleAndPropagateHostDowntime(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ScheduleAndPropageHostDowntime", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1668,6 +1716,8 @@ grpc::Status engine_impl::ScheduleAndPropagateTriggeredHostDowntime(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ScheduleAndPropageTriggerHostDowntime", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1699,6 +1749,8 @@ grpc::Status engine_impl::DeleteDowntime(grpc::ServerContext* context
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("DeleteDowntime", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1764,6 +1816,8 @@ grpc::Status engine_impl::DeleteHostDowntimeFull(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("DeleteHostDowntimeFull", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1835,6 +1889,8 @@ grpc::Status engine_impl::DeleteServiceDowntimeFull(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("DeleteServiceDowntimeFull", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1894,6 +1950,8 @@ grpc::Status engine_impl::DeleteDowntimeByHostName(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("DeleteDowntimeByHostName", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1970,6 +2028,8 @@ grpc::Status engine_impl::DeleteDowntimeByHostGroupName(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("DeleteDowntimeByHostGroupName", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2028,6 +2088,8 @@ grpc::Status engine_impl::DeleteDowntimeByStartTimeComment(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("DeleteDowntimeByStartTimeComment", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2076,6 +2138,8 @@ grpc::Status engine_impl::ScheduleHostCheck(grpc::ServerContext* context
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ScheduleHostCheck", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2131,6 +2195,8 @@ grpc::Status engine_impl::ScheduleHostServiceCheck(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ScheduleHostServiceCheck", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2187,6 +2253,8 @@ grpc::Status engine_impl::ScheduleServiceCheck(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ScheduleServiceCheck", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2230,6 +2298,8 @@ grpc::Status engine_impl::SignalProcess(grpc::ServerContext* context
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("SignalProcess", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2284,6 +2354,8 @@ grpc::Status engine_impl::DelayHostNotification(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("DelayHostNotification", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2344,6 +2416,8 @@ grpc::Status engine_impl::DelayServiceNotification(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("DelayServiceNotification", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2436,6 +2510,8 @@ grpc::Status engine_impl::ChangeHostObjectIntVar(grpc::ServerContext* context
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ChangeHostObjectIntVar", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2531,6 +2607,8 @@ grpc::Status engine_impl::ChangeServiceObjectIntVar(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ChangeServiceObjectIntVar", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2586,6 +2664,8 @@ grpc::Status engine_impl::ChangeContactObjectIntVar(
     return 0;
   });
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ChangeContactObjectIntVar", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2707,6 +2787,8 @@ grpc::Status engine_impl::ChangeHostObjectCharVar(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ChangeHostObjectCharVar", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2832,6 +2914,8 @@ grpc::Status engine_impl::ChangeServiceObjectCharVar(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ChangeServiceObjectCharVar", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2909,7 +2993,10 @@ grpc::Status engine_impl::ChangeContactObjectCharVar(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ChangeContactObjectCharVar", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
+
   response->set_value(!result.get());
   return grpc::Status::OK;
 }
@@ -2951,6 +3038,8 @@ grpc::Status engine_impl::ChangeHostObjectCustomVar(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ChangeHostObjectCustomVar", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -3003,6 +3092,8 @@ grpc::Status engine_impl::ChangeServiceObjectCustomVar(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ChangeServiceObjectCustomVar", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -3015,7 +3106,7 @@ grpc::Status engine_impl::ChangeContactObjectCustomVar(
     CommandSuccess* response) {
   if (request->contact().empty()) {
     logger(log_runtime_warning, basic)
-      << "Warning: From ChangeCOntactObjectCustomVar contact must not be empty!";
+      << "Warning: From ChangeContactObjectCustomVar contact must not be empty!";
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "contact must not be empty");
   }
@@ -3030,7 +3121,7 @@ grpc::Status engine_impl::ChangeContactObjectCustomVar(
       temp_contact = cnct_it->second.get();
     if (temp_contact == nullptr) {
       logger(log_runtime_warning, basic)
-        << "Warning: From ChangeCOntactObjectCustomVar contact must not be empty!";
+        << "Warning: From ChangeContactObjectCustomVar contact must not be empty!";
       return 1;
     }
 
@@ -3045,6 +3136,8 @@ grpc::Status engine_impl::ChangeContactObjectCustomVar(
   });
 
   std::future<int32_t> result = fn.get_future();
+
+  logger_info("ChangeContactObjectCustomVar", request->GetDescriptor());
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());

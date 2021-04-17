@@ -6,10 +6,12 @@
 
 CCE_BEGIN()
 class engine_impl final : public Engine::Service {
+  void logger_info(std::string method_name, 
+                   const google::protobuf::Descriptor* desc);
   grpc::Status GetVersion(grpc::ServerContext* context,
                           const ::google::protobuf::Empty* /*request*/,
                           Version* response) override;
-    grpc::Status GetStats(grpc::ServerContext* context,
+  grpc::Status GetStats(grpc::ServerContext* context,
                         const GenericString* request,
                         Stats* response) override;
   grpc::Status ProcessServiceCheckResult(grpc::ServerContext* context,
