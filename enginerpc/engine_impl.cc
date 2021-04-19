@@ -37,16 +37,10 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::logging;
 using namespace com::centreon::engine::downtimes;
 
-void engine_impl::logger_info(std::string method_name, 
-                              const google::protobuf::Descriptor* desc) {
-  logger(log_runtime_warning, basic) << "Processing command " << method_name;
-  uint16_t field_count = desc->field_count();
-  fprintf(stderr, "The fullname of the message is %s \n", desc->full_name().c_str());
-  for(uint16_t i = 0; i < field_count; i++) {
-    const google::protobuf::FieldDescriptor *field = desc->field(i);
-    fprintf(stderr, "The name of the %i th element is %s and the type is  %s \n",
-            i, field->name().c_str(), field->type_name());
-  }
+void engine_impl::logger_info(const std::string& method_name, 
+                              const std::string& desc) {
+  logger(log_runtime_warning, basic) << "Processing command " << method_name
+                                     << "with " << desc;
 }
 
 /**
@@ -546,8 +540,9 @@ grpc::Status engine_impl::AddHostComment(grpc::ServerContext* context
   });
 
   std::future<int32_t> result = fn.get_future();
-
-  logger_info("AddHostComment", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+  logger_info("AddHostComment", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -612,7 +607,10 @@ grpc::Status engine_impl::AddServiceComment(grpc::ServerContext* context
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("AddServiceComment", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("AddServiceComment", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -652,7 +650,10 @@ grpc::Status engine_impl::DeleteComment(grpc::ServerContext* context
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("DeleteComment", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("DeleteComment", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -708,7 +709,10 @@ grpc::Status engine_impl::DeleteAllHostComments(grpc::ServerContext* context
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("DeleteAllHostComments", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("DeleteAllHostComments", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -772,7 +776,10 @@ grpc::Status engine_impl::DeleteAllServiceComments(
   });
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("DeleteAllServiceComments", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("DeleteAllServiceComments", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -835,7 +842,10 @@ grpc::Status engine_impl::RemoveHostAcknowledgement(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("RemoveHostAcknowledgement", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("RemoveHostAcknowledgement", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -905,7 +915,10 @@ grpc::Status engine_impl::RemoveServiceAcknowledgement(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("RemoveServiceAcknowledgement", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("RemoveServiceAcknowledgement", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -970,7 +983,10 @@ grpc::Status engine_impl::AcknowledgementHostProblem(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("AcknowledgementHostProblem", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("AcknowledgementHostProblem", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1037,7 +1053,10 @@ grpc::Status engine_impl::AcknowledgementServiceProblem(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("AcknowledgementServiceProblem", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("AcknowledgementServiceProblem", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1108,7 +1127,10 @@ grpc::Status engine_impl::ScheduleHostDowntime(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ScheduleHostDowntime", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ScheduleHostDowntime", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1183,7 +1205,10 @@ grpc::Status engine_impl::ScheduleServiceDowntime(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ScheduleServiceDowntime", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ScheduleServiceDowntime", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1257,7 +1282,10 @@ grpc::Status engine_impl::ScheduleHostServicesDowntime(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ScheduleHostServicesDowntime", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ScheduleHostServicesDowntime", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1329,7 +1357,10 @@ grpc::Status engine_impl::ScheduleHostGroupHostsDowntime(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ScheduleHostGroupHostsDowntime", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ScheduleHostGroupHostsDowntime", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1414,7 +1445,10 @@ grpc::Status engine_impl::ScheduleHostGroupServicesDowntime(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ScheduleHostGroupServicesDowntime", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ScheduleHostGroupServicesDowntime", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1495,7 +1529,10 @@ grpc::Status engine_impl::ScheduleServiceGroupHostsDowntime(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ScheduleServiceGroupHostsDowntime", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ScheduleServiceGroupHostsDowntime", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1567,7 +1604,10 @@ grpc::Status engine_impl::ScheduleServiceGroupServicesDowntime(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ScheduleServiceGroupServicesDowntime", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ScheduleServiceGroupServicesDowntime", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1641,7 +1681,10 @@ grpc::Status engine_impl::ScheduleAndPropagateHostDowntime(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ScheduleAndPropageHostDowntime", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ScheduleAndPropageHostDowntime", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1717,7 +1760,10 @@ grpc::Status engine_impl::ScheduleAndPropagateTriggeredHostDowntime(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ScheduleAndPropageTriggerHostDowntime", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ScheduleAndPropageTriggerHostDowntime", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1750,7 +1796,10 @@ grpc::Status engine_impl::DeleteDowntime(grpc::ServerContext* context
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("DeleteDowntime", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("DeleteDowntime", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1817,7 +1866,10 @@ grpc::Status engine_impl::DeleteHostDowntimeFull(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("DeleteHostDowntimeFull", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("DeleteHostDowntimeFull", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1890,7 +1942,10 @@ grpc::Status engine_impl::DeleteServiceDowntimeFull(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("DeleteServiceDowntimeFull", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("DeleteServiceDowntimeFull", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -1951,7 +2006,10 @@ grpc::Status engine_impl::DeleteDowntimeByHostName(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("DeleteDowntimeByHostName", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("DeleteDowntimeByHostName", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2029,7 +2087,10 @@ grpc::Status engine_impl::DeleteDowntimeByHostGroupName(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("DeleteDowntimeByHostGroupName", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("DeleteDowntimeByHostGroupName", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2089,7 +2150,10 @@ grpc::Status engine_impl::DeleteDowntimeByStartTimeComment(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("DeleteDowntimeByStartTimeComment", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("DeleteDowntimeByStartTimeComment", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2139,7 +2203,10 @@ grpc::Status engine_impl::ScheduleHostCheck(grpc::ServerContext* context
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ScheduleHostCheck", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ScheduleHostCheck", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2196,7 +2263,10 @@ grpc::Status engine_impl::ScheduleHostServiceCheck(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ScheduleHostServiceCheck", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ScheduleHostServiceCheck", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2254,7 +2324,10 @@ grpc::Status engine_impl::ScheduleServiceCheck(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ScheduleServiceCheck", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ScheduleServiceCheck", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2299,7 +2372,10 @@ grpc::Status engine_impl::SignalProcess(grpc::ServerContext* context
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("SignalProcess", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("SignalProcess", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2355,7 +2431,10 @@ grpc::Status engine_impl::DelayHostNotification(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("DelayHostNotification", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("DelayHostNotification", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2417,7 +2496,10 @@ grpc::Status engine_impl::DelayServiceNotification(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("DelayServiceNotification", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("DelayServiceNotification", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2511,7 +2593,10 @@ grpc::Status engine_impl::ChangeHostObjectIntVar(grpc::ServerContext* context
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ChangeHostObjectIntVar", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ChangeHostObjectIntVar", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2608,7 +2693,10 @@ grpc::Status engine_impl::ChangeServiceObjectIntVar(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ChangeServiceObjectIntVar", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ChangeServiceObjectIntVar", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2665,7 +2753,10 @@ grpc::Status engine_impl::ChangeContactObjectIntVar(
   });
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ChangeContactObjectIntVar", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ChangeContactObjectIntVar", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2788,7 +2879,10 @@ grpc::Status engine_impl::ChangeHostObjectCharVar(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ChangeHostObjectCharVar", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ChangeHostObjectCharVar", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2915,7 +3009,10 @@ grpc::Status engine_impl::ChangeServiceObjectCharVar(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ChangeServiceObjectCharVar", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ChangeServiceObjectCharVar", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -2994,7 +3091,10 @@ grpc::Status engine_impl::ChangeContactObjectCharVar(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ChangeContactObjectCharVar", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ChangeContactObjectCharVar", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -3039,7 +3139,10 @@ grpc::Status engine_impl::ChangeHostObjectCustomVar(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ChangeHostObjectCustomVar", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ChangeHostObjectCustomVar", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -3093,7 +3196,10 @@ grpc::Status engine_impl::ChangeServiceObjectCustomVar(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ChangeServiceObjectCustomVar", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ChangeServiceObjectCustomVar", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
@@ -3137,7 +3243,10 @@ grpc::Status engine_impl::ChangeContactObjectCustomVar(
 
   std::future<int32_t> result = fn.get_future();
 
-  logger_info("ChangeContactObjectCustomVar", request->GetDescriptor());
+  std::string json_str;
+  google::protobuf::util::MessageToJsonString(*request,  &json_str);
+
+  logger_info("ChangeContactObjectCustomVar", json_str);
   command_manager::instance().enqueue(std::move(fn));
 
   response->set_value(!result.get());
