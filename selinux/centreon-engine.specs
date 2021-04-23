@@ -1,0 +1,40 @@
+Name:       centreon-engine-selinux
+Version:    0.0.9
+Release:    1
+Summary:    Apache2
+License:    SELinux context for centreon-engine
+Requires(post):   policycoreutils centreon-common-selinux
+Requires(postun): policycoreutils centreon-common-selinux
+Source:     centreon-engine-selinux-%{version}.tar.gz
+
+%description
+SElinux context for centreon-engine.
+
+%prep
+%setup -q
+
+%build
+make -f /usr/share/selinux/devel/Makefile
+
+%install
+mkdir -p %{buildroot}/usr/share/selinux/packages/centreon/
+install -m 655 centreon-engine.pp %{buildroot}/usr/share/selinux/packages/centreon/centreon-engine.pp
+
+%files
+/usr/share/selinux/packages/centreon/centreon-engine.pp
+
+%post
+if [ "$1" -le "1" ]; then # First install
+   semodule -i /usr/share/selinux/packages/centreon/centreon-engine.pp 2>/dev/null || :
+fi
+
+%preun
+if [ "$1" -lt "1" ]; then # Final removal
+    semodule -r centreon-engine 2>/dev/null || :
+fi
+
+%postun
+if [ "$1" -ge "1" ]; then # Upgrade
+    # Replaces the module if it is already loaded
+    semodule -i /usr/share/selinux/packages/centreon/centreon-engine.pp 2>/dev/null || :
+fi
