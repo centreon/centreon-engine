@@ -1,5 +1,14 @@
 # Changelog
 
+## 20.10.4
+
+### Bugfixes
+
+*Macros*
+
+If a service / host is not in a service/host group, then the HOSTGROUPNAME/
+SERVICEGROUPNAME macros can lead to segfault. This patch fixes this issue.
+
 ## 20.10.3
 
 ### Bugfixes
