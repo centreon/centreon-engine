@@ -1,4 +1,17 @@
 ========================
+Centreon Engine 19.10.18
+========================
+
+*******
+Bug Fix
+*******
+
+Macros
+======
+HOSTGROUPNAME and SERVICEGROUPNAME macros could lead to segfault if used on
+service/host without group.
+
+========================
 Centreon Engine 19.10.17
 ========================
 
