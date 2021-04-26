@@ -93,9 +93,11 @@ static std::string get_service_group_name(service& svc, nagios_macros* mac) {
   (void)mac;
 
   // Find all servicegroups this service is associated with.
-  std::string buf{svc.get_parent_groups().front()->get_group_name()};
-  logger(dbg_notifications, more) << "on grab service service name :" << buf;
-  return buf;
+  auto it = svc.get_parent_groups().begin();
+  if (it == svc.get_parent_groups().end())
+    return "";
+  else
+    return (*it)->get_group_name();
 }
 
 /**
@@ -234,7 +236,11 @@ struct grab_service_redirection {
         true}},
       // Is volatile.
       {MACRO_SERVICEISVOLATILE,
-       {&get_member_as_string<service, bool, notifier, &notifier::get_is_volatile>, true}},
+       {&get_member_as_string<service,
+                              bool,
+                              notifier,
+                              &notifier::get_is_volatile>,
+        true}},
       // Attempt.
       {MACRO_SERVICEATTEMPT,
        {&get_member_as_string<service,
