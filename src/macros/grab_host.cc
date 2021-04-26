@@ -33,12 +33,6 @@ using namespace com::centreon::engine;
 using namespace com::centreon::engine::macros;
 using namespace com::centreon::engine::logging;
 
-/**************************************
- *                                     *
- *           Local Functions           *
- *                                     *
- **************************************/
-
 /**
  *  Generate total services macros.
  *
@@ -141,10 +135,13 @@ static std::string get_host_group_names(host& hst, nagios_macros* mac) {
  */
 static std::string get_host_group_name(host& hst, nagios_macros* mac) {
   (void)mac;
-  logger(dbg_notifications, more) << "on macro juste avant host group ";
-  std::string buf{hst.get_parent_groups().front()->get_group_name()};
-  logger(dbg_notifications, more) << "on macro after host group " << buf;
-  return buf;
+
+  // Find all hostgroups this host is associated with.
+  auto it = hst.get_parent_groups().begin();
+  if (it == hst.get_parent_groups().end())
+    return "";
+  else
+    return (*it)->get_group_name();
 }
 
 /**
