@@ -1,5 +1,14 @@
 # Changelog
 
+## 21.04.1
+
+### Bugs
+
+*Macros*
+
+If a service / host is not in a service/host group, then the HOSTGROUPNAME/
+SERVICEGROUPNAME macros can lead to segfault. This patch fixes this issue.
+
 ## 21.04.0
 
 `To be released in april 2021`
