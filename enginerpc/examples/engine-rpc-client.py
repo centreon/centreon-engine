@@ -1,5 +1,5 @@
 # client_v2.py (second version)
-# file to communicate with gRPC methodsÂ 
+# file to communicate with gRPC methods
 
 import inspect, sys, getopt, time, grpc, json
 import engine_pb2
@@ -9,7 +9,7 @@ from google.protobuf.json_format import Parse
 from enum import Enum
 from collections import namedtuple
 
-###Â Class ###
+### Class ###
 
 # Class related with terminal colors
 class colors:
@@ -27,9 +27,9 @@ class colors:
 # Enum for grpc types
 class gRPC_types(Enum):
   TYPE_DOUBLE      = 1
-  TYPE_FLOAT       = 2 
-  TYPE_INT64       = 3 
-  TYPE_UINT64      = 4 
+  TYPE_FLOAT       = 2
+  TYPE_INT64       = 3
+  TYPE_UINT64      = 4
   TYPE_INT32       = 5
   TYPE_FIXEDINT64  = 6
   TYPE_FIXEDINT32  = 7
@@ -51,21 +51,21 @@ class gRPC_client:
     self.stub = ""
     self.dic_methods = {}
     # Assiociate each method name with his descriptor
-    for m in engine_pb2._ENGINE.methods: 
+    for m in engine_pb2._ENGINE.methods:
       self.dic_methods[m.name] = m
 
   def init_grpc(self, ip, port):
-    channel = grpc.insecure_channel("{}:{}".format(ip, port)) 
+    channel = grpc.insecure_channel("{}:{}".format(ip, port))
     self.stub = engine_pb2_grpc.EngineStub(channel)
 
-  #Â Show list of gRPC methods 
+  # Show list of gRPC methods
   def show_list_grpc_methods(self):
-    for m in engine_pb2._ENGINE.methods: 
+    for m in engine_pb2._ENGINE.methods:
       print("- ", m.name)
 
-  #Â Get the method descriptor
+  # Get the method descriptor
   def get_grpc_method(self, method_name):
-    try: 
+    try:
       method = self.dic_methods[method_name]
     except KeyError:
       print("No method with this name found. Check the list of methods by using -l "
@@ -76,7 +76,7 @@ class gRPC_client:
 
   # Give an info about grpc method
   def get_grpc_method_info(self, method_name):
-    method = self.get_grpc_method(method_name) 
+    method = self.get_grpc_method(method_name)
     # Get input type
     m_input = method.input_type
     # Same for output
@@ -90,7 +90,7 @@ class gRPC_client:
     print("For method : {}, input parameter is : {}, output parameter is : {}."
           .format(method.name, m_input.name, m_output.name))
     print("Input Message {} contains the main fields:".format(m_input.name))
-    
+
     for f in m_input.fields:
       print(" - {}".format(f.name))
 
@@ -101,13 +101,13 @@ class gRPC_client:
       for f in  oneofs_fields:
         lst_of_oneofs.append(f.name)
 
-      print(colors.WARNING + "/!\ Note /!\\" + " fields: " + ', '.join(lst_of_oneofs) +  
+      print(colors.WARNING + "/!\ Note /!\\" + " fields: " + ', '.join(lst_of_oneofs) +
             " are \'oneofs\', it means that you must choose one of the two but"
             " not the both !" + colors.ENDC, end='')
 
-    ## ---Â Json Layout Part --- ## 
+    ## --- Json Layout Part --- ##
     print(colors.OKBLUE + colors.UNDERLINE + "\n\nJSON LAYOUT:\n" + colors.ENDC)
-    result_str = "" 
+    result_str = ""
 
     # Show to user how the input message looks like in json
     if have_oneofs:
@@ -120,8 +120,8 @@ class gRPC_client:
             continue
           for type in gRPC_types:
             if f.type == type.value:
-              # If we dont get a basic type (like int, string, etc..), 
-              # it means that we have a type of TYPE_MESSAGE, so we have to describe 
+              # If we dont get a basic type (like int, string, etc..),
+              # it means that we have a type of TYPE_MESSAGE, so we have to describe
               # the Message to get more informations about it.
               if f.type == gRPC_types.TYPE_MESSAGE.value:
                 self.get_grpc_message_info(m_input, f, 3)
@@ -135,14 +135,14 @@ class gRPC_client:
           result_str = result_str[:-2]
           print(result_str)
         print("}\n")
-        
+
     else:
       print("{")
       for f in m_input.fields:
         for type in gRPC_types:
           if f.type == type.value:
-            # If we dont get a basic type (like int, string, etc..), 
-            # it means that we have a type of TYPE_MESSAGE, so we have to describe 
+            # If we dont get a basic type (like int, string, etc..),
+            # it means that we have a type of TYPE_MESSAGE, so we have to describe
             # the Message to get more informations about it.
             if f.type == gRPC_types.TYPE_MESSAGE.value:
               self.get_grpc_message_info(m_input, f, 3)
@@ -160,7 +160,7 @@ class gRPC_client:
 
   # Describe a TYPE_MESSAGE
   def get_grpc_message_info(self, parent_message_descriptor, field, string_space):
-    # Get current message 
+    # Get current message
     current_msg_dsc = parent_message_descriptor.fields_by_name[field.name].message_type
     # str_format variable is used to indent text
     str_format = string_space * ' '
@@ -168,8 +168,8 @@ class gRPC_client:
 
     str_format += ' '
     print(str_format + "{")
-    result_str = "" 
-    
+    result_str = ""
+
     for f in current_msg_dsc.fields:
       for type in gRPC_types:
         if f.type == type.value:
@@ -179,7 +179,7 @@ class gRPC_client:
             self.get_grpc_enum_info(m_input, f, 3)
           else:
             result_str += str_format + " \"{}\": {},\n".format(f.name, type.name)
-     
+
     # Remove last '\n' and ',' characters
     result_str = result_str[:-2]
     print(result_str)
@@ -199,13 +199,13 @@ class gRPC_client:
 
     for v in current_msg_dsc.values:
       print(str_format + " {}".format(v.name))
-      
+
     str_format = ' '
     str_format += string_space * ' '
     print(str_format + "}")
 
 
-  # Launch a grpc method 
+  # Launch a grpc method
   def exe(self, method_name, message):
     try :
       str_to_eval = "self.stub." + method_name + "(message)"
@@ -226,14 +226,14 @@ def json_to_message(client, method_name, json_datas):
     mod = __import__('engine_pb2', fromlist=[m.input_type.name])
 
   c = getattr(mod, m.input_type.name)
-  message = Parse(json.dumps(json_datas), c()) 
+  message = Parse(json.dumps(json_datas), c())
 
   return message
 
 # Show help/guide message
 def help_message():
-  print("Note that you need to inquire a Port in IPV6 for these uses :\n\n" 
-        "-> python3 client.py <port> -h|--help : Show help message\n" 
+  print("Note that you need to inquire a Port in IPV6 for these uses :\n\n"
+        "-> python3 client.py <port> -h|--help : Show help message\n"
         "-> python3 client.py <port> -d|--doc  : Show the documentation about"
         "this script and protobuf file (engine.proto)\n"
         "-> python3 client.py <port> -l|--list : Show the list of gRPC methods "
@@ -243,8 +243,8 @@ def help_message():
         "-> python3 client.py <port> -e|--exe <MethodName> "
         "<MessageContent.json>")
 
-#Â Show documentation message
-def documentation_message(): 
+# Show documentation message
+def documentation_message():
   print("You can read the gRPC_README.md to understand more about script working,"
         "you can read the documentation file \"index.html\" to see the documentation"
         "about protobuf file engine.proto")
@@ -283,7 +283,7 @@ def check_arguments(client, args, flags):
         mod = __import__('google.protobuf.empty_pb2', fromlist=[m.input_type.name])
         c = getattr(mod, m.input_type.name)
         json_datas = json.loads("{}")
-        message = Parse(json.dumps(json_datas), c()) 
+        message = Parse(json.dumps(json_datas), c())
         client.exe(args.method_name, message)
       else:
         print(colors.WARNING + "/!\ Warning /!\ Your method have not Empty in his input field but you have not \n"
@@ -300,11 +300,10 @@ def check_arguments(client, args, flags):
         msg = json_to_message(client, args.method_name, json_datas)
         client.exe(args.method_name, msg)
 
-    
 
-###Â Main ###
+### Main ###
 if __name__ == "__main__":
-  # Defines flags 
+  # Defines flags
   Arguments = namedtuple("Arguments", "ip, port, input_file, json_args, method_name")
   Flags     = namedtuple("Flags", "LIST_METHOD, HELP_METHOD, DESCRIPTION_METHOD, EXEC_METHOD")
 
@@ -318,13 +317,13 @@ if __name__ == "__main__":
 
   try:
     opts, args = getopt.getopt(sys.argv[1:], "hlp:f:a:d:e:",
-                              ["help", "list", "port=", "file=", 
+                              ["help", "list", "port=", "file=",
                               "args=", "description=", "exe="])
   except getopt.GetoptError as err:
     print(err)
     arg_error(sys.argv[0])
 
-  # Parsing essential options. 
+  # Parsing essential options.
   # this allows to reverse the order of the arguments in the reading
   for o, a in opts:
     if o in ("-i", "--ip"):
@@ -353,7 +352,7 @@ if __name__ == "__main__":
   check_arguments(client, arguments_fields, flags_fields)
 
   """
-  # Parsing others. They executes script functions. 
+  # Parsing others. They executes script functions.
   for o, a in opts:
     if o in ("-l", "--list"):
       client.show_list_grpc_methods()
@@ -371,12 +370,12 @@ if __name__ == "__main__":
       # We probably should have an empty message.
       if not input_file and not json_args:
         m = client.get_grpc_method(method_name)
-          
+
         if m.input_type.name == "Empty":
           mod = __import__('google.protobuf.empty_pb2', fromlist=[m.input_type.name])
           c = getattr(mod, m.input_type.name)
           json_datas = json.loads("{}")
-          message = Parse(json.dumps(json_datas), c()) 
+          message = Parse(json.dumps(json_datas), c())
           client.exe(method_name, message)
         else:
           print("Your method have not Empty in his input field but you have not \n"
