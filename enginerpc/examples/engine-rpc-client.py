@@ -9,7 +9,7 @@ from google.protobuf.json_format import Parse
 from enum import Enum
 from collections import namedtuple
 
-### Class ###
+### Class ###
 
 # Class related with terminal colors
 class colors:
@@ -58,12 +58,12 @@ class gRPC_client:
     channel = grpc.insecure_channel("{}:{}".format(ip, port))
     self.stub = engine_pb2_grpc.EngineStub(channel)
 
-  # Show list of gRPC methods
+  # Show list of gRPC methods
   def show_list_grpc_methods(self):
     for m in engine_pb2._ENGINE.methods:
       print("- ", m.name)
 
-  # Get the method descriptor
+  # Get the method descriptor
   def get_grpc_method(self, method_name):
     try:
       method = self.dic_methods[method_name]
@@ -105,7 +105,7 @@ class gRPC_client:
             " are \'oneofs\', it means that you must choose one of the two but"
             " not the both !" + colors.ENDC, end='')
 
-    ## --- Json Layout Part --- ##
+    ## --- Json Layout Part --- ##
     print(colors.OKBLUE + colors.UNDERLINE + "\n\nJSON LAYOUT:\n" + colors.ENDC)
     result_str = ""
 
@@ -187,7 +187,7 @@ class gRPC_client:
     str_format += string_space * ' '
     print(str_format + "}")
 
-  # Describe a TYPE_ENUM
+  # Describe a TYPE_ENUM
   def get_grpc_enum_info(self, parent_message_descriptor, field, string_space):
     current_msg_dsc = parent_message_descriptor.fields_by_name[field.name].enum_type
 
@@ -217,7 +217,7 @@ class gRPC_client:
 
 ### Basic Functions ###
 
-# Convert a json object into a gRPC message
+# Convert a json object into a gRPC message
 def json_to_message(client, method_name, json_datas):
   m = client.get_grpc_method(method_name)
   if m.input_type.name == "Empty":
@@ -243,20 +243,20 @@ def help_message():
         "-> python3 client.py <port> -e|--exe <MethodName> "
         "<MessageContent.json>")
 
-# Show documentation message
+# Show documentation message
 def documentation_message():
   print("You can read the gRPC_README.md to understand more about script working,"
         "you can read the documentation file \"index.html\" to see the documentation"
         "about protobuf file engine.proto")
 
-# Function Arguments Errors
+# Function Arguments Errors
 def arg_error(prog_name):
   print("Usage : python3 {} <port> -h|-d|-l|-i|-e".format(prog_name))
   help_message()
   exit(1)
 
 def check_arguments(client, args, flags):
-  # check if we have one flags and not more
+  # check if we have one flags and not more
   if sum(flags._asdict().values()) > 1:
     print(colors.WARNING + "/!\ Warning /!\\ You have probably used at least two "
         "of these options (-l|--list, -d|--description, -h|--help, -e|--exe) in the "
@@ -301,7 +301,7 @@ def check_arguments(client, args, flags):
         client.exe(args.method_name, msg)
 
 
-### Main ###
+### Main ###
 if __name__ == "__main__":
   # Defines flags
   Arguments = namedtuple("Arguments", "ip, port, input_file, json_args, method_name")
