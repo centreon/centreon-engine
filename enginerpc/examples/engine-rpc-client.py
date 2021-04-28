@@ -187,7 +187,7 @@ class gRPC_client:
     str_format += string_space * ' '
     print(str_format + "}")
 
-  #Â Describe a TYPE_ENUM
+  # Describe a TYPE_ENUM
   def get_grpc_enum_info(self, parent_message_descriptor, field, string_space):
     current_msg_dsc = parent_message_descriptor.fields_by_name[field.name].enum_type
 
@@ -217,7 +217,7 @@ class gRPC_client:
 
 ### Basic Functions ###
 
-#Â Convert a json object into a gRPC message
+# Convert a json object into a gRPC message
 def json_to_message(client, method_name, json_datas):
   m = client.get_grpc_method(method_name)
   if m.input_type.name == "Empty":
@@ -249,14 +249,14 @@ def documentation_message():
         "you can read the documentation file \"index.html\" to see the documentation"
         "about protobuf file engine.proto")
 
-#Â Function Arguments Errors
+# Function Arguments Errors
 def arg_error(prog_name):
   print("Usage : python3 {} <port> -h|-d|-l|-i|-e".format(prog_name))
   help_message()
   exit(1)
 
 def check_arguments(client, args, flags):
-  #Â check if we have one flags and not more
+  # check if we have one flags and not more
   if sum(flags._asdict().values()) > 1:
     print(colors.WARNING + "/!\ Warning /!\\ You have probably used at least two "
         "of these options (-l|--list, -d|--description, -h|--help, -e|--exe) in the "
