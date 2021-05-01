@@ -399,7 +399,7 @@ void loop::_dispatching() {
       }
 
       auto t1 = std::chrono::system_clock::now();
-      auto t2 = t1 + std::chrono::nanoseconds(static_cast<uint64_t>(
+      auto delay = std::chrono::nanoseconds(static_cast<uint64_t>(
                          1000000000 * config->sleep_time()));
       command_manager::instance().execute();
 
@@ -418,7 +418,12 @@ void loop::_dispatching() {
       broker_timed_event(NEBTYPE_TIMEDEVENT_SLEEP, NEBFLAG_NONE, NEBATTR_NONE,
                          &_sleep_event, nullptr);
 
-      std::this_thread::sleep_until(t2);
+      auto t2 = std::chrono::system_clock::now();
+      auto laps = t2 - t1;
+      if (laps < delay) {
+        delay -= laps;
+        std::this_thread::sleep_for(delay);
+      }
     }
     configuration::applier::state::instance().unlock();
   }
