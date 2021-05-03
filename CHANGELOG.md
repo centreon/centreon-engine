@@ -1,5 +1,14 @@
 # Changelog
 
+## 21.04.2
+
+### Bugs
+
+*loop*
+
+Sometimes, centengine can not stop, this has been seen when engine is compiled
+using gcc-4.8.5, because of a bug in the function sleep_until().
+
 ## 21.04.1
 
 ### Bugs
