@@ -21,6 +21,7 @@ do
       ;;
     -r|--release)
       BUILD_TYPE="Release"
+      shift
       ;;
     -h|--help)
       show_help
@@ -63,10 +64,14 @@ if [ -r /etc/centos-release ] ; then
     echo "pip3 already installed"
   fi
 
-  if ! rpm -q gcc-c++ ; then
-    yum -y install gcc-c++
-  fi
+  good=$(gcc --version | awk '/gcc/ && ($3+0)>5.0{print 1}')
 
+  if [ $good -ne 1 ] ; then
+    yum install centos-release-scl
+    yum-config-manager --enable rhel-server-rhscl-7-rpms
+    yum install devtoolset-7
+    source scl_source enable devtoolset-9
+  fi
   pkgs=(
     ninja-build
   )
@@ -169,17 +174,8 @@ if [ $my_id -eq 0 ] ; then
 else
   conan="$HOME/.local/bin/conan"
 fi
-if ! $conan remote list | grep ^centreon ; then
-  $conan remote add centreon https://api.bintray.com/conan/centreon/centreon
-fi
 
-good=$(gcc --version | awk '/gcc/ && ($3+0)>5.0{print 1}')
 
-if [ ! -d build ] ; then
-  mkdir build
-else
-  echo "'build' directory already there"
-fi
 
 if [ ! -d build ] ; then
   mkdir build
@@ -193,10 +189,10 @@ if [ "$force" = "1" ] ; then
 fi
 cd build
 
-if [ $good -eq 1 ] ; then
-  $conan install .. --remote centreon -s compiler.libcxx=libstdc++11
+if [ $maj = "centos7" ] ; then
+  $conan install .. -s compiler.libcxx=libstdc++11 --build="*"
 else
-  $conan install .. --remote centreon -s compiler.libcxx=libstdc++
+  $conan install .. -s compiler.libcxx=libstdc++ --build=missing
 fi
 
 if [ $maj = "Raspbian" ] ; then
