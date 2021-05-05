@@ -1,5 +1,5 @@
 ##
-## Copyright 2016 Centreon
+## Copyright 2016, 2020-2021 Centreon
 ##
 
 ## This file is part of Centreon Engine.
@@ -22,9 +22,9 @@
 option(WITH_TESTING "Build unit tests." OFF)
 if (WITH_TESTING)
 
-  find_package(gtest REQUIRED)
-  include_directories(${gtest_INCLUDE_DIRS})
-  link_directories(${gtest_LIB_DIRS})
+  find_package(GTest REQUIRED)
+  include_directories(${GTest_INCLUDE_DIRS})
+  link_directories(${GTest_LIB_DIRS})
 
 # Tests directory.
   # Add root inclusion direction.
@@ -40,7 +40,7 @@ if (WITH_TESTING)
   add_executable(rpc_client
       ${TESTS_DIR}/enginerpc/client.cc)
 
-  target_link_libraries(rpc_client cerpc ${gRPC_LIBS} ${absl_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} dl)
+  target_link_libraries(rpc_client cerpc ${gRPC_LIBS} ${absl_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} dl pthread)
 
   add_executable("bin_connector_test_run"
       "${TESTS_DIR}/commands/bin_connector_test_run.cc")
@@ -116,7 +116,7 @@ if (WITH_TESTING)
     "${TESTS_DIR}/timeperiod/get_next_valid_time/skip_interval.cc"
     "${TESTS_DIR}/timeperiod/get_next_valid_time/specific_month_date.cc"
     "${TESTS_DIR}/timeperiod/utils.cc"
-    # Headers.
+#    # Headers.
     "${TESTS_DIR}/test_engine.hh"
     "${TESTS_DIR}/timeperiod/utils.hh"
   )
@@ -137,6 +137,6 @@ if (WITH_TESTING)
     )
     set(GCOV gcov)
   endif ()
-  target_link_libraries(ut gtest ${ENGINERPC} cce_core pthread ${GCOV} ${gtest_LIBS} ${gRPC_LIBS} ${absl_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} ${fmt_LIBS} dl)
+  target_link_libraries(ut ${ENGINERPC} cce_core pthread ${GCOV} ${GTest_LIBS} ${gRPC_LIBS} ${absl_LIBS} ${OpenSSL_LIBS} ${c-ares_LIBS} ${ZLIB_LIBS} ${fmt_LIBS} dl)
 
 endif ()
