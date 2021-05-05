@@ -764,10 +764,13 @@ void anomalydetection::init_thresholds() {
   std::stringstream buffer;
   buffer << t.rdbuf();
   std::string err;
-  auto json = json11::Json::parse(buffer.str(), err);
-  if (!err.empty()) {
+  nlohmann::json json;
+  try {
+    json = nlohmann::json::parse(buffer.str());
+  }
+  catch (const nlohmann::json::parse_error& e) {
     logger(log_config_error, basic) << "Error: the file '" << _thresholds_file
-                                    << "' contains errors: " << err;
+                                    << "' contains errors: " << e.what();
     return;
   }
   if (!json.is_array()) {
@@ -778,11 +781,12 @@ void anomalydetection::init_thresholds() {
   }
 
   int count = 0;
-  for (auto& item : json.array_items()) {
+  for (auto it = json.begin(); it != json.end(); ++it) {
     uint64_t host_id, service_id;
+    auto item = it.value();
     try {
-      host_id = stoull(item["host_id"].string_value());
-      service_id = stoull(item["service_id"].string_value());
+      host_id = stoull(item["host_id"].get<std::string>());
+      service_id = stoull(item["service_id"].get<std::string>());
     } catch (std::exception const& e) {
       logger(log_config_error, basic) << "Error: host_id and service_id must "
                                          "be strings containing integers: "
@@ -790,17 +794,17 @@ void anomalydetection::init_thresholds() {
       return;
     }
     if (host_id == get_host_id() && service_id == get_service_id() &&
-        item["metric_name"].string_value() == _metric_name) {
+        item["metric_name"].get<std::string>() == _metric_name) {
       logger(log_info_message, basic)
           << "Filling thresholds in anomaly detection (host_id: "
           << get_host_id() << ", service_id: " << get_service_id()
           << ", metric: " << _metric_name << ")";
       auto predict = item["predict"];
       _thresholds.clear();
-      for (auto& i : predict.array_items()) {
-        time_t timestamp = static_cast<time_t>(i["timestamp"].number_value());
-        double upper = i["upper"].number_value();
-        double lower = i["lower"].number_value();
+      for (auto& i : predict) {
+        time_t timestamp = static_cast<time_t>(i["timestamp"].get<uint64_t>());
+        double upper = i["upper"].get<double>();
+        double lower = i["lower"].get<double>();
         _thresholds.emplace_hint(
             _thresholds.end(),
             std::make_pair(timestamp, std::make_pair(lower, upper)));
@@ -834,11 +838,12 @@ int anomalydetection::update_thresholds(const std::string& filename) {
 
   std::stringstream buffer;
   buffer << t.rdbuf();
-  std::string err;
-  auto json = json11::Json::parse(buffer.str(), err);
-  if (!err.empty()) {
+  nlohmann::json json;
+  try {
+    json = nlohmann::json::parse(buffer.str());
+  } catch (const nlohmann::json::parse_error& e) {
     logger(log_config_error, basic) << "Error: The thresholds file '"
-                                    << filename << "' should be a json file.";
+                                    << filename << "' should be a json file: " << e.what();
     return -2;
   }
 
@@ -849,11 +854,12 @@ int anomalydetection::update_thresholds(const std::string& filename) {
     return -3;
   }
 
-  for (auto& item : json.array_items()) {
+  for (auto it = json.begin(); it != json.end(); ++it) {
     uint64_t host_id, svc_id;
+    auto item = it.value();
     try {
-      host_id = stoull(item["host_id"].string_value());
-      svc_id = stoull(item["service_id"].string_value());
+      host_id = stoull(item["host_id"].get<std::string>());
+      svc_id = stoull(item["service_id"].get<std::string>());
     } catch (std::exception const& e) {
       logger(log_config_error, basic) << "Error: host_id and service_id must "
                                          "be strings containing integers: "
@@ -870,7 +876,7 @@ int anomalydetection::update_thresholds(const std::string& filename) {
     }
     std::shared_ptr<anomalydetection> ad =
         std::static_pointer_cast<anomalydetection>(found->second);
-    const std::string& metric_name(item["metric_name"].string_value());
+    const std::string& metric_name(item["metric_name"].get<std::string>());
     if (ad->get_metric_name() != metric_name) {
       logger(log_config_error, basic)
           << "Error: The thresholds file contains thresholds for the anomaly "
@@ -888,10 +894,10 @@ int anomalydetection::update_thresholds(const std::string& filename) {
 
     auto predict = item["predict"];
     std::map<time_t, std::pair<double, double> > thresholds;
-    for (auto& i : predict.array_items()) {
-      time_t timestamp = static_cast<time_t>(i["timestamp"].number_value());
-      double upper = i["upper"].number_value();
-      double lower = i["lower"].number_value();
+    for (auto& i : predict) {
+      time_t timestamp = static_cast<time_t>(i["timestamp"].get<int64_t>());
+      double upper = i["upper"].get<double>();
+      double lower = i["lower"].get<double>();
       thresholds.emplace_hint(
           thresholds.end(),
           std::make_pair(timestamp, std::make_pair(lower, upper)));
