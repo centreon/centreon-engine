@@ -2,11 +2,11 @@
 
 ## Installation of gRPC ##
 
-Verify that you have installed theses packages on your system else install them. On Centos 7 you can execute these command below :
+Verify that you have installed theses packages on your system else install them. On Centos 7 you can execute this command below :
 
 $> yum install python3-devel, gcc-c++, gcc, epel-release, wget
 
-Now you have to install gRPC, so you can do (on Centos 7) :
+Now you have to install gRPC, so you can do these commands below (on Centos 7) :
 
 $> pip3 install grpcio-tools=1.33.2
 
@@ -16,9 +16,9 @@ $> pip3 install grpcio==1.33.2
 
 <img src="https://zupimages.net/up/21/18/dkto.png" />
 
-Note the 1.33.2 version, highter version may not work (on Centos 7).
+/!\ Note the 1.33.2 version, highter version may not work (on Centos 7). /!\
 
-## Download the script and dependances here : ##
+## Download the python script ##
 
 $> mkdir ~/install-grpc/ && cd ~/install-grpc/ </br>
 $> wget https://raw.githubusercontent.com/centreon/centreon-engine/master/enginerpc/engine.proto </br>
