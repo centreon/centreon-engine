@@ -256,7 +256,6 @@ TEST_F(ApplierService, ServicesEquality) {
   ASSERT_TRUE(csvc.parse("retry_interval", "120"));
   ASSERT_TRUE(csvc1 < csvc);
 
-  ASSERT_TRUE(svc1 == svc1);
   ASSERT_TRUE(svc1 != svc2);
 }
 
