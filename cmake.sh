@@ -8,10 +8,12 @@ This program build Centreon-engine
 
     -f|--force    : force rebuild
     -r|--release  : Build on release mode
+    -ncr|--no-conan-rebuild : rebuild conan data
     -h|--help     : help
 EOF
 }
 BUILD_TYPE="Debug"
+CONAN_REBUILD="1"
 for i in "$@"
 do
   case $i in
@@ -22,6 +24,9 @@ do
     -r|--release)
       BUILD_TYPE="Release"
       shift
+      ;;
+    -ncr|--no-conan-rebuild)
+      CONAN_REBUILD="0"
       ;;
     -h|--help)
       show_help
@@ -194,9 +199,13 @@ cd build
 
 if [ $maj = "centos7" ] ; then
   rm -rf ~/.conan/profiles/default
-  $conan install .. -s compiler.libcxx=libstdc++11 --build="*"
+  if [ "$CONAN_REBUILD" = "1" ] ; then
+    $conan install .. -s compiler.libcxx=libstdc++11 --build="*"
+  else
+    $conan install .. -s compiler.libcxx=libstdc++11 --build=missing
+  fi
 else
-  $conan install .. -s compiler.libcxx=libstdc++ --build=missing
+    $conan install .. -s compiler.libcxx=libstdc++11 --build=missing
 fi
 
 if [ $maj = "Raspbian" ] ; then
