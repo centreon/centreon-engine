@@ -27,13 +27,13 @@ CCE_BEGIN()
 template <typename T>
 class opt {
  public:
-  opt() : _is_set(false) {}
+  opt() : _data{}, _is_set(false) {}
   opt(T const& right) : _data(right), _is_set(false) {}
   opt(opt const& right) : _data(right._data), _is_set(right._is_set) {}
-  ~opt() throw() {}
+  ~opt() noexcept {}
   T const& operator=(T const& right) {
     set(right);
-    return (_data);
+    return _data;
   }
   opt& operator=(opt const& right) {
     _data = right._data;

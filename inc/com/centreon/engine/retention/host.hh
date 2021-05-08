@@ -37,7 +37,7 @@ class host : public object {
  public:
   host();
   host(host const& right);
-  ~host() throw() override;
+  ~host() noexcept override;
   host& operator=(host const& right);
   bool operator==(host const& right) const throw();
   bool operator!=(host const& right) const throw();

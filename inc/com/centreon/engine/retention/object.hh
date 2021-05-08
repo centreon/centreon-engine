@@ -40,6 +40,10 @@ class object {
     service = 6
   };
 
+ private:
+  type_id _type;
+
+ public:
   object(type_id type);
   object(object const& right);
   virtual ~object() throw();
@@ -68,9 +72,6 @@ class object {
       return ((obj.*ptr)(value));
     }
   };
-
- private:
-  type_id _type;
 };
 
 typedef std::shared_ptr<object> object_ptr;
