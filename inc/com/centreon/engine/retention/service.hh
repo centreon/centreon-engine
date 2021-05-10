@@ -60,8 +60,8 @@ class service : public object {
   opt<std::string> const& event_handler() const throw();
   opt<bool> const& event_handler_enabled() const throw();
   opt<bool> const& flap_detection_enabled() const throw();
-  opt<bool> const& has_been_checked() const throw();
-  uint64_t host_id() const throw();
+  opt<bool> const& has_been_checked() const noexcept;
+  uint64_t host_id() const noexcept;
   std::string const& host_name() const throw();
   opt<bool> const& is_flapping() const throw();
   opt<time_t> const& last_acknowledgement() const throw();

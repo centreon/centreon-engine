@@ -101,7 +101,7 @@ host::setters const host::_setters[] = {
 /**
  *  Constructor.
  */
-host::host() : object(object::host) {}
+host::host() : object(object::host), _host_id{0} {}
 
 /**
  *  Copy constructor.

@@ -26,6 +26,9 @@
 using namespace com::centreon::engine;
 
 class RetentionServiceTest : public ::testing::Test {
+ protected:
+  retention::service _ref;
+
  public:
   void SetUp() {
     _ref.set("acknowledgement_type", "1");
@@ -84,9 +87,6 @@ class RetentionServiceTest : public ::testing::Test {
     _ref.set("state_history", "0,1,2,3,4,5,6,7");
     _ref.set("state_type", "2");
   }
-
- protected:
-  retention::service _ref;
 };
 
 TEST_F(RetentionServiceTest, CopyConstructor) {

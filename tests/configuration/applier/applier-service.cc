@@ -256,7 +256,6 @@ TEST_F(ApplierService, ServicesEquality) {
   ASSERT_TRUE(csvc.parse("retry_interval", "120"));
   ASSERT_TRUE(csvc1 < csvc);
 
-  ASSERT_EQ(svc1, svc1);
   ASSERT_TRUE(svc1 != svc2);
 }
 
@@ -495,4 +494,3 @@ TEST_F(ApplierService, StalkingOptionsWhenServiceIsModified) {
   ASSERT_TRUE(serv->get_notify_on(engine::service::critical));
   ASSERT_TRUE(serv->get_notify_on(engine::service::unknown));
 }
-

@@ -107,7 +107,11 @@ service::setters const service::_setters[] = {
 /**
  *  Constructor.
  */
-service::service() : object(object::service), _next_setter(_setters) {}
+service::service()
+    : object(object::service),
+      _next_setter(_setters),
+      _host_id{0},
+      _service_id{0} {}
 
 /**
  *  Copy constructor.
@@ -130,7 +134,7 @@ service::~service() throw() {}
  *
  *  @return This object.
  */
-service& service::operator=(service const& right) {
+service& service::operator=(const service& right) {
   if (this != &right) {
     object::operator=(right);
     _acknowledgement_type = right._acknowledgement_type;
@@ -497,7 +501,7 @@ opt<bool> const& service::flap_detection_enabled() const throw() {
  *
  *  @return The has_been_checked.
  */
-opt<bool> const& service::has_been_checked() const throw() {
+opt<bool> const& service::has_been_checked() const noexcept {
   return _has_been_checked;
 }
 
@@ -506,7 +510,7 @@ opt<bool> const& service::has_been_checked() const throw() {
  *
  *  @return The host_id.
  */
-uint64_t service::host_id() const throw() {
+uint64_t service::host_id() const noexcept {
   return _host_id;
 }
 
