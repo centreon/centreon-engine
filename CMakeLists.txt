@@ -24,7 +24,7 @@
 # Set necessary settings.
 cmake_minimum_required(VERSION 2.8)
 project("Centreon Engine" C CXX)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 # With libasan
 option(WITH_ASAN "Add the libasan to check memory leaks and other memory issues." OFF)
@@ -45,17 +45,17 @@ include_directories("${INC_DIR}/compatibility")
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 
 set(protobuf_MODULE_COMPATIBLE True)
-find_package(protobuf REQUIRED)
-find_package(protoc_installer REQUIRED)
+find_package(Protobuf REQUIRED)
 find_package(gRPC REQUIRED)
 find_package(c-ares REQUIRED)
 find_package(ZLIB REQUIRED)
-find_package(json11 REQUIRED)
+find_package(nlohmann_json REQUIRED)
 find_package(fmt REQUIRED)
 
 include_directories(${gRPC_INCLUDE_DIRS})
+include_directories(${absl_INCLUDE_DIRS})
 include_directories(${protobuf_INCLUDE_DIRS})
-include_directories(${json11_INCLUDE_DIRS})
+include_directories(${nlohmann_json_INCLUDE_DIRS})
 include_directories(${fmt_INCLUDE_DIRS})
 
 link_directories(${protobuf_LIB_DIRS})
@@ -63,7 +63,7 @@ link_directories(${gRPC_LIB_DIRS})
 link_directories(${OpenSSL_LIB_DIRS})
 link_directories(${c-ares_LIB_DIRS})
 link_directories(${ZLIB_LIB_DIRS})
-link_directories(${json11_LIB_DIRS})
+link_directories(${nlohmann_json_LIB_DIRS})
 
 # Version.
 set(CENTREON_ENGINE_MAJOR 21)
@@ -622,7 +622,7 @@ add_library(cce_core ${LIBRARY_TYPE} ${FILES})
 add_dependencies(cce_core engine_rpc)
 
 # Link target with required libraries.
-target_link_libraries(cce_core ${json11_LIBS}
+target_link_libraries(cce_core ${nlohmann_json_LIBS}
   ${MATH_LIBRARIES}
   ${PTHREAD_LIBRARIES}
   ${SOCKET_LIBRARIES}

@@ -4,10 +4,15 @@
 
 ### Bugs
 
+*Build*
+
+Since the closure of bintray, we could no more download our dependencies. We
+changed them to use the conan-center. Now centengine builds again.
+
 *loop*
 
 Sometimes, centengine can not stop, this has been seen when engine is compiled
-using gcc-4.8.5, because of a bug in the function sleep_until().
+using gcc-4.8.5, because of a bug in the function sleep\_until().
 
 ## 21.04.1
 
