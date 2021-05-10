@@ -1,5 +1,13 @@
 # Changelog
 
+## 20.04.12
+
+### Bugfixes
+
+*Build*
+
+centengine builds again using packages provided by conan-center.
+
 ## 20.04.11
 
 ### Bugfixes
