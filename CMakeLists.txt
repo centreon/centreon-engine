@@ -24,7 +24,7 @@
 # Set necessary settings.
 cmake_minimum_required(VERSION 2.8)
 project("Centreon Engine" C CXX)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
 # With libasan
 option(WITH_ASAN "Add the libasan to check memory leaks and other memory issues." OFF)
@@ -34,7 +34,7 @@ if (WITH_ASAN)
   set (CMAKE_LINKER_FLAGS_DEBUG "${CMAKE_LINKER_FLAGS_DEBUG} -fno-omit-frame-pointer -fsanitize=address")
 endif ()
 
-add_definitions("-D_GLIBCXX_USE_CXX11_ABI=0")
+add_definitions("-D_GLIBCXX_USE_CXX11_ABI=1")
 set(INC_DIR "${PROJECT_SOURCE_DIR}/inc")
 set(SCRIPT_DIR "${PROJECT_SOURCE_DIR}/scripts")
 set(SRC_DIR "${PROJECT_SOURCE_DIR}/src")
@@ -44,17 +44,17 @@ include_directories("${INC_DIR}/compatibility")
 include(${CMAKE_BINARY_DIR}/conan_paths.cmake)
 
 set(protobuf_MODULE_COMPATIBLE True)
-find_package(protobuf REQUIRED)
-find_package(protoc_installer REQUIRED)
+find_package(Protobuf REQUIRED)
 find_package(gRPC REQUIRED)
 find_package(c-ares REQUIRED)
 find_package(ZLIB REQUIRED)
-find_package(json11 REQUIRED)
+find_package(nlohmann_json REQUIRED)
 find_package(fmt REQUIRED)
 
 include_directories(${gRPC_INCLUDE_DIRS})
+include_directories(${absl_INCLUDE_DIRS})
 include_directories(${protobuf_INCLUDE_DIRS})
-include_directories(${json11_INCLUDE_DIRS})
+include_directories(${nlohmann_json_INCLUDE_DIRS})
 include_directories(${fmt_INCLUDE_DIRS})
 
 link_directories(${protobuf_LIB_DIRS})
@@ -62,12 +62,12 @@ link_directories(${gRPC_LIB_DIRS})
 link_directories(${OpenSSL_LIB_DIRS})
 link_directories(${c-ares_LIB_DIRS})
 link_directories(${ZLIB_LIB_DIRS})
-link_directories(${json11_LIB_DIRS})
+link_directories(${nlohmann_json_LIB_DIRS})
 
 # Version.
 set(CENTREON_ENGINE_MAJOR 20)
 set(CENTREON_ENGINE_MINOR 04)
-set(CENTREON_ENGINE_PATCH 11)
+set(CENTREON_ENGINE_PATCH 12)
 if (CENTREON_ENGINE_PRERELEASE)
   set(CENTREON_ENGINE_VERSION "${CENTREON_ENGINE_MAJOR}.${CENTREON_ENGINE_MINOR}.${CENTREON_ENGINE_PATCH}-${CENTREON_ENGINE_PRERELEASE}")
 else ()
@@ -620,7 +620,7 @@ include_directories(enginerpc)
 add_library(cce_core ${LIBRARY_TYPE} ${FILES})
 
 # Link target with required libraries.
-target_link_libraries(cce_core ${json11_LIBS}
+target_link_libraries(cce_core ${nlohmann_json_LIBS}
   ${MATH_LIBRARIES}
   ${PTHREAD_LIBRARIES}
   ${SOCKET_LIBRARIES}
@@ -628,7 +628,7 @@ target_link_libraries(cce_core ${json11_LIBS}
 )
 
 # centengine target.
-add_executable("centengine" "${SRC_DIR}/main.cc")
+add_executable(centengine "${SRC_DIR}/main.cc")
 set_property(TARGET "centengine" PROPERTY ENABLE_EXPORTS "1")
 get_property(CENTENGINE_BINARY TARGET "centengine" PROPERTY LOCATION)
 

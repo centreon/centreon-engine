@@ -30,18 +30,17 @@ include_directories(
 
 
 set(protobuf_MODULE_COMPATIBLE True)
-find_package(protobuf REQUIRED)
-find_package(protoc_installer REQUIRED)
+find_package(Protobuf REQUIRED)
 find_package(gRPC REQUIRED)
 
 include_directories(${gRPC_INCLUDE_DIRS})
+include_directories(${absl_INCLUDE_DIRS})
 include_directories(${protobuf_INCLUDE_DIRS})
 
 link_directories(${protobuf_LIB_DIRS})
 link_directories(${gRPC_LIB_DIRS})
 
-message(STATUS "Using protobuf ${gRPC_VERSION}")
-set(PROTOBUF_PREFIX "${protoc_installer_LIB_DIRS}/..")
+set(PROTOBUF_PREFIX "${protobuf_LIB_DIRS}/..")
 message(STATUS "${PROTOBUF_PREFIX}/bin/protoc")
 set(GRPC_PREFIX "${gRPC_LIB_DIRS}/..")
 
@@ -58,6 +57,12 @@ add_custom_command(
   COMMAND ${PROTOBUF_PREFIX}/bin/protoc
   ARGS --cpp_out="${ENGINERPC_DIR}" --proto_path=${ENGINERPC_DIR} ${ENGINERPC_DIR}/engine.proto
 )
+
+add_custom_target(engine_rpc DEPENDS
+  ${ENGINERPC_DIR}/engine.grpc.pb.cc
+  ${ENGINERPC_DIR}/engine.pb.cc
+  ${ENGINERPC_DIR}/engine.grpc.pb.h
+  ${ENGINERPC_DIR}/engine.pb.h)
 
 add_library(
     cerpc
