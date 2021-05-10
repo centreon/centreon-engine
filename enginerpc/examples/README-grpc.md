@@ -50,4 +50,7 @@ To verify that the script is working well, you can run this command as an exampl
 $> python3 engine-rpc-client.py --port={your-current-engine-port} --exe=GetVersion
 
 
+## Infos ##
 
+I tested this guide on Centreon 20.04, 20.10 and 21.04, that i downloaded from this link : https://download.centreon.com/. </br>
+I did not encounter any particular errors.
