@@ -1,5 +1,13 @@
 # Changelog
 
+## 20.10.5
+
+### Bugfixes
+
+*Build*
+
+centengine builds again, using dependency packages available on conan-center.
+
 ## 20.10.4
 
 ### Bugfixes
