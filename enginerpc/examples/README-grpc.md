@@ -4,17 +4,22 @@
 
 Verify that you have installed theses packages on your system else install them. On Centos 7 you can execute this command below :
 
-$> yum install python3-devel, gcc-c++, gcc, epel-release, wget
+$> yum install python3-devel </br>
+$> yum install gcc-c++ </br>
+$> yum install gcc </br>
+$> yum install epel-release </br>
+$> yum install net-tools </br>
+$> yum install wget
 
 Now you have to install gRPC, so you can do these commands below (on Centos 7) :
-
-$> pip3 install grpcio-tools=1.33.2
-
-<img src="https://zupimages.net/up/21/18/900w.png" />
 
 $> pip3 install grpcio==1.33.2
 
 <img src="https://zupimages.net/up/21/18/dkto.png" />
+
+$> pip3 install grpcio-tools=1.33.2
+
+<img src="https://zupimages.net/up/21/18/900w.png" />
 
 /!\ Note the 1.33.2 version, highter version may not work (on Centos 7). /!\
 
