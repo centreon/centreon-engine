@@ -801,6 +801,7 @@ bool check_time_against_period_for_notif(time_t test_time,
  *
  *  @param[in]  preferred_time  The preferred time to check.
  *  @param[out] invalid_time    Variable to fill.
+ *  @param[in]  notif_timeperiod    if called for the notification .
  */
 void timeperiod::get_next_invalid_time_per_timeperiod(time_t preferred_time,
                                                       time_t* invalid_time,
@@ -985,6 +986,7 @@ static time_t _get_next_valid_time_in_timeranges(time_t preferred_time,
  *
  *  @param[in]  preferred_time  The preferred time to check.
  *  @param[out] valid_time      Variable to fill.
+ *  @param[in]  notif_timeperiod    if called for the notification .
  */
 void timeperiod::get_next_valid_time_per_timeperiod(time_t preferred_time,
                                                     time_t* valid_time,
