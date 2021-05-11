@@ -52,9 +52,11 @@ class timeperiod {
   timeperiodexclusion const& get_exclusions() const;
   timeperiodexclusion& get_exclusions();
   void get_next_valid_time_per_timeperiod(time_t preferred_time,
-                                          time_t* invalid_time);
+                                          time_t* invalid_time,
+                                          bool notif_timeperiod);
   void get_next_invalid_time_per_timeperiod(time_t preferred_time,
-                                            time_t* invalid_time);
+                                            time_t* invalid_time,
+                                            bool notif_timeperiod);
 
   void resolve(int& w, int& e);
 
@@ -76,6 +78,9 @@ CCE_END()
 
 bool check_time_against_period(time_t test_time,
                                com::centreon::engine::timeperiod* tperiod);
+bool check_time_against_period_for_notif(
+    time_t test_time,
+    com::centreon::engine::timeperiod* tperiod);
 void get_next_valid_time(time_t pref_time,
                          time_t* valid_time,
                          com::centreon::engine::timeperiod* tperiod);
