@@ -1,4 +1,12 @@
 # Changelog
+## 20.04.13
+
+### Bugfixes
+
+*Check*
+
+if host or service with check_period set to none, Engine burns 100% of the CPU.
+This patch fixes this issue.
 
 ## 20.04.12
 
