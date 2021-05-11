@@ -8,12 +8,22 @@ This program build Centreon-engine
 
     -f|--force    : force rebuild
     -r|--release  : Build on release mode
-    -ncr|--no-conan-rebuild : rebuild conan data
+    -fcr|--force-conan-rebuild : rebuild conan data
     -h|--help     : help
 EOF
 }
 BUILD_TYPE="Debug"
-CONAN_REBUILD="1"
+CONAN_REBUILD="0"
+for i in $(cat conanfile.txt) ; do
+  if [[ $i =~ / ]] ; then
+    if [ ! -d ~/.conan/data/$i ] ; then
+      echo "The package '$i' is missing"
+      CONAN_REBUILD="1"
+      break
+    fi
+  fi
+done
+
 for i in "$@"
 do
   case $i in
@@ -25,8 +35,8 @@ do
       BUILD_TYPE="Release"
       shift
       ;;
-    -ncr|--no-conan-rebuild)
-      CONAN_REBUILD="0"
+    -fcr|--force-conan-rebuild)
+      CONAN_REBUILD="1"
       ;;
     -h|--help)
       show_help
@@ -50,8 +60,7 @@ if [ -r /etc/centos-release ] ; then
     if rpm -q cmake3 ; then
       cmake='cmake3'
     elif [ $maj = "centos7" ] ; then
-      yum -y install epel-release
-      yum -y install cmake3
+      yum -y install epel-release cmake3
       cmake='cmake3'
     else
       dnf -y install cmake
@@ -78,7 +87,7 @@ if [ -r /etc/centos-release ] ; then
     ln -s /usr/bin/cmake3 /usr/bin/cmake
     source /opt/rh/devtoolset-9/enable
   fi
-  
+
   pkgs=(
     ninja-build
     perl-Thread-Queue
