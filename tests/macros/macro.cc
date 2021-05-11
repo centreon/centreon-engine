@@ -884,7 +884,7 @@ TEST_F(Macro, IsValidTime) {
   std::string out;
   nagios_macros* mac(get_global_macros());
   process_macros_r(mac, "$ISVALIDTIME:test$", out, 1);
-  ASSERT_EQ(out, "1");
+  ASSERT_EQ(out, "0");
 }
 
 TEST_F(Macro, NextValidTime) {
