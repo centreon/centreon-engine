@@ -268,7 +268,7 @@ bool notifier::_is_notification_viable_normal(reason_type type
   time_t now;
   time(&now);
 
-  if (!check_time_against_period(now, tp)) {
+  if (!check_time_against_period_for_notif(now, tp)) {
     logger(dbg_notifications, more)
         << "This notifier shouldn't have notifications sent out "
            "at this time.";
@@ -381,7 +381,7 @@ bool notifier::_is_notification_viable_recovery(reason_type type
     std::time_t now;
     std::time(&now);
 
-    if (!check_time_against_period(now, tp)) {
+    if (!check_time_against_period_for_notif(now, tp)) {
       logger(dbg_notifications, more)
           << "This notifier shouldn't have notifications sent out "
              "at this time.";

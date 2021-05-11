@@ -1539,7 +1539,8 @@ int host::run_scheduled_check(int check_options, double latency) {
         logger(log_runtime_warning, basic)
             << "Warning: Check of host '" << get_name()
             << "' could not be "
-               "rescheduled properly.  Scheduling check for next week...";
+               "rescheduled properly.  Scheduling check for next week... "
+            << " next_check  " << get_next_check();
 
         logger(dbg_checks, more)
             << "Unable to find any valid times to reschedule the next"
@@ -3561,9 +3562,10 @@ void host::check_for_orphaned() {
 
     /* determine the time at which the check results should have come in (allow
      * 10 minutes slack time) */
-    expected_time = (time_t)(
-        it->second->get_next_check() + it->second->get_latency() +
-        config->host_check_timeout() + config->check_reaper_interval() + 600);
+    expected_time =
+        (time_t)(it->second->get_next_check() + it->second->get_latency() +
+                 config->host_check_timeout() +
+                 config->check_reaper_interval() + 600);
 
     /* this host was supposed to have executed a while ago, but for some reason
      * the results haven't come back in... */
