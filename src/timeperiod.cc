@@ -766,7 +766,32 @@ bool check_time_against_period(time_t test_time, timeperiod* tperiod) {
 
   // Faked next valid time must be tested time.
   time_t next_valid_time{(time_t)-1};
-  tperiod->get_next_valid_time_per_timeperiod(test_time, &next_valid_time);
+  tperiod->get_next_valid_time_per_timeperiod(test_time, &next_valid_time,
+                                              false);
+  return next_valid_time == test_time;
+}
+
+/**
+ *  See if the specified time falls into a valid time range in the given
+ *  time period for the notification.
+ *
+ *  @param[in] test_time  Time to test.
+ *  @param[in] tperiod    Target time period.
+ *
+ *  @return true on success, false on failure.
+ */
+bool check_time_against_period_for_notif(time_t test_time,
+                                         timeperiod* tperiod) {
+  logger(dbg_functions, basic) << "check_time_against_period_for_notif()";
+
+  // If no period was specified, assume the time is good.
+  if (!tperiod)
+    return true;
+
+  // Faked next valid time must be tested time.
+  time_t next_valid_time{(time_t)-1};
+  tperiod->get_next_valid_time_per_timeperiod(test_time, &next_valid_time,
+                                              true);
   return next_valid_time == test_time;
 }
 
@@ -776,9 +801,11 @@ bool check_time_against_period(time_t test_time, timeperiod* tperiod) {
  *
  *  @param[in]  preferred_time  The preferred time to check.
  *  @param[out] invalid_time    Variable to fill.
+ *  @param[in]  notif_timeperiod    if called for the notification .
  */
 void timeperiod::get_next_invalid_time_per_timeperiod(time_t preferred_time,
-                                                      time_t* invalid_time) {
+                                                      time_t* invalid_time,
+                                                      bool notif_timeperiod) {
   logger(dbg_functions, basic) << "get_next_invalid_time_per_timeperiod()";
 
   // If no time can be found, the original preferred time will be set
@@ -882,7 +909,8 @@ void timeperiod::get_next_invalid_time_per_timeperiod(time_t preferred_time,
     for (timeperiodexclusion::iterator it(tpe.begin()), end(tpe.end());
          it != end; ++it) {
       time_t valid((time_t)-1);
-      it->second->get_next_valid_time_per_timeperiod(preferred_time, &valid);
+      it->second->get_next_valid_time_per_timeperiod(preferred_time, &valid,
+                                                     notif_timeperiod);
       if ((valid != (time_t)-1) &&
           (((time_t)-1 == next_exclusion) || (valid < next_exclusion)))
         next_exclusion = valid;
@@ -956,12 +984,18 @@ static time_t _get_next_valid_time_in_timeranges(time_t preferred_time,
 /**
  *  Get the next valid time within a time period.
  *
- *  @param[in]  preferred_time  The preferred time to check.
- *  @param[out] valid_time      Variable to fill.
+ *  @param[in]  preferred_time      The preferred time to check.
+ *  @param[out] valid_time          Variable to fill.
+ *  @param[in]  notif_timeperiod    if called for the notification .
  */
 void timeperiod::get_next_valid_time_per_timeperiod(time_t preferred_time,
-                                                    time_t* valid_time) {
+                                                    time_t* valid_time,
+                                                    bool notif_timeperiod) {
   logger(dbg_functions, basic) << "get_next_valid_time_per_timeperiod()";
+
+  // If no time can be found, the original preferred time will be set
+  // in valid_time at the end of the loop.
+  time_t original_preferred_time(preferred_time);
 
   // Loop through the upcoming year a day at a time.
   time_t earliest_time((time_t)-1);
@@ -1042,8 +1076,8 @@ void timeperiod::get_next_valid_time_per_timeperiod(time_t preferred_time,
       for (timeperiodexclusion::iterator it(tpe.begin()), end(tpe.end());
            it != end; ++it) {
         time_t invalid((time_t)-1);
-        it->second->get_next_invalid_time_per_timeperiod(earliest_time,
-                                                         &invalid);
+        it->second->get_next_invalid_time_per_timeperiod(
+            earliest_time, &invalid, notif_timeperiod);
         if ((invalid != (time_t)-1) &&
             (((time_t)-1 == max_invalid) || (invalid > max_invalid)))
           max_invalid = invalid;
@@ -1062,8 +1096,12 @@ void timeperiod::get_next_valid_time_per_timeperiod(time_t preferred_time,
           _add_round_days_to_midnight(ti.midnight, 24 * 60 * 60);
   }
 
-  // If we couldn't find a time period there must be none defined and return -1.
-  *valid_time = earliest_time;
+  // If we couldn't find a time period there must be none defined.
+  if ((earliest_time == (time_t)-1) && !notif_timeperiod)
+    *valid_time = original_preferred_time;
+  // Else use the calculated time.
+  else
+    *valid_time = earliest_time;
 }
 
 /**
@@ -1091,7 +1129,8 @@ void get_next_valid_time(time_t pref_time,
   // before getting a valid_time.
   else {
     *valid_time = 0;
-    tperiod->get_next_valid_time_per_timeperiod(preferred_time, valid_time);
+    tperiod->get_next_valid_time_per_timeperiod(preferred_time, valid_time,
+                                                false);
   }
 }
 

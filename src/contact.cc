@@ -849,8 +849,8 @@ bool contact::should_be_notified(notifier::notification_category cat,
       }
       // See if the contact can be notified at this time for the host.
       timezone_locker lock(get_timezone());
-      if (!check_time_against_period(std::time(nullptr),
-                                     get_service_notification_period_ptr())) {
+      if (!check_time_against_period_for_notif(
+              std::time(nullptr), get_service_notification_period_ptr())) {
         logger(dbg_notifications, most)
             << "This contact shouldn't be notified at this time.";
         return false;
@@ -864,8 +864,8 @@ bool contact::should_be_notified(notifier::notification_category cat,
       }
       // See if the contact can be notified at this time for the service.
       timezone_locker lock(get_timezone());
-      if (!check_time_against_period(std::time(nullptr),
-                                     get_host_notification_period_ptr())) {
+      if (!check_time_against_period_for_notif(
+              std::time(nullptr), get_host_notification_period_ptr())) {
         logger(dbg_notifications, most)
             << "This contact shouldn't be notified at this time.";
         return false;
