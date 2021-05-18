@@ -1,13 +1,4 @@
 # Changelog
-## 21.04.3
-
-### Bugfixes
-
-*Check*
-
-if host or service with check_period set to none, Engine burns 100% of the CPU.
-This patch fixes this issue.
-
 ## 21.04.2
 
 ### Bugs
@@ -21,6 +12,11 @@ changed them to use the conan-center. Now centengine builds again.
 
 Sometimes, centengine can not stop, this has been seen when engine is compiled
 using gcc-4.8.5, because of a bug in the function sleep\_until().
+
+*Check*
+
+if host or service with check_period set to none, Engine burns 100% of the CPU.
+This patch fixes this issue.
 
 ## 21.04.1
 
