@@ -794,7 +794,7 @@ void service::check_for_expired_acknowledgement() {
             << "' on host '" << this->get_host_ptr()->get_name()
             << "' just expired";
         set_problem_has_been_acknowledged(false);
-        this->set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
+        set_acknowledgement_type(ACKNOWLEDGEMENT_NONE);
         update_status();
       }
     }
@@ -2487,12 +2487,14 @@ bool service::schedule_check(time_t check_time, int options) {
   // Save check options for retention purposes.
   set_check_options(options);
 
+  bool no_update_status_now = false;
   // Schedule a new event.
   if (!use_original_event) {
     // We're using the new event, so remove the old one.
     if (temp_event) {
       events::loop::instance().remove_event(temp_event, events::loop::low);
       temp_event = nullptr;
+      no_update_status_now = true;
     }
 
     logger(dbg_checks, most) << "Scheduling new service check event.";
@@ -2523,7 +2525,8 @@ bool service::schedule_check(time_t check_time, int options) {
   }
 
   // Update the status log.
-  update_status();
+  if (!no_update_status_now)
+    update_status();
   return true;
 }
 
