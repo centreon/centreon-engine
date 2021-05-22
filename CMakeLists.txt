@@ -68,7 +68,7 @@ link_directories(${nlohmann_json_LIB_DIRS})
 # Version.
 set(CENTREON_ENGINE_MAJOR 21)
 set(CENTREON_ENGINE_MINOR 04)
-set(CENTREON_ENGINE_PATCH 2)
+set(CENTREON_ENGINE_PATCH 3)
 if (CENTREON_ENGINE_PRERELEASE)
   set(CENTREON_ENGINE_VERSION "${CENTREON_ENGINE_MAJOR}.${CENTREON_ENGINE_MINOR}.${CENTREON_ENGINE_PATCH}-${CENTREON_ENGINE_PRERELEASE}")
 else ()
@@ -603,7 +603,7 @@ set(
 # Subdirectories with core features.
 add_subdirectory(src/broker)
 add_subdirectory(src/checks)
-add_subdirectory(conf)
+#add_subdirectory(conf)
 add_subdirectory(src/downtimes)
 add_subdirectory(src/configuration)
 add_subdirectory(src/commands)
