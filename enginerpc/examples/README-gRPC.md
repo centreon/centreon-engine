@@ -5,10 +5,15 @@
 Verify that you have installed theses packages on your system else install them. On Centos 7 you can execute this command below :
 
 ```yum install python3-devel``` 
+
 ```yum install gcc-c++```
+
 ```yum install gcc```
+
 ```yum install epel-release```
+
 ```yum install net-tools```
+
 ```yum install wget```
 
 Now you have to install gRPC, so you can do these commands below (on Centos 7) :
