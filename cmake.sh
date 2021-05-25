@@ -58,10 +58,14 @@ if [ -r /etc/centos-release ] ; then
     cmake='cmake'
   else
     if rpm -q cmake3 ; then
-      cmake='cmake3'
+      rm -f /usr/bin/cmake
+      ln -s /usr/bin/cmake3 /usr/bin/cmake
+      cmake='cmake'
     elif [ $maj = "centos7" ] ; then
       yum -y install epel-release cmake3
-      cmake='cmake3'
+      mv /usr/bin/cmake /usr/bin/cmake2
+      ln -s /usr/bin/cmake3 /usr/bin/cmake
+      cmake='cmake'
     else
       dnf -y install cmake
       cmake='cmake'
@@ -81,10 +85,10 @@ if [ -r /etc/centos-release ] ; then
   good=$(gcc --version | awk '/gcc/ && ($3+0)>5.0{print 1}')
 
   if [ ! $good ] ; then
+    echo "Your compiler is too old. Trying to used devtoolset-9."
     yum -y install centos-release-scl
     yum-config-manager --enable rhel-server-rhscl-7-rpms
     yum -y install devtoolset-9
-    ln -s /usr/bin/cmake3 /usr/bin/cmake
     source /opt/rh/devtoolset-9/enable
   fi
 
