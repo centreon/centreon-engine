@@ -1,4 +1,14 @@
 # Changelog
+
+## 20.04.13
+
+### Bugs
+
+*notification*
+
+Recovery notifications forgotten when engine is stopped during incident.
+This patch fixes this issue.
+
 ## 20.04.12
 
 ### Bugfixes
