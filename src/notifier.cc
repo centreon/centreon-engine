@@ -1507,12 +1507,15 @@ void notifier::set_notification(int32_t idx, std::string const& value) {
     return;
   }
 
-  v += 13;
+  v = next + 2;
   std::set<std::string> contacts;
-  for (const char* s = v; *s; ++s) {
-    if ((*s == ',' || *s == '\n') && v != s) {
-      contacts.emplace(v, s);
-      v = s + 1;
+  if (!strncmp(v, "contacts: ", 10)) {
+    v += 10;
+    for (const char* s = v; *s; ++s) {
+      if ((*s == ',' || *s == '\n') && v != s) {
+        contacts.emplace(v, s);
+        v = s + 1;
+      }
     }
   }
 

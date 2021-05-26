@@ -1458,8 +1458,9 @@ int service::handle_async_check_result(check_result* queued_check_result) {
     set_no_more_notifications(false);
 
     if (reschedule_check)
-      next_service_check = (time_t)(
-          get_last_check() + get_check_interval() * config->interval_length());
+      next_service_check =
+          (time_t)(get_last_check() +
+                   get_check_interval() * config->interval_length());
   }
 
   /*******************************************/
@@ -3039,9 +3040,9 @@ bool service::is_result_fresh(time_t current_time, int log_this) {
    * suggested by Altinity */
   else if (this->get_checks_enabled() && event_start > get_last_check() &&
            this->get_freshness_threshold() == 0)
-    expiration_time = (time_t)(
-        event_start + freshness_threshold +
-        (config->max_service_check_spread() * config->interval_length()));
+    expiration_time = (time_t)(event_start + freshness_threshold +
+                               (config->max_service_check_spread() *
+                                config->interval_length()));
   else
     expiration_time = (time_t)(get_last_check() + freshness_threshold);
 
