@@ -9,6 +9,11 @@
 Recovery notifications forgotten when engine is stopped during incident.
 This patch fixes this issue.
 
+*Check*
+
+If a service check is forced, two service status are sent to broker while only
+one would be enough.
+
 ## 20.10.5
 
 ### Bugfixes
@@ -19,7 +24,7 @@ centengine builds again, using dependency packages available on conan-center.
 
 *Check*
 
-if host or service with check_period set to none, Engine burns 100% of the CPU.
+if host or service with check\_period set to none, Engine burns 100% of the CPU.
 This patch fixes this issue.
 
 ## 20.10.4
@@ -44,7 +49,8 @@ if they have no meaning, they are replaced by a default value.
 
 They could be sent twice. This new version fixes that.
 
-fix update last_state_change and last_hard_state_change on host with no service
+fix update last\_state\_change and last\_hard\_state\_change on host with no
+service
 
 *Notification macros*
 
