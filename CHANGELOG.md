@@ -1,7 +1,13 @@
 # Changelog
+
 ## 20.10.6
 
-### Bugfixes
+### Bugs
+
+*notification*
+
+Recovery notifications forgotten when engine is stopped during incident.
+This patch fixes this issue.
 
 *Check*
 
