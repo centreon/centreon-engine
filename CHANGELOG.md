@@ -1,4 +1,13 @@
 # Changelog
+## 21.04.3
+
+### Bugs
+
+*Check*
+
+If a service check is forced, two service status are sent to broker while only
+one would be enough.
+
 ## 21.04.2
 
 ### Bugs
