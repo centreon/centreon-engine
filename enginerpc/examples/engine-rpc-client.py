@@ -1,3 +1,7 @@
+# engine-rpc-client.py (second version)
+# last modified 27.05.2021
+# file to communicate with gRPC methods
+
 import inspect, sys, getopt, time, grpc, json
 import engine_pb2
 import broker_pb2
