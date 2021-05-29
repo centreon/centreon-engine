@@ -8,10 +8,22 @@ This program build Centreon-engine
 
     -f|--force    : force rebuild
     -r|--release  : Build on release mode
+    -fcr|--force-conan-rebuild : rebuild conan data
     -h|--help     : help
 EOF
 }
 BUILD_TYPE="Debug"
+CONAN_REBUILD="0"
+for i in $(cat conanfile.txt) ; do
+  if [[ $i =~ / ]] ; then
+    if [ ! -d ~/.conan/data/$i ] ; then
+      echo "The package '$i' is missing"
+      CONAN_REBUILD="1"
+      break
+    fi
+  fi
+done
+
 for i in "$@"
 do
   case $i in
@@ -22,6 +34,9 @@ do
     -r|--release)
       BUILD_TYPE="Release"
       shift
+      ;;
+    -fcr|--force-conan-rebuild)
+      CONAN_REBUILD="1"
       ;;
     -h|--help)
       show_help
@@ -43,11 +58,14 @@ if [ -r /etc/centos-release ] ; then
     cmake='cmake'
   else
     if rpm -q cmake3 ; then
-      cmake='cmake3'
+      rm -f /usr/bin/cmake
+      ln -s /usr/bin/cmake3 /usr/bin/cmake
+      cmake='cmake'
     elif [ $maj = "centos7" ] ; then
-      yum -y install epel-release
-      yum -y install cmake3
-      cmake='cmake3'
+      yum -y install epel-release cmake3
+      mv /usr/bin/cmake /usr/bin/cmake2
+      ln -s /usr/bin/cmake3 /usr/bin/cmake
+      cmake='cmake'
     else
       dnf -y install cmake
       cmake='cmake'
@@ -67,13 +85,13 @@ if [ -r /etc/centos-release ] ; then
   good=$(gcc --version | awk '/gcc/ && ($3+0)>5.0{print 1}')
 
   if [ ! $good ] ; then
+    echo "Your compiler is too old. Trying to used devtoolset-9."
     yum -y install centos-release-scl
     yum-config-manager --enable rhel-server-rhscl-7-rpms
     yum -y install devtoolset-9
-    ln -s /usr/bin/cmake3 /usr/bin/cmake
     source /opt/rh/devtoolset-9/enable
   fi
-  
+
   pkgs=(
     ninja-build
     perl-Thread-Queue
@@ -194,9 +212,13 @@ cd build
 
 if [ $maj = "centos7" ] ; then
   rm -rf ~/.conan/profiles/default
-  $conan install .. -s compiler.libcxx=libstdc++11 --build="*"
+  if [ "$CONAN_REBUILD" = "1" ] ; then
+    $conan install .. -s compiler.libcxx=libstdc++11 --build="*"
+  else
+    $conan install .. -s compiler.libcxx=libstdc++11 --build=missing
+  fi
 else
-  $conan install .. -s compiler.libcxx=libstdc++ --build=missing
+    $conan install .. -s compiler.libcxx=libstdc++11 --build=missing
 fi
 
 if [ $maj = "Raspbian" ] ; then
