@@ -26,6 +26,11 @@ cmake_minimum_required(VERSION 2.8)
 project("Centreon Engine" C CXX)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14")
 
+# set -latomic if OS is Raspbian.
+if (CMAKE_SYSTEM_PROCESSOR MATCHES "arm")
+  set(CMAKE_CXX_LINK_FLAGS "${CMAKE_CXX_LINK_FLAGS} -latomic")
+endif ()
+
 # With libasan
 option(WITH_ASAN "Add the libasan to check memory leaks and other memory issues." OFF)
 if (WITH_ASAN)

@@ -60,7 +60,7 @@ class DowntimeFinderFindMatchingAllTest : public ::testing::Test {
     deinit_config_state();
   }
 
-  /*downtime**/ void new_downtime(unsigned long downtime_id,
+  /*downtime**/ void new_downtime(uint64_t downtime_id,
                                   std::string const& host_name,
                                   std::string const& service_description,
                                   time_t start,
