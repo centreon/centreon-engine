@@ -9,6 +9,10 @@
 Recovery notifications forgotten when engine is stopped during incident.
 This patch fixes this issue.
 
+### Build
+
+repair the compilation for Raspberry PI
+
 ## 20.04.12
 
 ### Bugfixes
