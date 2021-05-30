@@ -59,7 +59,7 @@ Centreon Clib should be installed before installing Centreon Engine.
 If you do not have Centreon Clib please refer to the
 [centreon-clib](https://github.com/centreon/centreon-clib) project.
 
-### CentOS / Debian / Raspbian
+### CentOS / Debian / Raspberry
 
 Compilation of these distributions is pretty straightforward.
 
@@ -107,27 +107,13 @@ pip3 install conan
 > you want to use a dependency from your package manager instead of conan,
 > you need to remove it from conanfile.txt.
 
-Then you have to add a remote conan repository, for that enter the command:
-
-```shell
-conan remote add centreon https://api.bintray.com/conan/centreon/centreon
-```
-
-Now, the list command should list two repositories:
-
-```shell
-conan remote list
-conan-center: https://conan.bintray.com [Verify SSL: True]
-centreon: https://api.bintray.com/conan/centreon/centreon [Verify SSL: True]
-```
-
 You can now compile Centreon Engine:
 
 ```shell
 git clone https://github.com/centreon/centreon-engine
 mkdir -p centreon-engine/build
 cd centreon-engine/build
-conan install --remote centreon --build missing ..
+conan install --build missing ..
 ```
 
 Once the sources of Centreon Engine extracted go to the *./build/*
