@@ -1,5 +1,5 @@
 # engine-rpc-client.py (second version)
-# last modified 27.05.2021
+# last modified 28.05.2021
 # file to communicate with gRPC methods
 
 import inspect, sys, getopt, time, grpc, json
@@ -8,6 +8,7 @@ import broker_pb2
 import engine_pb2_grpc
 import broker_pb2_grpc
 import google.protobuf.json_format
+import pdb
 from google.protobuf import descriptor, empty_pb2, timestamp_pb2
 from google.protobuf.json_format import Parse
 from enum import Enum
@@ -105,6 +106,7 @@ class gRPC_client:
           .format(method.name, m_input.name, m_output.name))
     print("Input Message {} contains the main fields:".format(m_input.name))
 
+
     for f in m_input.fields:
       print(" - {}".format(f.name))
 
@@ -122,6 +124,8 @@ class gRPC_client:
     ## --- Json Layout Part --- ##
     print(colors.OKBLUE + colors.UNDERLINE + "\n\nJSON LAYOUT:\n" + colors.ENDC)
     result_str = ""
+
+    #pdb.set_trace()
 
     # Show to user how the input message looks like in json
     if have_oneofs:
@@ -162,7 +166,7 @@ class gRPC_client:
               self.get_grpc_message_info(m_input, f, 3)
             # same for TYPE_ENUM
             elif f.type == gRPC_types.TYPE_ENUM.value:
-              self.get_grpc_enum_info(m_input, f, 3)
+              result_str = self.get_grpc_enum_info(m_input, f, 3, result_str)
             else:
               result_str += " \"{}\": {},\n".format(f.name, type.name)
 
@@ -190,7 +194,7 @@ class gRPC_client:
           if f.type == gRPC_types.TYPE_MESSAGE.value:
             self.get_grpc_message_info(current_msg_dsc, f, n+1)
           elif f.type == gRPC_types.TYPE_ENUM.value:
-            self.get_grpc_enum_info(m_input, f, 3)
+            result_str = self.get_grpc_enum_info(m_input, f, 3, result_str)
           else:
             result_str += str_format + " \"{}\": {},\n".format(f.name, type.name)
 
@@ -202,21 +206,20 @@ class gRPC_client:
     print(str_format + "}")
 
   # Describe a TYPE_ENUM
-  def get_grpc_enum_info(self, parent_message_descriptor, field, string_space):
+  def get_grpc_enum_info(self, parent_message_descriptor, field, string_space,
+                         result_str):
     current_msg_dsc = parent_message_descriptor.fields_by_name[field.name].enum_type
 
-    str_format = string_space * ' '
-    print(str_format + "\"{}\":".format(field.name))
-
-    str_format += ' '
-    print(str_format + "{")
-
-    for v in current_msg_dsc.values:
-      print(str_format + " {}".format(v.name))
+    result_str += " \"{}\":".format(field.name) + '\n'
 
     str_format = ' '
-    str_format += string_space * ' '
-    print(str_format + "}")
+    result_str += str_format + "{" + '\n'
+
+    for v in current_msg_dsc.values:
+      result_str += str_format + " {}".format(v.name) + '\n'
+
+    reurn_str += str_format + "}" + '\n'
+    return return_str
 
 
   # Launch a gRPC method
@@ -355,6 +358,7 @@ if __name__ == "__main__":
   except getopt.GetoptError as err:
     print(err)
     arg_error(sys.argv[0])
+
 
   # Parsing essential options.
   # this allows to reverse the order of the arguments in the reading
