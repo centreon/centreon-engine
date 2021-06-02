@@ -14,6 +14,9 @@ This patch fixes this issue.
 If a service check is forced, two service status are sent to broker while only
 one would be enough.
 
+### Build
+
+repair the compilation for Raspberry PI
 
 ## 21.04.2
 
