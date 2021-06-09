@@ -5,6 +5,7 @@
   delaycompress
   missingok
   olddir @LOG_ARCHIVE_DIR@
+  createolddir 755 @USER@ @GROUP@
   rotate 365
   postrotate
     reload centengine
@@ -17,6 +18,7 @@
   delaycompress
   missingok
   olddir @LOG_ARCHIVE_DIR@
+  createolddir 755 @USER@ @GROUP@
   rotate 5
   size   1G
   postrotate
