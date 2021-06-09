@@ -1,5 +1,5 @@
 /*
-** Copyright 2011 - 2020 Centreon
+** Copyright 2011 - 2021 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -2511,6 +2511,9 @@ bool service::schedule_check(time_t check_time, int options) {
                           false, 0L, nullptr, true, this, nullptr, options);
 
       events::loop::instance().reschedule_event(new_event, events::loop::low);
+
+      if (!get_checks_enabled())
+        no_update_status_now = true;
     } catch (...) {
       // Update the status log.
       update_status();
