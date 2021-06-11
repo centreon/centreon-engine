@@ -153,7 +153,7 @@ TEST_F(EngineRpc, GetVersion) {
 TEST_F(EngineRpc, ProcessServiceCheckResult) {
   enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("ProcessServiceCheckResult test_host test_svc 0");
-  ASSERT_EQ(output.size(), 1);
+  ASSERT_EQ(output.size(), 1u);
   ASSERT_EQ(output.front(), "ProcessServiceCheckResult: 0");
   erpc.shutdown();
 }
@@ -161,7 +161,7 @@ TEST_F(EngineRpc, ProcessServiceCheckResult) {
 TEST_F(EngineRpc, ProcessServiceCheckResultBadHost) {
   enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("ProcessServiceCheckResult \"\" test_svc 0");
-  ASSERT_EQ(output.size(), 2);
+  ASSERT_EQ(output.size(), 2u);
   ASSERT_EQ(output.front(), "ProcessServiceCheckResult failed.");
   erpc.shutdown();
 }
@@ -169,7 +169,7 @@ TEST_F(EngineRpc, ProcessServiceCheckResultBadHost) {
 TEST_F(EngineRpc, ProcessServiceCheckResultBadService) {
   enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("ProcessServiceCheckResult test_host \"\" 0");
-  ASSERT_EQ(output.size(), 2);
+  ASSERT_EQ(output.size(), 2u);
   ASSERT_EQ(output.front(), "ProcessServiceCheckResult failed.");
   erpc.shutdown();
 }
@@ -177,7 +177,7 @@ TEST_F(EngineRpc, ProcessServiceCheckResultBadService) {
 TEST_F(EngineRpc, ProcessHostCheckResult) {
   enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("ProcessHostCheckResult test_host 0");
-  ASSERT_EQ(output.size(), 1);
+  ASSERT_EQ(output.size(), 1u);
   ASSERT_EQ(output.front(), "ProcessHostCheckResult: 0");
   erpc.shutdown();
 }
@@ -185,7 +185,7 @@ TEST_F(EngineRpc, ProcessHostCheckResult) {
 TEST_F(EngineRpc, ProcessHostCheckResultBadHost) {
   enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("ProcessHostCheckResult '' 0");
-  ASSERT_EQ(output.size(), 2);
+  ASSERT_EQ(output.size(), 2u);
   ASSERT_EQ(output.front(), "ProcessHostCheckResult failed.");
   erpc.shutdown();
 }
@@ -203,7 +203,7 @@ TEST_F(EngineRpc, NewThresholdsFile) {
       "21,\n \"fit\": 60.5\n }\n]}]");
   enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("NewThresholdsFile /tmp/thresholds_file.json");
-  ASSERT_EQ(output.size(), 1);
+  ASSERT_EQ(output.size(), 1u);
   ASSERT_EQ(output.front(), "NewThresholdsFile: 0");
   command_manager::instance().execute();
   ASSERT_EQ(_ad->get_thresholds_file(), "/tmp/thresholds_file.json");
