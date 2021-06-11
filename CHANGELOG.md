@@ -4,6 +4,10 @@
 
 ### Bugs
 
+*gRPC*
+
+The reflection module has been removed because of an issue in the compilation.
+
 *notification*
 
 Recovery notifications forgotten when engine is stopped during incident.
