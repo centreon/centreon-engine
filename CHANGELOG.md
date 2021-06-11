@@ -4,6 +4,10 @@
 
 ### Bugs
 
+*gRPC*
+
+The reflection is removed because of an issue during the compilation.
+
 *notification*
 
 Recovery notifications forgotten when engine is stopped during incident.
