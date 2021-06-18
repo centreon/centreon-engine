@@ -261,7 +261,8 @@ grpc::Status engine_impl::GetContact(grpc::ServerContext* context
  *
  *@return Status::OK
  */
-grpc::Status engine_impl::GetService(grpc::ServerContext* context,
+grpc::Status engine_impl::GetService(grpc::ServerContext* context
+                                     __attribute__((unused)),
                                      const ServiceIdentifier* request,
                                      EngineService* response) {
   std::string err;
@@ -526,15 +527,19 @@ grpc::Status engine_impl::GetHostDependenciesCount(
 grpc::Status engine_impl::AddHostComment(grpc::ServerContext* context
                                          __attribute__((unused)),
                                          const EngineComment* request,
-                                         CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+                                         CommandSuccess* response 
+                                         __attribute__((unused))) {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     /* get the host */
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      err = "could not find host";
       return 1;
+    }
     /* add the comment */
     auto cmt = std::make_shared<comment>(
         comment::host, comment::user, temp_host->get_host_id(), 0,
@@ -547,8 +552,10 @@ grpc::Status engine_impl::AddHostComment(grpc::ServerContext* context
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -570,8 +577,10 @@ grpc::Status engine_impl::AddHostComment(grpc::ServerContext* context
 grpc::Status engine_impl::AddServiceComment(grpc::ServerContext* context
                                             __attribute__((unused)),
                                             const EngineComment* request,
-                                            CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+                                            CommandSuccess* response
+                                            __attribute__((unused))) {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     std::shared_ptr<engine::service> temp_service;
     /* get the service */
@@ -579,21 +588,27 @@ grpc::Status engine_impl::AddServiceComment(grpc::ServerContext* context
         service::services.find({request->host_name(), request->svc_desc()});
     if (it != service::services.end())
       temp_service = it->second;
-    if (temp_service == nullptr)
+    if (temp_service == nullptr) {
+      err = "could not find service";
       return 1;
+    }
     auto it2 = host::hosts.find(request->host_name());
     if (it2 != host::hosts.end())
       temp_host = it2->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      err = "could not find service";
       return 1;
+    }
     /* add the comment */
     auto cmt = std::make_shared<comment>(
         comment::service, comment::user, temp_host->get_host_id(),
         temp_service->get_service_id(), request->entry_time(), request->user(),
         request->comment_data(), request->persistent(), comment::external,
         false, (time_t)0);
-    if (cmt == nullptr)
+    if (cmt == nullptr)  {
+      err = "could not delete comment";
       return 1;
+    }
     comment::comments.insert({cmt->get_comment_id(), cmt});
     return 0;
   });
@@ -601,8 +616,10 @@ grpc::Status engine_impl::AddServiceComment(grpc::ServerContext* context
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -617,7 +634,8 @@ grpc::Status engine_impl::AddServiceComment(grpc::ServerContext* context
 grpc::Status engine_impl::DeleteComment(grpc::ServerContext* context
                                         __attribute__((unused)),
                                         const GenericValue* request,
-                                        CommandSuccess* response) {
+                                        CommandSuccess* response
+                                        __attribute__((unused))) {
   uint32_t comment_id = request->value();
   std::string err;
   if (comment_id == 0)
@@ -655,7 +673,8 @@ grpc::Status engine_impl::DeleteComment(grpc::ServerContext* context
 grpc::Status engine_impl::DeleteAllHostComments(grpc::ServerContext* context
                                                 __attribute__((unused)),
                                                 const HostIdentifier* request,
-                                                CommandSuccess* response) {
+                                                CommandSuccess* response
+                                                __attribute__((unused))) {
 
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
@@ -714,7 +733,7 @@ grpc::Status engine_impl::DeleteAllHostComments(grpc::ServerContext* context
 grpc::Status engine_impl::DeleteAllServiceComments(
     grpc::ServerContext* context __attribute__((unused)),
     const ServiceIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
@@ -776,7 +795,7 @@ grpc::Status engine_impl::DeleteAllServiceComments(
 grpc::Status engine_impl::RemoveHostAcknowledgement(
     grpc::ServerContext* context __attribute__((unused)),
     const HostIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
@@ -841,7 +860,7 @@ grpc::Status engine_impl::RemoveHostAcknowledgement(
 grpc::Status engine_impl::RemoveServiceAcknowledgement(
     grpc::ServerContext* context __attribute__((unused)),
     const ServiceIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
@@ -900,7 +919,7 @@ grpc::Status engine_impl::RemoveServiceAcknowledgement(
 grpc::Status engine_impl::AcknowledgementHostProblem(
     grpc::ServerContext* context __attribute__((unused)),
     const EngineAcknowledgement* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
@@ -963,7 +982,7 @@ grpc::Status engine_impl::AcknowledgementHostProblem(
 grpc::Status engine_impl::AcknowledgementServiceProblem(
     grpc::ServerContext* context __attribute__((unused)),
     const EngineAcknowledgement* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
@@ -1046,7 +1065,7 @@ grpc::Status engine_impl::AcknowledgementServiceProblem(
 grpc::Status engine_impl::ScheduleHostDowntime(
     grpc::ServerContext* context __attribute__((unused)),
     const ScheduleDowntimeIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   if (request->host_name().empty() || request->author().empty() ||
       request->comment_data().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
@@ -1115,7 +1134,7 @@ grpc::Status engine_impl::ScheduleHostDowntime(
 grpc::Status engine_impl::ScheduleServiceDowntime(
     grpc::ServerContext* context __attribute__((unused)),
     const ScheduleDowntimeIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   if (request->host_name().empty() || request->service_desc().empty() ||
       request->author().empty() || request->comment_data().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
@@ -1185,7 +1204,7 @@ grpc::Status engine_impl::ScheduleServiceDowntime(
 grpc::Status engine_impl::ScheduleHostServicesDowntime(
     grpc::ServerContext* context __attribute__((unused)),
     const ScheduleDowntimeIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   if (request->host_name().empty() || request->author().empty() ||
       request->comment_data().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
@@ -1257,7 +1276,7 @@ grpc::Status engine_impl::ScheduleHostServicesDowntime(
 grpc::Status engine_impl::ScheduleHostGroupHostsDowntime(
     grpc::ServerContext* context __attribute__((unused)),
     const ScheduleDowntimeIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   if (request->host_group_name().empty() || request->author().empty() ||
       request->comment_data().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
@@ -1327,7 +1346,7 @@ grpc::Status engine_impl::ScheduleHostGroupHostsDowntime(
 grpc::Status engine_impl::ScheduleHostGroupServicesDowntime(
     grpc::ServerContext* context __attribute__((unused)),
     const ScheduleDowntimeIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   if (request->host_group_name().empty() || request->author().empty() ||
       request->comment_data().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
@@ -1407,7 +1426,7 @@ grpc::Status engine_impl::ScheduleHostGroupServicesDowntime(
 grpc::Status engine_impl::ScheduleServiceGroupHostsDowntime(
     grpc::ServerContext* context __attribute__((unused)),
     const ScheduleDowntimeIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   if (request->service_group_name().empty() || request->author().empty() ||
       request->comment_data().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
@@ -1484,7 +1503,7 @@ grpc::Status engine_impl::ScheduleServiceGroupHostsDowntime(
 grpc::Status engine_impl::ScheduleServiceGroupServicesDowntime(
     grpc::ServerContext* context __attribute__((unused)),
     const ScheduleDowntimeIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   if (request->service_group_name().empty() || request->author().empty() ||
       request->comment_data().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
@@ -1550,7 +1569,7 @@ grpc::Status engine_impl::ScheduleServiceGroupServicesDowntime(
 grpc::Status engine_impl::ScheduleAndPropagateHostDowntime(
     grpc::ServerContext* context __attribute__((unused)),
     const ScheduleDowntimeIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   if (request->host_name().empty() || request->author().empty() ||
       request->comment_data().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
@@ -1622,7 +1641,7 @@ grpc::Status engine_impl::ScheduleAndPropagateHostDowntime(
 grpc::Status engine_impl::ScheduleAndPropagateTriggeredHostDowntime(
     grpc::ServerContext* context __attribute__((unused)),
     const ScheduleDowntimeIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   if (request->host_name().empty() || request->author().empty() ||
       request->comment_data().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
@@ -1682,7 +1701,8 @@ grpc::Status engine_impl::ScheduleAndPropagateTriggeredHostDowntime(
 grpc::Status engine_impl::DeleteDowntime(grpc::ServerContext* context
                                          __attribute__((unused)),
                                          const GenericValue* request,
-                                         CommandSuccess* response) {
+                                         CommandSuccess* response
+                                         __attribute__((unused))) {
   uint32_t downtime_id = request->value();
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, &downtime_id]() -> int32_t {
@@ -1720,10 +1740,9 @@ grpc::Status engine_impl::DeleteDowntime(grpc::ServerContext* context
 grpc::Status engine_impl::DeleteHostDowntimeFull(
     grpc::ServerContext* context __attribute__((unused)),
     const DowntimeCriterias* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
-    downtime::type downtime_type = downtime::host_downtime;
     std::list<std::shared_ptr<downtimes::downtime> > dtlist;
     for (auto it = downtimes::downtime_manager::instance()
                        .get_scheduled_downtimes()
@@ -1788,10 +1807,9 @@ grpc::Status engine_impl::DeleteHostDowntimeFull(
 grpc::Status engine_impl::DeleteServiceDowntimeFull(
     grpc::ServerContext* context __attribute__((unused)),
     const DowntimeCriterias* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
-    downtime::type downtime_type = downtime::service_downtime;
     std::list<service_downtime*> dtlist;
     /* iterate through all current downtime(s) */
     for (auto it = downtimes::downtime_manager::instance()
@@ -1861,7 +1879,7 @@ grpc::Status engine_impl::DeleteServiceDowntimeFull(
 grpc::Status engine_impl::DeleteDowntimeByHostName(
     grpc::ServerContext* context __attribute__((unused)),
     const DowntimeHostIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   /*hostname must be defined to delete the downtime but not others arguments*/
   std::string const& host_name = request->host_name();
   if (host_name.empty())
@@ -1917,7 +1935,7 @@ grpc::Status engine_impl::DeleteDowntimeByHostName(
 grpc::Status engine_impl::DeleteDowntimeByHostGroupName(
     grpc::ServerContext* context __attribute__((unused)),
     const DowntimeHostGroupIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   std::string const& host_group_name = request->host_group_name();
   if (host_group_name.empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
@@ -1991,7 +2009,7 @@ grpc::Status engine_impl::DeleteDowntimeByHostGroupName(
 grpc::Status engine_impl::DeleteDowntimeByStartTimeComment(
     grpc::ServerContext* context __attribute__((unused)),
     const DowntimeStartTimeIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   time_t start_time;
   /*hostname must be defined to delete the downtime but not others arguments*/
   if (!(request->has_start()))
@@ -2039,7 +2057,8 @@ grpc::Status engine_impl::DeleteDowntimeByStartTimeComment(
 grpc::Status engine_impl::ScheduleHostCheck(grpc::ServerContext* context
                                             __attribute__((unused)),
                                             const HostCheckIdentifier* request,
-                                            CommandSuccess* response) {
+                                            CommandSuccess* response
+                                            __attribute__((unused))) {
   if (request->host_name().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
@@ -2085,7 +2104,7 @@ grpc::Status engine_impl::ScheduleHostCheck(grpc::ServerContext* context
 grpc::Status engine_impl::ScheduleHostServiceCheck(
     grpc::ServerContext* context __attribute__((unused)),
     const HostCheckIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   if (request->host_name().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
@@ -2139,7 +2158,7 @@ grpc::Status engine_impl::ScheduleHostServiceCheck(
 grpc::Status engine_impl::ScheduleServiceCheck(
     grpc::ServerContext* context __attribute__((unused)),
     const ServiceCheckIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   if (request->host_name().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
@@ -2190,7 +2209,8 @@ grpc::Status engine_impl::ScheduleServiceCheck(
 grpc::Status engine_impl::SignalProcess(grpc::ServerContext* context
                                         __attribute__((unused)),
                                         const EngineSignalProcess* request,
-                                        CommandSuccess* response) {
+                                        CommandSuccess* response
+                                        __attribute__((unused))) {
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     timed_event* evt;
@@ -2235,7 +2255,7 @@ grpc::Status engine_impl::SignalProcess(grpc::ServerContext* context
 grpc::Status engine_impl::DelayHostNotification(
     grpc::ServerContext* context __attribute__((unused)),
     const HostDelayIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
@@ -2292,7 +2312,7 @@ grpc::Status engine_impl::DelayHostNotification(
 grpc::Status engine_impl::DelayServiceNotification(
     grpc::ServerContext* context __attribute__((unused)),
     const ServiceDelayIdentifier* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
@@ -2343,7 +2363,8 @@ grpc::Status engine_impl::DelayServiceNotification(
 grpc::Status engine_impl::ChangeHostObjectIntVar(grpc::ServerContext* context
                                                  __attribute__((unused)),
                                                  const ChangeObjectInt* request,
-                                                 CommandSuccess* response) {
+                                                 CommandSuccess* response
+                                                 __attribute__((unused))) {
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
@@ -2436,7 +2457,7 @@ grpc::Status engine_impl::ChangeHostObjectIntVar(grpc::ServerContext* context
 grpc::Status engine_impl::ChangeServiceObjectIntVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeObjectInt* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
@@ -2531,7 +2552,7 @@ grpc::Status engine_impl::ChangeServiceObjectIntVar(
 grpc::Status engine_impl::ChangeContactObjectIntVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeContactObjectInt* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<com::centreon::engine::contact> temp_contact;
@@ -2589,7 +2610,7 @@ grpc::Status engine_impl::ChangeContactObjectIntVar(
 grpc::Status engine_impl::ChangeHostObjectCharVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeObjectChar* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
@@ -2709,7 +2730,7 @@ grpc::Status engine_impl::ChangeHostObjectCharVar(
 grpc::Status engine_impl::ChangeServiceObjectCharVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeObjectChar* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   std::string err;
   auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
@@ -2832,7 +2853,7 @@ grpc::Status engine_impl::ChangeServiceObjectCharVar(
 grpc::Status engine_impl::ChangeContactObjectCharVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeContactObjectChar* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   if (request->contact().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "contact must not be empty");
@@ -2906,7 +2927,7 @@ grpc::Status engine_impl::ChangeContactObjectCharVar(
 grpc::Status engine_impl::ChangeHostObjectCustomVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeObjectCustomVar* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   if (request->host_name().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
@@ -2948,7 +2969,7 @@ grpc::Status engine_impl::ChangeHostObjectCustomVar(
 grpc::Status engine_impl::ChangeServiceObjectCustomVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeObjectCustomVar* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   if (request->host_name().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
@@ -2993,7 +3014,7 @@ grpc::Status engine_impl::ChangeServiceObjectCustomVar(
 grpc::Status engine_impl::ChangeContactObjectCustomVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeObjectCustomVar* request,
-    CommandSuccess* response) {
+    CommandSuccess* response __attribute__((unused))) {
   if (request->contact().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "contact must not be empty");
@@ -3042,7 +3063,7 @@ grpc::Status engine_impl::ChangeContactObjectCustomVar(
 grpc::Status engine_impl::ShutdownProgram(
     grpc::ServerContext* context __attribute__((unused)),
     const ::google::protobuf::Empty* request __attribute__((unused)),
-    ::google::protobuf::Empty* response) {
+    ::google::protobuf::Empty* response __attribute__((unused))) {
   auto fn = std::packaged_task<int32_t(void)>([]() -> int32_t {
     exit(0);
     return 0;
