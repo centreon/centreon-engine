@@ -158,8 +158,9 @@ grpc::Status engine_impl::GetHost(grpc::ServerContext* context
                                   const HostIdentifier* request
                                   __attribute__((unused)),
                                   EngineHost* response) {
+  std::string err;
   auto fn =
-      std::packaged_task<int(void)>([request, host = response]() -> int32_t {
+      std::packaged_task<int(void)>([&err, request, host = response]() -> int32_t {
         std::shared_ptr<com::centreon::engine::host> selectedhost;
         /* checking identifier hostname (by name or by id) */
         switch (request->identifier_case()) {
@@ -168,20 +169,26 @@ grpc::Status engine_impl::GetHost(grpc::ServerContext* context
             auto ithostname = host::hosts.find(request->name());
             if (ithostname != host::hosts.end())
               selectedhost = ithostname->second;
-            else
+            else {
+              err = "could not find host";
               return 1;
+            }
           } break;
           case HostIdentifier::kId: {
             /* get the host */
             auto ithostid = host::hosts_by_id.find(request->id());
             if (ithostid != host::hosts_by_id.end())
               selectedhost = ithostid->second;
-            else
+            else {
+              err = "could not find host";
               return 1;
+            }
           } break;
-          default:
+          default: {
+            err = "could not find identifier";
             return 1;
             break;
+          }
         }
 
         host->set_name(selectedhost->get_name());
@@ -201,7 +208,7 @@ grpc::Status engine_impl::GetHost(grpc::ServerContext* context
     return grpc::Status::OK;
   else
     return grpc::Status(grpc::INVALID_ARGUMENT,
-                        grpc::string("hostname not found"));
+                        err);
 }
 
 /**
@@ -217,15 +224,18 @@ grpc::Status engine_impl::GetContact(grpc::ServerContext* context
                                      __attribute__((unused)),
                                      const ContactIdentifier* request,
                                      EngineContact* response) {
+  std::string err;
   auto fn =
-      std::packaged_task<int(void)>([request, contact = response]() -> int32_t {
+      std::packaged_task<int(void)>([&err, request, contact = response]() -> int32_t {
         std::shared_ptr<com::centreon::engine::contact> selectedcontact;
         /* get the contact by his name */
         auto itcontactname = contact::contacts.find(request->name());
         if (itcontactname != contact::contacts.end())
           selectedcontact = itcontactname->second;
-        else
+        else {
+          err = "could not find contact";
           return 1;
+        }
         /* recovering contact's information */
         contact->set_name(selectedcontact->get_name());
         contact->set_alias(selectedcontact->get_alias());
@@ -238,7 +248,7 @@ grpc::Status engine_impl::GetContact(grpc::ServerContext* context
     return grpc::Status::OK;
   else
     return grpc::Status(grpc::INVALID_ARGUMENT,
-                        grpc::string("contact not found"));
+                        err);
 }
 
 /**
@@ -254,8 +264,9 @@ grpc::Status engine_impl::GetContact(grpc::ServerContext* context
 grpc::Status engine_impl::GetService(grpc::ServerContext* context,
                                      const ServiceIdentifier* request,
                                      EngineService* response) {
+  std::string err;
   auto fn =
-      std::packaged_task<int(void)>([request, service = response]() -> int32_t {
+      std::packaged_task<int(void)>([&err, request, service = response]() -> int32_t {
         std::shared_ptr<com::centreon::engine::service> selectedservice;
 
         /* checking identifier sesrname (by names or by ids) */
@@ -267,8 +278,10 @@ grpc::Status engine_impl::GetService(grpc::ServerContext* context,
                 std::make_pair(names.host_name(), names.service_name()));
             if (itservicenames != service::services.end())
               selectedservice = itservicenames->second;
-            else
+            else {
+              err = "could not find service";
               return 1;
+            }
           } break;
           case ServiceIdentifier::kIds: {
             IdIdentifier ids = request->ids();
@@ -277,12 +290,16 @@ grpc::Status engine_impl::GetService(grpc::ServerContext* context,
                 std::make_pair(ids.host_id(), ids.service_id()));
             if (itserviceids != service::services_by_id.end())
               selectedservice = itserviceids->second;
-            else
+            else {
+              err = "could not find service";
               return 1;
+            }
           } break;
-          default:
+          default: {
+            err = "could not find identifier";
             return 1;
             break;
+          }
         }
 
         /* recovering service's information */
@@ -302,8 +319,7 @@ grpc::Status engine_impl::GetService(grpc::ServerContext* context,
   if (result.get() == 0)
     return grpc::Status::OK;
   else
-    return grpc::Status(grpc::INVALID_ARGUMENT,
-                        grpc::string("service not found"));
+    return grpc::Status(grpc::INVALID_ARGUMENT, err);
 }
 
 /**
@@ -603,22 +619,28 @@ grpc::Status engine_impl::DeleteComment(grpc::ServerContext* context
                                         const GenericValue* request,
                                         CommandSuccess* response) {
   uint32_t comment_id = request->value();
+  std::string err;
   if (comment_id == 0)
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "comment_id must not be set to 0");
 
-  auto fn = std::packaged_task<int32_t(void)>([&comment_id]() -> int32_t {
+  auto fn = std::packaged_task<int32_t(void)>([&err, &comment_id]()
+    -> int32_t {
     if (comment::delete_comment(comment_id))
       return 0;
-    else
+    else {
+      err = "could not delete comment";
       return 1;
+    }
   });
 
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -634,7 +656,9 @@ grpc::Status engine_impl::DeleteAllHostComments(grpc::ServerContext* context
                                                 __attribute__((unused)),
                                                 const HostIdentifier* request,
                                                 CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     /* checking the host identifer (by name or id) */
     switch (request->identifier_case()) {
@@ -643,20 +667,26 @@ grpc::Status engine_impl::DeleteAllHostComments(grpc::ServerContext* context
         auto it = host::hosts.find(request->name());
         if (it != host::hosts.end())
           temp_host = it->second;
-        if (temp_host == nullptr)
+        if (temp_host == nullptr) {
+          err = "could not find a real host";
           return 1;
+        }
       } break;
       case HostIdentifier::kId: {
         /* get the host */
         auto it = host::hosts_by_id.find(request->id());
         if (it != host::hosts_by_id.end())
           temp_host = it->second;
-        if (temp_host == nullptr)
+        if (temp_host == nullptr) {
+          err = "could not find a real host";
           return 1;
+        }
       } break;
-      default:
+      default: {
+        err = "could not find identifier";
         return 1;
         break;
+      }
     }
     comment::delete_host_comments(temp_host->get_host_id());
     return 0;
@@ -665,8 +695,10 @@ grpc::Status engine_impl::DeleteAllHostComments(grpc::ServerContext* context
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -683,7 +715,8 @@ grpc::Status engine_impl::DeleteAllServiceComments(
     grpc::ServerContext* context __attribute__((unused)),
     const ServiceIdentifier* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
 
     /* checking the service identifer (by names or ids) */
@@ -695,8 +728,10 @@ grpc::Status engine_impl::DeleteAllServiceComments(
             service::services.find({names.host_name(), names.service_name()});
         if (it != service::services.end())
           temp_service = it->second;
-        if (temp_service == nullptr)
+        if (temp_service == nullptr) {
+          err = "could not find service";
           return 1;
+        }
       } break;
       case ServiceIdentifier::kIds: {
         IdIdentifier ids = request->ids();
@@ -705,12 +740,16 @@ grpc::Status engine_impl::DeleteAllServiceComments(
             service::services_by_id.find({ids.host_id(), ids.service_id()});
         if (it != service::services_by_id.end())
           temp_service = it->second;
-        if (temp_service == nullptr)
+        if (temp_service == nullptr) { 
+          err = "could not find service";
           return 1;
+        }
       } break;
-      default:
+      default: {
+        err = "could not find identifier";
         return 1;
         break;
+      }
     }
     comment::delete_service_comments(temp_service->get_host_id(),
                                      temp_service->get_service_id());
@@ -719,8 +758,10 @@ grpc::Status engine_impl::DeleteAllServiceComments(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -736,7 +777,8 @@ grpc::Status engine_impl::RemoveHostAcknowledgement(
     grpc::ServerContext* context __attribute__((unused)),
     const HostIdentifier* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
 
     /* checking the host identifer (by name or id) */
@@ -746,20 +788,26 @@ grpc::Status engine_impl::RemoveHostAcknowledgement(
         auto it = host::hosts.find(request->name());
         if (it != host::hosts.end())
           temp_host = it->second;
-        if (temp_host == nullptr)
+        if (temp_host == nullptr) {
+          err = "could not find host";
           return 1;
+        }
       } break;
       case HostIdentifier::kId: {
         /* get the host */
         auto it = host::hosts_by_id.find(request->id());
         if (it != host::hosts_by_id.end())
           temp_host = it->second;
-        if (temp_host == nullptr)
+        if (temp_host == nullptr) {
+          err = "could not find host";
           return 1;
+        }
       } break;
-      default:
+      default: {
+        err = "could not find identifier";
         return 1;
         break;
+      }
     }
 
     /* set the acknowledgement flag */
@@ -774,8 +822,10 @@ grpc::Status engine_impl::RemoveHostAcknowledgement(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -792,7 +842,8 @@ grpc::Status engine_impl::RemoveServiceAcknowledgement(
     grpc::ServerContext* context __attribute__((unused)),
     const ServiceIdentifier* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
 
     /* checking the service identifer (by names or ids) */
@@ -804,8 +855,10 @@ grpc::Status engine_impl::RemoveServiceAcknowledgement(
             service::services.find({names.host_name(), names.service_name()});
         if (it != service::services.end())
           temp_service = it->second;
-        if (temp_service == nullptr)
+        if (temp_service == nullptr) {
+          err = "could not find service";
           return 1;
+        }
       } break;
       case ServiceIdentifier::kIds: {
         IdIdentifier ids = request->ids();
@@ -814,12 +867,16 @@ grpc::Status engine_impl::RemoveServiceAcknowledgement(
             service::services_by_id.find({ids.host_id(), ids.service_id()});
         if (it != service::services_by_id.end())
           temp_service = it->second;
-        if (temp_service == nullptr)
+        if (temp_service == nullptr) {
+          err = "could not find service";
           return 1;
+        }
       } break;
-      default:
+      default: {
+        err = "could not find service";
         return 1;
         break;
+      }
     }
 
     /* set the acknowledgement flag */
@@ -834,25 +891,32 @@ grpc::Status engine_impl::RemoveServiceAcknowledgement(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 grpc::Status engine_impl::AcknowledgementHostProblem(
     grpc::ServerContext* context __attribute__((unused)),
     const EngineAcknowledgement* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     /* get the host */
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      err = "could not find host";
       return 1;
+    }
     /* cannot acknowledge a non-existent problem */
-    if (temp_host->get_current_state() == host::state_up)
+    if (temp_host->get_current_state() == host::state_up) {
+      err = "state of host is up";
       return 1;
+    }
     /* set the acknowledgement flag */
     temp_host->set_problem_has_been_acknowledged(true);
     /* set the acknowledgement type */
@@ -890,25 +954,32 @@ grpc::Status engine_impl::AcknowledgementHostProblem(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 grpc::Status engine_impl::AcknowledgementServiceProblem(
     grpc::ServerContext* context __attribute__((unused)),
     const EngineAcknowledgement* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
     auto it =
         service::services.find({request->host_name(), request->service_desc()});
     if (it != service::services.end())
       temp_service = it->second;
-    if (temp_service == nullptr)
+    if (temp_service == nullptr) {
+      err = "could not find service";
       return 1;
+    }
     /* cannot acknowledge a non-existent problem */
-    if (temp_service->get_current_state() == service::state_ok)
+    if (temp_service->get_current_state() == service::state_ok) {
+      err = "state of service is up";
       return 1;
+    }
     /* set the acknowledgement flag */
     temp_service->set_problem_has_been_acknowledged(true);
     /* set the acknowledgement type */
@@ -947,8 +1018,10 @@ grpc::Status engine_impl::AcknowledgementServiceProblem(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -979,7 +1052,8 @@ grpc::Status engine_impl::ScheduleHostDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     uint64_t downtime_id = 0;
     unsigned long duration;
@@ -987,8 +1061,10 @@ grpc::Status engine_impl::ScheduleHostDowntime(
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      err = "could not find host";
       return 1;
+    }
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
     else
@@ -999,8 +1075,10 @@ grpc::Status engine_impl::ScheduleHostDowntime(
         request->entry_time(), request->author().c_str(),
         request->comment_data().c_str(), request->start(), request->end(),
         request->fixed(), request->triggered_by(), duration, &downtime_id);
-    if (res == ERROR)
+    if (res == ERROR) {
+      err = "could not schedule downtime";
       return 1;
+    }
     else
       return 0;
   });
@@ -1008,8 +1086,10 @@ grpc::Status engine_impl::ScheduleHostDowntime(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1041,7 +1121,8 @@ grpc::Status engine_impl::ScheduleServiceDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
     uint64_t downtime_id(0);
     unsigned long duration;
@@ -1050,8 +1131,10 @@ grpc::Status engine_impl::ScheduleServiceDowntime(
         service::services.find({request->host_name(), request->service_desc()});
     if (it != service::services.end())
       temp_service = it->second;
-    if (temp_service == nullptr)
+    if (temp_service == nullptr) {
+      err = "could not find service";
       return 1;
+    }
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
     else
@@ -1064,17 +1147,20 @@ grpc::Status engine_impl::ScheduleServiceDowntime(
         request->author().c_str(), request->comment_data().c_str(),
         request->start(), request->end(), request->fixed(),
         request->triggered_by(), duration, &downtime_id);
-    if (res == ERROR)
+    if (res == ERROR) { 
+      err = "could not schedule downtime";
       return 1;
-    else
+    } else
       return 0;
   });
 
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1105,7 +1191,8 @@ grpc::Status engine_impl::ScheduleHostServicesDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     uint64_t downtime_id(0);
     unsigned long duration;
@@ -1113,8 +1200,10 @@ grpc::Status engine_impl::ScheduleHostServicesDowntime(
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      err = "could not find host";
       return 1;
+    }
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
     else
@@ -1139,8 +1228,10 @@ grpc::Status engine_impl::ScheduleHostServicesDowntime(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1172,15 +1263,18 @@ grpc::Status engine_impl::ScheduleHostGroupHostsDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     uint64_t downtime_id = 0;
     unsigned long duration;
     hostgroup* hg{nullptr};
     /* get the host group */
     hostgroup_map::const_iterator it(
         hostgroup::hostgroups.find(request->host_group_name()));
-    if (it == hostgroup::hostgroups.end() || !it->second)
+    if (it == hostgroup::hostgroups.end() || !it->second) {
+      err = "could not find hostgroup";
       return 1;
+    }
     hg = it->second.get();
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
@@ -1203,8 +1297,10 @@ grpc::Status engine_impl::ScheduleHostGroupHostsDowntime(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1237,15 +1333,18 @@ grpc::Status engine_impl::ScheduleHostGroupServicesDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     uint64_t downtime_id(0);
     unsigned long duration;
     hostgroup* hg{nullptr};
     /* get the hostgroup */
     hostgroup_map::const_iterator it(
         hostgroup::hostgroups.find(request->host_group_name()));
-    if (it == hostgroup::hostgroups.end() || !it->second)
+    if (it == hostgroup::hostgroups.end() || !it->second) {
+      err = "could not find hostgroup";
       return 1;
+    }
     hg = it->second.get();
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
@@ -1279,8 +1378,10 @@ grpc::Status engine_impl::ScheduleHostGroupServicesDowntime(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1312,7 +1413,8 @@ grpc::Status engine_impl::ScheduleServiceGroupHostsDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     host* temp_host{nullptr};
     host* last_host{nullptr};
     uint64_t downtime_id(0);
@@ -1320,8 +1422,10 @@ grpc::Status engine_impl::ScheduleServiceGroupHostsDowntime(
     servicegroup_map::const_iterator sg_it;
     /* verify that the servicegroup is valid */
     sg_it = servicegroup::servicegroups.find(request->service_group_name());
-    if (sg_it == servicegroup::servicegroups.end() || !sg_it->second)
+    if (sg_it == servicegroup::servicegroups.end() || !sg_it->second) {
+      err = "could find service";
       return 1;
+    }
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
     else
@@ -1351,8 +1455,10 @@ grpc::Status engine_impl::ScheduleServiceGroupHostsDowntime(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1384,14 +1490,17 @@ grpc::Status engine_impl::ScheduleServiceGroupServicesDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     uint64_t downtime_id(0);
     unsigned long duration;
     servicegroup_map::const_iterator sg_it;
     /* verify that the servicegroup is valid */
     sg_it = servicegroup::servicegroups.find(request->service_group_name());
-    if (sg_it == servicegroup::servicegroups.end() || !sg_it->second)
+    if (sg_it == servicegroup::servicegroups.end() || !sg_it->second) {
+      err = "could not find servicegroup";
       return 1;
+    }
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
     else
@@ -1413,8 +1522,10 @@ grpc::Status engine_impl::ScheduleServiceGroupServicesDowntime(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1445,7 +1556,8 @@ grpc::Status engine_impl::ScheduleAndPropagateHostDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     uint64_t downtime_id(0);
     unsigned long duration;
@@ -1453,8 +1565,10 @@ grpc::Status engine_impl::ScheduleAndPropagateHostDowntime(
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      err = "could not find host";
       return 1;
+    }
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
     else
@@ -1478,8 +1592,10 @@ grpc::Status engine_impl::ScheduleAndPropagateHostDowntime(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1512,7 +1628,8 @@ grpc::Status engine_impl::ScheduleAndPropagateTriggeredHostDowntime(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "all fieds must be defined");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     uint64_t downtime_id(0);
     unsigned long duration;
@@ -1520,8 +1637,10 @@ grpc::Status engine_impl::ScheduleAndPropagateTriggeredHostDowntime(
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      err = "could not find host";
       return 1;
+    }
     if (request->fixed())
       duration = static_cast<unsigned long>(request->end() - request->start());
     else
@@ -1545,8 +1664,10 @@ grpc::Status engine_impl::ScheduleAndPropagateTriggeredHostDowntime(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1563,19 +1684,24 @@ grpc::Status engine_impl::DeleteDowntime(grpc::ServerContext* context
                                          const GenericValue* request,
                                          CommandSuccess* response) {
   uint32_t downtime_id = request->value();
-  auto fn = std::packaged_task<int32_t(void)>([&downtime_id]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, &downtime_id]() -> int32_t {
     /* deletes scheduled  downtime */
-    if (downtime_manager::instance().unschedule_downtime(downtime_id) == ERROR)
+    if (downtime_manager::instance().unschedule_downtime(downtime_id) == ERROR) {
+      err = "could not delete downtime";
       return 1;
+    }
     else
       return 0;
   });
 
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
-
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+    
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1595,7 +1721,8 @@ grpc::Status engine_impl::DeleteHostDowntimeFull(
     grpc::ServerContext* context __attribute__((unused)),
     const DowntimeCriterias* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     downtime::type downtime_type = downtime::host_downtime;
     std::list<std::shared_ptr<downtimes::downtime> > dtlist;
     for (auto it = downtimes::downtime_manager::instance()
@@ -1639,8 +1766,10 @@ grpc::Status engine_impl::DeleteHostDowntimeFull(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1660,7 +1789,8 @@ grpc::Status engine_impl::DeleteServiceDowntimeFull(
     grpc::ServerContext* context __attribute__((unused)),
     const DowntimeCriterias* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     downtime::type downtime_type = downtime::service_downtime;
     std::list<service_downtime*> dtlist;
     /* iterate through all current downtime(s) */
@@ -1710,8 +1840,10 @@ grpc::Status engine_impl::DeleteServiceDowntimeFull(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1735,8 +1867,8 @@ grpc::Status engine_impl::DeleteDowntimeByHostName(
   if (host_name.empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
-
-  auto fn = std::packaged_task<int32_t(void)>([&host_name,
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, &host_name,
                                                request]() -> int32_t {
     std::pair<bool, time_t> start_time;
     std::string service_desc;
@@ -1754,16 +1886,20 @@ grpc::Status engine_impl::DeleteDowntimeByHostName(
         downtime_manager::instance()
             .delete_downtime_by_hostname_service_description_start_time_comment(
                 host_name, service_desc, start_time, comment_data);
-    if (deleted == 0)
+    if (deleted == 0) {
+      err = "could not delete downtime";
       return 1;
+    }
     return 0;
   });
 
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1786,7 +1922,8 @@ grpc::Status engine_impl::DeleteDowntimeByHostGroupName(
   if (host_group_name.empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_group_name must not be empty");
-  auto fn = std::packaged_task<int32_t(void)>([&host_group_name,
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, &host_group_name,
                                                request]() -> int32_t {
     std::pair<bool, time_t> start_time;
     std::string host_name;
@@ -1795,8 +1932,10 @@ grpc::Status engine_impl::DeleteDowntimeByHostGroupName(
     uint32_t deleted = 0;
 
     auto it = hostgroup::hostgroups.find(host_group_name);
-    if (it == hostgroup::hostgroups.end() || !it->second)
+    if (it == hostgroup::hostgroups.end() || !it->second) {
+      err = "could not find hostgroup";
       return 1;
+    }
     if (!(request->host_name().empty()))
       host_name = request->host_name();
     if (!(request->service_desc().empty()))
@@ -1821,16 +1960,20 @@ grpc::Status engine_impl::DeleteDowntimeByHostGroupName(
                   host_name, service_desc, start_time, comment_data);
     }
 
-    if (deleted == 0)
+    if (deleted == 0) {
+      err = "could not delete downtime";
       return 1;
+    }
     return 0;
   });
 
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1861,22 +2004,26 @@ grpc::Status engine_impl::DeleteDowntimeByStartTimeComment(
   if (comment_data.empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "comment_data must not be empty");
-
-  auto fn = std::packaged_task<int32_t(void)>([&comment_data,
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, &comment_data,
                                                &start_time]() -> int32_t {
     uint32_t deleted =
         downtime_manager::instance()
             .delete_downtime_by_hostname_service_description_start_time_comment(
                 "", "", {true, start_time}, comment_data);
-    if (0 == deleted)
+    if (0 == deleted) {
+      err = "could not delete comment";
       return 1;
+    }
     return 0;
   });
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1897,14 +2044,17 @@ grpc::Status engine_impl::ScheduleHostCheck(grpc::ServerContext* context
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     /* get the host */
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      err = "could not find host";
       return 1;
+    }
     if (!request->force())
       temp_host->schedule_check(request->delay_time(), CHECK_OPTION_NONE);
     else
@@ -1916,8 +2066,10 @@ grpc::Status engine_impl::ScheduleHostCheck(grpc::ServerContext* context
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1938,15 +2090,18 @@ grpc::Status engine_impl::ScheduleHostServiceCheck(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
 
     /* get the host */
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      err = "could not find host";
       return 1;
+    }
     /* iterate through services of the current host */
     for (service_map_unsafe::iterator it(temp_host->services.begin()),
          end(temp_host->services.end());
@@ -1965,8 +2120,10 @@ grpc::Status engine_impl::ScheduleHostServiceCheck(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -1991,15 +2148,18 @@ grpc::Status engine_impl::ScheduleServiceCheck(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "service description must not be empty");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
     /* get the service */
     auto it =
         service::services.find({request->host_name(), request->service_desc()});
     if (it != service::services.end())
       temp_service = it->second;
-    if (temp_service == nullptr)
+    if (temp_service == nullptr) {
+      err = "could not find service";
       return 1;
+    }
     if (!request->force())
       temp_service->schedule_check(request->delay_time(), CHECK_OPTION_NONE);
     else
@@ -2011,8 +2171,10 @@ grpc::Status engine_impl::ScheduleServiceCheck(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -2029,7 +2191,8 @@ grpc::Status engine_impl::SignalProcess(grpc::ServerContext* context
                                         __attribute__((unused)),
                                         const EngineSignalProcess* request,
                                         CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     timed_event* evt;
     if (EngineSignalProcess::Process_Name(request->process()) == "SHUTDOWN") {
       /* add a scheduled program shutdown or restart to the event list */
@@ -2042,6 +2205,7 @@ grpc::Status engine_impl::SignalProcess(grpc::ServerContext* context
                             request->scheduled_time(), false, 0, nullptr, false,
                             nullptr, nullptr, 0);
     } else {
+      err = "no signal informed";
       return 1;
     }
 
@@ -2052,8 +2216,10 @@ grpc::Status engine_impl::SignalProcess(grpc::ServerContext* context
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -2070,7 +2236,8 @@ grpc::Status engine_impl::DelayHostNotification(
     grpc::ServerContext* context __attribute__((unused)),
     const HostDelayIdentifier* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
 
     switch (request->identifier_case()) {
@@ -2078,19 +2245,25 @@ grpc::Status engine_impl::DelayHostNotification(
         auto it = host::hosts.find(request->name());
         if (it != host::hosts.end())
           temp_host = it->second;
-        if (temp_host == nullptr)
+        if (temp_host == nullptr) {
+          err = "could not find host";
           return 1;
+        }
       } break;
       case HostDelayIdentifier::kId: {
         auto it = host::hosts_by_id.find(request->id());
         if (it != host::hosts_by_id.end())
           temp_host = it->second;
-        if (temp_host == nullptr)
+        if (temp_host == nullptr) {
+          err = "could not find host";
           return 1;
+        }
       } break;
-      default:
+      default: {
+        err = "could not find identifier";
         return 1;
         break;
+      }
     }
 
     temp_host->set_next_notification(request->delay_time());
@@ -2100,8 +2273,10 @@ grpc::Status engine_impl::DelayHostNotification(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
@@ -2118,7 +2293,8 @@ grpc::Status engine_impl::DelayServiceNotification(
     grpc::ServerContext* context __attribute__((unused)),
     const ServiceDelayIdentifier* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
 
     switch (request->identifier_case()) {
@@ -2128,8 +2304,10 @@ grpc::Status engine_impl::DelayServiceNotification(
             service::services.find({names.host_name(), names.service_name()});
         if (it != service::services.end())
           temp_service = it->second;
-        if (temp_service == nullptr)
+        if (temp_service == nullptr) {
+          err = "could not find service";
           return 1;
+        }
       } break;
       case ServiceDelayIdentifier::kIds: {
         IdIdentifier ids = request->ids();
@@ -2137,12 +2315,16 @@ grpc::Status engine_impl::DelayServiceNotification(
             service::services_by_id.find({ids.host_id(), ids.service_id()});
         if (it != service::services_by_id.end())
           temp_service = it->second;
-        if (temp_service == nullptr)
+        if (temp_service == nullptr) {
+          err = "could not find service";
           return 1;
+        }
       } break;
-      default:
+      default: {
+        err = "could not find identifier";
         return 1;
         break;
+      }
     }
 
     temp_service->set_next_notification(request->delay_time());
@@ -2152,23 +2334,28 @@ grpc::Status engine_impl::DelayServiceNotification(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 grpc::Status engine_impl::ChangeHostObjectIntVar(grpc::ServerContext* context
                                                  __attribute__((unused)),
                                                  const ChangeObjectInt* request,
                                                  CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     unsigned long attr = MODATTR_NONE;
 
     auto it = host::hosts.find(request->host_name());
     if (it != host::hosts.end())
       temp_host = it->second;
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      err = "could not find host";
       return 1;
+    }
     if (ChangeObjectInt::Mode_Name(request->mode()) ==
         "NORMAL_CHECK_INTERVAL") {
       /* save the old check interval */
@@ -2216,8 +2403,10 @@ grpc::Status engine_impl::ChangeHostObjectIntVar(grpc::ServerContext* context
         temp_host->set_current_attempt(temp_host->get_max_attempts());
     } else if (ChangeObjectInt::Mode_Name(request->mode()) == "MODATTR") {
       attr = request->intval();
-    } else
+    } else {
+      err = "no mode informed";
       return 1;
+    }
 
     if (ChangeObjectInt::Mode_Name(request->mode()) == "MODATTR")
       temp_host->set_modified_attributes(attr);
@@ -2238,15 +2427,18 @@ grpc::Status engine_impl::ChangeHostObjectIntVar(grpc::ServerContext* context
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 grpc::Status engine_impl::ChangeServiceObjectIntVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeObjectInt* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
     unsigned long attr = MODATTR_NONE;
 
@@ -2254,8 +2446,10 @@ grpc::Status engine_impl::ChangeServiceObjectIntVar(
         service::services.find({request->host_name(), request->service_desc()});
     if (it != service::services.end())
       temp_service = it->second;
-    if (temp_service == nullptr)
+    if (temp_service == nullptr) {
+      err = "could not find service";
       return 1;
+    }
     if (ChangeObjectInt::Mode_Name(request->mode()) ==
         "NORMAL_CHECK_INTERVAL") {
       /* save the old check interval */
@@ -2304,8 +2498,10 @@ grpc::Status engine_impl::ChangeServiceObjectIntVar(
         temp_service->set_current_attempt(temp_service->get_max_attempts());
     } else if (ChangeObjectInt::Mode_Name(request->mode()) == "MODATTR")
       attr = request->intval();
-    else
+    else {
+      err = "no mode informed";
       return 1;
+    }
 
     if (ChangeObjectInt::Mode_Name(request->mode()) == "MODATTR")
       temp_service->set_modified_attributes(attr);
@@ -2326,15 +2522,18 @@ grpc::Status engine_impl::ChangeServiceObjectIntVar(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 grpc::Status engine_impl::ChangeContactObjectIntVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeContactObjectInt* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<com::centreon::engine::contact> temp_contact;
     unsigned long attr = MODATTR_NONE;
     unsigned long hattr = MODATTR_NONE;
@@ -2344,6 +2543,7 @@ grpc::Status engine_impl::ChangeContactObjectIntVar(
     if (itcontactname != contact::contacts.end())
       temp_contact = itcontactname->second;
     else {
+      err = "could not find contact";
       return 1;
     }
 
@@ -2358,8 +2558,10 @@ grpc::Status engine_impl::ChangeContactObjectIntVar(
                "MODSATTR") {
       sattr = request->intval();
       temp_contact->set_modified_service_attributes(sattr);
-    } else
+    } else {
+      err = "no mode informed";
       return 1;
+    }
 
     /* send data to event broker */
     broker_adaptive_contact_data(
@@ -2376,7 +2578,11 @@ grpc::Status engine_impl::ChangeContactObjectIntVar(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    response->set_value(result.get());
+
   return grpc::Status::OK;
 }
 
@@ -2384,7 +2590,8 @@ grpc::Status engine_impl::ChangeHostObjectCharVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeObjectChar* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::host> temp_host;
     timeperiod* temp_timeperiod{nullptr};
     command_map::iterator cmd_found;
@@ -2402,8 +2609,10 @@ grpc::Status engine_impl::ChangeHostObjectCharVar(
       auto it = host::hosts.find(request->host_name());
       if (it != host::hosts.end())
         temp_host = it->second;
-      if (temp_host == nullptr)
+      if (temp_host == nullptr) {
+        err = "could not find host";
         return 1;
+      }
     }
 
     /* make sure the timeperiod is valid */
@@ -2414,14 +2623,18 @@ grpc::Status engine_impl::ChangeHostObjectCharVar(
       auto found = timeperiod::timeperiods.find(request->charval());
       if (found != timeperiod::timeperiods.end())
         temp_timeperiod = found->second.get();
-      if (temp_timeperiod == nullptr)
+      if (temp_timeperiod == nullptr) {
+        err = "could not find timeperiod";
         return 1;
+      }
     }
     /* make sure the command exists */
     else {
       cmd_found = commands::command::commands.find(request->charval());
-      if (cmd_found == commands::command::commands.end() || !cmd_found->second)
+      if (cmd_found == commands::command::commands.end() || !cmd_found->second) {
+        err = "no command found";
         return 1;
+      }
     }
 
     /* update the variable */
@@ -2450,8 +2663,10 @@ grpc::Status engine_impl::ChangeHostObjectCharVar(
       temp_host->set_notification_period(request->charval());
       temp_host->set_notification_period_ptr(temp_timeperiod);
       attr = MODATTR_NOTIFICATION_TIMEPERIOD;
-    } else
+    } else {
+      err = "no mode informed";
       return 1;
+    }
 
     /* send data to event broker and update status file */
     if (ChangeObjectChar::Mode_Name(request->mode()) ==
@@ -2485,15 +2700,18 @@ grpc::Status engine_impl::ChangeHostObjectCharVar(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 grpc::Status engine_impl::ChangeServiceObjectCharVar(
     grpc::ServerContext* context __attribute__((unused)),
     const ChangeObjectChar* request,
     CommandSuccess* response) {
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     std::shared_ptr<engine::service> temp_service;
     timeperiod* temp_timeperiod{nullptr};
     command_map::iterator cmd_found;
@@ -2513,8 +2731,10 @@ grpc::Status engine_impl::ChangeServiceObjectCharVar(
           {request->host_name(), request->service_desc()});
       if (it != service::services.end())
         temp_service = it->second;
-      if (temp_service == nullptr)
+      if (temp_service == nullptr) {
+        err = "could not find service";
         return 1;
+      }
     }
     /* make sure the timeperiod is valid */
     if (ChangeObjectChar::Mode_Name(request->mode()) ==
@@ -2524,14 +2744,17 @@ grpc::Status engine_impl::ChangeServiceObjectCharVar(
       auto found = timeperiod::timeperiods.find(request->charval());
       if (found != timeperiod::timeperiods.end())
         temp_timeperiod = found->second.get();
-      if (temp_timeperiod == nullptr)
+      if (temp_timeperiod == nullptr) {
+        err = "could not find timeperiod";
         return 1;
+      }
     }
     /* make sure the command exists */
     else {
       cmd_found = commands::command::commands.find(request->charval());
       if (cmd_found == commands::command::commands.end() ||
           !cmd_found->second) {
+        err = "no command found";
         return 1;
       }
     }
@@ -2562,8 +2785,10 @@ grpc::Status engine_impl::ChangeServiceObjectCharVar(
       temp_service->set_notification_period(request->charval());
       temp_service->set_notification_period_ptr(temp_timeperiod);
       attr = MODATTR_NOTIFICATION_TIMEPERIOD;
-    } else
+    } else {
+      err = "no mode informed";
       return 1;
+    }
 
     /* send data to event broker and update status file */
     if (ChangeObjectChar::Mode_Name(request->mode()) ==
@@ -2598,8 +2823,10 @@ grpc::Status engine_impl::ChangeServiceObjectCharVar(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 grpc::Status engine_impl::ChangeContactObjectCharVar(
@@ -2610,7 +2837,8 @@ grpc::Status engine_impl::ChangeContactObjectCharVar(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "contact must not be empty");
 
-  auto fn = std::packaged_task<int32_t(void)>([request](void) -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request](void) -> int32_t {
     std::shared_ptr<engine::contact> temp_contact;
     timeperiod* temp_timeperiod{nullptr};
     unsigned long hattr{MODATTR_NONE};
@@ -2619,14 +2847,18 @@ grpc::Status engine_impl::ChangeContactObjectCharVar(
     auto it = contact::contacts.find(request->contact());
     if (it != contact::contacts.end())
       temp_contact = it->second;
-    if (temp_contact == nullptr)
+    if (temp_contact == nullptr) {
+      err = "could not find contact";
       return 1;
+    }
 
     auto found = timeperiod::timeperiods.find(request->charval());
     if (found != timeperiod::timeperiods.end())
       temp_timeperiod = found->second.get();
-    if (temp_timeperiod == nullptr)
+    if (temp_timeperiod == nullptr) {
+      err = "could not find timeperiod";
       return 1;
+    }
     if (ChangeContactObjectChar::Mode_Name(request->mode()) ==
         "CHANGE_HOST_NOTIFICATION_TIMEPERIOD") {
       temp_contact->set_host_notification_period(request->charval());
@@ -2637,8 +2869,10 @@ grpc::Status engine_impl::ChangeContactObjectCharVar(
       temp_contact->set_service_notification_period(request->charval());
       temp_contact->set_service_notification_period_ptr(temp_timeperiod);
       hattr = MODATTR_NOTIFICATION_TIMEPERIOD;
-    } else
+    } else {
+      err = "no mode informed";
       return 1;
+    }
 
     /* set the modified attributes */
     temp_contact->set_modified_host_attributes(
@@ -2662,8 +2896,11 @@ grpc::Status engine_impl::ChangeContactObjectCharVar(
 
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 grpc::Status engine_impl::ChangeHostObjectCustomVar(
@@ -2673,7 +2910,8 @@ grpc::Status engine_impl::ChangeHostObjectCustomVar(
   if (request->host_name().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "host_name must not be empty");
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     // std::shared_ptr<engine::host> temp_host;
     host* temp_host{nullptr};
     std::string varname(request->varname());
@@ -2682,8 +2920,10 @@ grpc::Status engine_impl::ChangeHostObjectCustomVar(
     host_map::const_iterator it_h(host::hosts.find(request->host_name()));
     if (it_h != host::hosts.end())
       temp_host = it_h->second.get();
-    if (temp_host == nullptr)
+    if (temp_host == nullptr) {
+      err = "could not find host";
       return 1;
+    }
     map_customvar::iterator it(temp_host->custom_variables.find(varname));
     if (it == temp_host->custom_variables.end())
       temp_host->custom_variables[varname] =
@@ -2699,8 +2939,10 @@ grpc::Status engine_impl::ChangeHostObjectCustomVar(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 grpc::Status engine_impl::ChangeServiceObjectCustomVar(
@@ -2714,7 +2956,8 @@ grpc::Status engine_impl::ChangeServiceObjectCustomVar(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "service description must not be empty");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     service* temp_service{nullptr};
     std::string varname(request->varname());
 
@@ -2723,8 +2966,10 @@ grpc::Status engine_impl::ChangeServiceObjectCustomVar(
         {request->host_name(), request->service_desc()}));
     if (it_s != service::services.end())
       temp_service = it_s->second.get();
-    if (temp_service == nullptr)
+    if (temp_service == nullptr) {
+      err = "could not find service";
       return 1;
+    }
     map_customvar::iterator it(temp_service->custom_variables.find(varname));
     if (it == temp_service->custom_variables.end())
       temp_service->custom_variables[varname] =
@@ -2739,8 +2984,10 @@ grpc::Status engine_impl::ChangeServiceObjectCustomVar(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 grpc::Status engine_impl::ChangeContactObjectCustomVar(
@@ -2751,7 +2998,8 @@ grpc::Status engine_impl::ChangeContactObjectCustomVar(
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
                         "contact must not be empty");
 
-  auto fn = std::packaged_task<int32_t(void)>([request]() -> int32_t {
+  std::string err;
+  auto fn = std::packaged_task<int32_t(void)>([&err, request]() -> int32_t {
     contact* temp_contact{nullptr};
     std::string varname(request->varname());
 
@@ -2759,8 +3007,10 @@ grpc::Status engine_impl::ChangeContactObjectCustomVar(
     contact_map::iterator cnct_it = contact::contacts.find(request->contact());
     if (cnct_it != contact::contacts.end())
       temp_contact = cnct_it->second.get();
-    if (temp_contact == nullptr)
+    if (temp_contact == nullptr) {
+      err = "could not find contact";
       return 1;
+    }
     map_customvar::iterator it(
         temp_contact->get_custom_variables().find(varname));
     if (it == temp_contact->get_custom_variables().end())
@@ -2774,8 +3024,10 @@ grpc::Status engine_impl::ChangeContactObjectCustomVar(
   std::future<int32_t> result = fn.get_future();
   command_manager::instance().enqueue(std::move(fn));
 
-  response->set_value(!result.get());
-  return grpc::Status::OK;
+  if (result.get())
+    return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
+  else 
+    return grpc::Status::OK;
 }
 
 /**
