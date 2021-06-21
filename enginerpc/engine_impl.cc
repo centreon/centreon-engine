@@ -1065,7 +1065,7 @@ grpc::Status engine_impl::AcknowledgementServiceProblem(
 grpc::Status engine_impl::ScheduleHostDowntime(
     grpc::ServerContext* context __attribute__((unused)),
     const ScheduleDowntimeIdentifier* request,
-    CommandSuccess* response __attribute__((unused))) {
+    CommandSuccess* response ) {
   if (request->host_name().empty() || request->author().empty() ||
       request->comment_data().empty())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT,
@@ -1098,8 +1098,9 @@ grpc::Status engine_impl::ScheduleHostDowntime(
       err = "could not schedule downtime";
       return 1;
     }
-    else
+    else {
       return 0;
+    }
   });
 
   std::future<int32_t> result = fn.get_future();
@@ -1107,8 +1108,10 @@ grpc::Status engine_impl::ScheduleHostDowntime(
 
   if (result.get())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
-  else 
+  else { 
+    response->set_value(1);
     return grpc::Status::OK;
+  }
 }
 
 /**
@@ -1178,8 +1181,10 @@ grpc::Status engine_impl::ScheduleServiceDowntime(
 
   if (result.get())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
-  else 
+  else  {
+    response->set_value(1);
     return grpc::Status::OK;
+  }
 }
 
 /**
@@ -1249,8 +1254,10 @@ grpc::Status engine_impl::ScheduleHostServicesDowntime(
 
   if (result.get())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
-  else 
+  else {
+    response->set_value(1);
     return grpc::Status::OK;
+  }
 }
 
 /**
@@ -1318,8 +1325,10 @@ grpc::Status engine_impl::ScheduleHostGroupHostsDowntime(
 
   if (result.get())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
-  else 
+  else { 
+    response->set_value(1);
     return grpc::Status::OK;
+  }
 }
 
 /**
@@ -1399,8 +1408,10 @@ grpc::Status engine_impl::ScheduleHostGroupServicesDowntime(
 
   if (result.get())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
-  else 
+  else {
+    response->set_value(1);
     return grpc::Status::OK;
+  }
 }
 
 /**
@@ -1476,8 +1487,10 @@ grpc::Status engine_impl::ScheduleServiceGroupHostsDowntime(
 
   if (result.get())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
-  else 
+  else { 
+    response->set_value(1);
     return grpc::Status::OK;
+  }
 }
 
 /**
@@ -1543,8 +1556,10 @@ grpc::Status engine_impl::ScheduleServiceGroupServicesDowntime(
 
   if (result.get())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
-  else 
+  else {
+    response->set_value(1);
     return grpc::Status::OK;
+  }
 }
 
 /**
@@ -1613,8 +1628,10 @@ grpc::Status engine_impl::ScheduleAndPropagateHostDowntime(
 
   if (result.get())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
-  else 
+  else {
+    response->set_value(1);
     return grpc::Status::OK;
+  }
 }
 
 /**
@@ -1685,8 +1702,10 @@ grpc::Status engine_impl::ScheduleAndPropagateTriggeredHostDowntime(
 
   if (result.get())
     return grpc::Status(::grpc::StatusCode::INVALID_ARGUMENT, err);
-  else 
+  else {
+    response->set_value(1);
     return grpc::Status::OK;
+  }
 }
 
 /**
