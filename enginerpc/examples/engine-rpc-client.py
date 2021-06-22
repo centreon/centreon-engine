@@ -1,4 +1,4 @@
-# engine-rpc-client.py (second version)
+# engine-rpc-client.py (second version)
 # last modified 22.06.2021
 # file to communicate with gRPC methods
 
@@ -6,11 +6,17 @@ import inspect, sys, getopt, time, grpc, json
 import engine_pb2
 import engine_pb2_grpc
 import google.protobuf.json_format
+import google.protobuf.text_format
 import pdb
 from google.protobuf import descriptor, empty_pb2, timestamp_pb2
 from google.protobuf.json_format import Parse
 from enum import Enum
 from collections import namedtuple
+
+### GLOBALS ###
+
+VERBOSE_MODE = False
+DEBUG = False
 
 ### Class ###
 
@@ -209,17 +215,24 @@ class gRPC_client:
 
 
   # Launch a gRPC method
-  def exe(self, method_name, message, verbose):
+  def exe(self, method_name, message):
     try:
       str_to_eval = "self.stub." + method_name + "(message)"
       check = eval(str_to_eval)
+      response_str = google.protobuf.text_format.MessageToString(check)
     except grpc.RpcError as e:
       sys.exit(f"code={e.code()}, message={e.details()}")
     else:
-      if verbose:
+      if not isBlank(response_str):
+        print("response :\n", response_str)
+      elif VERBOSE_MODE:
         print(grpc.StatusCode.OK)
 
 ### Basic Functions ###
+
+# Check if string is blank or not
+def isBlank (myString):
+  return not (myString and myString.strip())
 
 # Convert a json object into a gRPC message
 def json_to_message(client, method_name, json_datas):
@@ -267,7 +280,6 @@ def check_arguments(client, args, flags):
     sys.exit(colors.WARNING + "/!\ Warning /!\\ You have probably used at least two "
         "of these options (-l|--list, -d|--description, -h|--help, -e|--exe) in the "
         "same command line, you must only use one !\n\n" + colors.ENDC)
-
   if flags.LIST_METHOD:
     client.show_list_grpc_methods()
   elif flags.HELP_METHOD:
@@ -291,7 +303,7 @@ def check_arguments(client, args, flags):
           message = Parse(json.dumps(json_datas), c())
         except google.protobuf.json_format.ParseError as e:
           sys.exit(e)
-        client.exe(args.method_name, message, flags.VERBOSE_MODE)
+        client.exe(args.method_name, message)
       else:
         sys.exit(colors.WARNING + "/!\ Warning /!\ Your method have not Empty "
               "message in his input field but you have not \n entered json "
@@ -312,15 +324,15 @@ def check_arguments(client, args, flags):
         msg = json_to_message(client, args.method_name, json_datas)
         client.exe(args.method_name, msg)
 
-
 ### Main ###
 if __name__ == "__main__":
   # Defines flags
   Arguments = namedtuple("Arguments", "ip, port, input_file, json_args, method_name")
-  Flags     = namedtuple("Flags", "LIST_METHOD, HELP_METHOD, DESCRIPTION_METHOD, EXEC_METHOD, VERBOSE_MODE")
-
-  arguments_fields =  Arguments(ip="127.0.0.1", port="", input_file="", json_args="", method_name="")
-  flags_fields     =  Flags(LIST_METHOD=False, HELP_METHOD=False, DESCRIPTION_METHOD=False, EXEC_METHOD=False, VERBOSE_MODE=False)
+  Flags     = namedtuple("Flags", "LIST_METHOD, HELP_METHOD, DESCRIPTION_METHOD, EXEC_METHOD")
+  arguments_fields =  Arguments(ip="127.0.0.1", port="", input_file="",
+                                json_args="", method_name="")
+  flags_fields     =  Flags(LIST_METHOD=False, HELP_METHOD=False,
+                            DESCRIPTION_METHOD=False, EXEC_METHOD=False)
   ip          = "127.0.0.1"
   port        = ""
   input_file  = ""
@@ -328,13 +340,12 @@ if __name__ == "__main__":
   client      = gRPC_client()
 
   try:
-    opts, args = getopt.getopt(sys.argv[1:], "hlp:f:a:d:e:v:",
+    opts, args = getopt.getopt(sys.argv[1:], "vhlp:f:a:d:e:",
                               ["help", "list", "port=", "file=",
                               "args=", "description=", "exe="])
   except getopt.GetoptError as err:
     print(err)
     arg_error(sys.argv[0])
-
 
   # Parsing essential options.
   # this allows to reverse the order of the arguments in the reading
@@ -356,7 +367,7 @@ if __name__ == "__main__":
     elif o in ("-h", "--help"):
       flags_fields = flags_fields._replace(HELP_METHOD=True)
     elif o in ("-v", "--verbose"):
-      flags_fields = flags_fields._replace(VERBOSE_MODE=True)
+      VERBOSE_MODE = True
     elif o in ("-d", "--description"):
       arguments_fields = arguments_fields._replace(method_name=a)
       flags_fields = flags_fields._replace(DESCRIPTION_METHOD=True)
