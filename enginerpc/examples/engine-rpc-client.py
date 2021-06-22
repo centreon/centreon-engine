@@ -209,14 +209,14 @@ class gRPC_client:
 
 
   # Launch a gRPC method
-  def exe(self, method_name, message):
+  def exe(self, method_name, message, verbose):
     try:
       str_to_eval = "self.stub." + method_name + "(message)"
       check = eval(str_to_eval)
     except grpc.RpcError as e:
       sys.exit(f"code={e.code()}, message={e.details()}")
     else:
-      print(check)
+      print(grpc.StatusCode.OK)
 
 ### Basic Functions ###
 
@@ -316,10 +316,10 @@ def check_arguments(client, args, flags):
 if __name__ == "__main__":
   # Defines flags
   Arguments = namedtuple("Arguments", "ip, port, input_file, json_args, method_name")
-  Flags     = namedtuple("Flags", "LIST_METHOD, HELP_METHOD, DESCRIPTION_METHOD, EXEC_METHOD")
+  Flags     = namedtuple("Flags", "LIST_METHOD, HELP_METHOD, DESCRIPTION_METHOD, EXEC_METHOD, VERBOSE_MODE")
 
   arguments_fields =  Arguments(ip="127.0.0.1", port="", input_file="", json_args="", method_name="")
-  flags_fields     =  Flags(LIST_METHOD=False, HELP_METHOD=False, DESCRIPTION_METHOD=False, EXEC_METHOD=False)
+  flags_fields     =  Flags(LIST_METHOD=False, HELP_METHOD=False, DESCRIPTION_METHOD=False, EXEC_METHOD=False, VERBOSE_MODE=False)
   ip          = "127.0.0.1"
   port        = ""
   input_file  = ""
@@ -327,7 +327,7 @@ if __name__ == "__main__":
   client      = gRPC_client()
 
   try:
-    opts, args = getopt.getopt(sys.argv[1:], "hlp:f:a:d:e:",
+    opts, args = getopt.getopt(sys.argv[1:], "hlp:f:a:d:e:v:",
                               ["help", "list", "port=", "file=",
                               "args=", "description=", "exe="])
   except getopt.GetoptError as err:
@@ -354,6 +354,8 @@ if __name__ == "__main__":
       flags_fields = flags_fields._replace(LIST_METHOD=True)
     elif o in ("-h", "--help"):
       flags_fields = flags_fields._replace(HELP_METHOD=True)
+    elif o in ("-v", "--verbose"):
+      flags_fields = flags_fields._replace(VERBOSE_MODE=True)
     elif o in ("-d", "--description"):
       arguments_fields = arguments_fields._replace(method_name=a)
       flags_fields = flags_fields._replace(DESCRIPTION_METHOD=True)
