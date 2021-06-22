@@ -131,8 +131,6 @@ class gRPC_client:
     print(colors.OKBLUE + colors.UNDERLINE + "\n\nJSON LAYOUT:\n" + colors.ENDC)
     result_str = ""
 
-    #pdb.set_trace()
-
     # Show to user how the input message looks like in json
     if have_oneofs:
       for o in lst_of_oneofs:
