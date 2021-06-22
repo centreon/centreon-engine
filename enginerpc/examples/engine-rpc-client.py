@@ -1,5 +1,5 @@
 # engine-rpc-client.py (second version)
-# last modified 28.05.2021
+# last modified 22.06.2021
 # file to communicate with gRPC methods
 
 import inspect, sys, getopt, time, grpc, json
@@ -216,7 +216,8 @@ class gRPC_client:
     except grpc.RpcError as e:
       sys.exit(f"code={e.code()}, message={e.details()}")
     else:
-      print(grpc.StatusCode.OK)
+      if verbose:
+        print(grpc.StatusCode.OK)
 
 ### Basic Functions ###
 
@@ -290,7 +291,7 @@ def check_arguments(client, args, flags):
           message = Parse(json.dumps(json_datas), c())
         except google.protobuf.json_format.ParseError as e:
           sys.exit(e)
-        client.exe(args.method_name, message)
+        client.exe(args.method_name, message, flags.VERBOSE_MODE)
       else:
         sys.exit(colors.WARNING + "/!\ Warning /!\ Your method have not Empty "
               "message in his input field but you have not \n entered json "
