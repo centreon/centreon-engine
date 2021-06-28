@@ -1902,14 +1902,17 @@ void host::check_for_flapping(bool update,
 
   update_history = update;
 
+  /* don't update history if parents are not up */
+  if (update_history) {
+    if (get_current_state() == host::state_unreachable)
+      update_history = false;
+  }
+
   /* should we update state history for this state? */
   if (update_history) {
     if (get_current_state() == host::state_up && !get_flap_detection_on(up))
       update_history = false;
     if (get_current_state() == host::state_down && !get_flap_detection_on(down))
-      update_history = false;
-    if (get_current_state() == host::state_unreachable &&
-        !get_flap_detection_on(host::unreachable))
       update_history = false;
   }
 
