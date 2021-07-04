@@ -32,11 +32,6 @@ using namespace com::centreon::engine::exceptions;
 using namespace com::centreon::engine::broker;
 using namespace com::centreon::engine::logging;
 
-/**************************************
- *                                     *
- *           Public Methods            *
- *                                     *
- **************************************/
 
 /**
  *  Add a new module.
@@ -149,17 +144,6 @@ void loader::unload_modules() {
   }
   _modules.clear();
 }
-
-/**************************************
- *                                     *
- *           Private Methods           *
- *                                     *
- **************************************/
-
-/**
- *  Default constructor.
- */
-loader::loader() {}
 
 /**
  *  Default destructor.
