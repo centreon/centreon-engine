@@ -46,13 +46,11 @@ class handle {
   std::string _name;
   std::string _version;
 
-  void _internal_copy(handle const& right);
-
  public:
   handle(std::string const& filename = "", std::string const& args = "");
-  handle(handle const& right);
   virtual ~handle() noexcept;
-  handle& operator=(handle const& rigth);
+  handle(const handle&) = delete;
+  handle& operator=(const handle&) = delete;
   bool operator==(handle const& right) const noexcept;
   bool operator!=(handle const& right) const noexcept;
   void close();
