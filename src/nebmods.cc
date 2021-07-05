@@ -96,12 +96,9 @@ int neb_load_all_modules() {
     if (!mod_dir.empty())
       loader.load_directory(mod_dir);
 
-    std::list<std::shared_ptr<broker::handle> > modules(loader.get_modules());
-    for (std::list<std::shared_ptr<broker::handle> >::const_iterator
-             it(modules.begin()),
-         end(modules.end());
-         it != end; ++it)
-      if (neb_load_module(&(*(*it))))
+    auto& modules = loader.get_modules();
+    for (auto& m : modules)
+      if (neb_load_module(&(*m)))
         ++unloaded;
   } catch (...) {
     logger(dbg_eventbroker, basic) << "Could not load all modules";
@@ -147,14 +144,10 @@ int neb_reload_all_modules() {
   try {
     broker::loader* loader(&broker::loader::instance());
     if (loader) {
-      std::list<std::shared_ptr<broker::handle> > modules(
-          loader->get_modules());
-      for (std::list<std::shared_ptr<broker::handle> >::const_iterator
-               it(modules.begin()),
-           end(modules.end());
-           it != end; ++it) {
-        neb_reload_module(&**it);
-      }
+      auto& modules = loader->get_modules();
+      for (auto& m : modules)
+        neb_reload_module(&*m);
+
       logger(dbg_eventbroker, basic) << "All modules got successfully reloaded";
     }
     retval = OK;
@@ -200,12 +193,9 @@ int neb_unload_all_modules(int flags, int reason) {
   int retval;
   try {
     broker::loader& loader(broker::loader::instance());
-    std::list<std::shared_ptr<broker::handle> > modules(loader.get_modules());
-    for (std::list<std::shared_ptr<broker::handle> >::const_iterator
-             it = modules.begin(),
-             end = modules.end();
-         it != end; ++it)
-      neb_unload_module((*it).get(), flags, reason);
+    auto& modules = loader.get_modules();
+    for (auto& m : modules)
+      neb_unload_module(m.get(), flags, reason);
     loader.unload_modules();
     logger(dbg_eventbroker, basic) << "All modules got successfully unloaded";
     retval = OK;
