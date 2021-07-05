@@ -36,14 +36,18 @@ namespace broker {
  *  Loader manage all modules.
  */
 class loader {
+  static loader* _instance;
   std::list<std::unique_ptr<handle>> _modules;
 
   loader() = default;
   virtual ~loader() noexcept;
 
  public:
-  loader(const loader&) = delete;
+  static void load();
+  static void unload();
   loader& operator=(const loader&) = delete;
+  loader(const loader&) = delete;
+
   handle* add_module(std::string const& filename = "",
                                      std::string const& args = "");
   void del_module(handle* mod);

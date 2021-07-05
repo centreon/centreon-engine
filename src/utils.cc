@@ -39,7 +39,6 @@
 
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/broker/compatibility.hh"
-#include "com/centreon/engine/broker/loader.hh"
 #include "com/centreon/engine/checks/checker.hh"
 #include "com/centreon/engine/commands/raw.hh"
 #include "com/centreon/engine/comment.hh"

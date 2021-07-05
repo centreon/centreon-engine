@@ -32,6 +32,7 @@ using namespace com::centreon::engine::exceptions;
 using namespace com::centreon::engine::broker;
 using namespace com::centreon::engine::logging;
 
+loader* loader::_instance = nullptr;
 
 /**
  *  Add a new module.
@@ -75,8 +76,20 @@ const std::list<std::unique_ptr<broker::handle>>& loader::get_modules() const {
  *  @return Class instance.
  */
 loader& loader::instance() {
-  static loader instance;
-  return instance;
+  assert(_instance);
+  return *_instance;
+}
+
+void loader::load() {
+  if (_instance == nullptr)
+    _instance = new loader();
+}
+
+void loader::unload() {
+  if (_instance) {
+    delete _instance;
+    _instance = nullptr;
+  }
 }
 
 /**

@@ -359,6 +359,8 @@ int main(int argc, char* argv[]) {
         program_start = std::time(nullptr);
         mac->x[MACRO_PROCESSSTARTTIME] = std::to_string(program_start);
 
+        broker::loader::load();
+
         // Load broker modules.
         for (std::list<std::string>::const_iterator
                  it(config.broker_module().begin()),
