@@ -41,7 +41,7 @@ class handle {
   std::string _copyright;
   std::string _description;
   std::string _filename;
-  std::shared_ptr<library> _handle;
+  std::unique_ptr<library> _handle;
   std::string _license;
   std::string _name;
   std::string _version;

@@ -142,7 +142,7 @@ int open_command_file(void) {
 /* closes the external command file FIFO and deletes it */
 int close_command_file(void) {
   /* if we're not checking external commands, don't do anything */
-  if (config->check_external_commands() == false)
+  if (!config || !config->check_external_commands())
     return OK;
 
   /* the command file wasn't created or was already cleaned up */

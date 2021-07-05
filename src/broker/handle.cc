@@ -76,7 +76,7 @@ bool handle::operator!=(handle const& right) const noexcept {
  *  Close and unload module.
  */
 void handle::close() {
-  if (_handle.get()) {
+  if (_handle) {
     if (_handle->is_loaded()) {
       typedef int (*func_deinit)(int, int);
       func_deinit deinit(
@@ -193,7 +193,7 @@ void handle::open() {
     return;
 
   try {
-    _handle = std::shared_ptr<library>(new library(_filename));
+    _handle = std::make_unique<library>(_filename);
     _handle->load();
 
     int api_version(*static_cast<int*>(_handle->resolve("__neb_api_version")));
