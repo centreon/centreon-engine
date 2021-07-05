@@ -121,7 +121,7 @@ int neb_load_module(void* mod) {
 
   try {
     module->open();
-    logger(log_info_message, basic)
+    logger(dbg_eventbroker, basic)
         << "Event broker module '" << module->get_filename()
         << "' initialized successfully";
   } catch (std::exception const& e) {
@@ -195,8 +195,11 @@ int neb_unload_all_modules(int flags, int reason) {
   try {
     broker::loader& loader(broker::loader::instance());
     auto& modules = loader.get_modules();
-    for (auto& m : modules)
-      neb_unload_module(m.get(), flags, reason);
+    for (auto& m : modules) {
+      /* deregister all of the module's callbacks */
+      if (m)
+        neb_deregister_module_callbacks(m.get());
+    }
     loader.unload_modules();
     logger(dbg_eventbroker, basic) << "All modules got successfully unloaded";
     retval = OK;
@@ -210,35 +213,6 @@ int neb_unload_all_modules(int flags, int reason) {
     retval = ERROR;
   }
   return retval;
-}
-
-/* close (unload) a particular module */
-int neb_unload_module(broker::handle* module, int flags, int reason) {
-  (void)flags;
-  (void)reason;
-
-  if (module == nullptr)
-    return ERROR;
-
-  if (!module->is_loaded())
-    return OK;
-
-  logger(dbg_eventbroker, basic)
-      << "Attempting to unload module '" << module->get_filename() << "'";
-
-  module->close();
-
-  /* deregister all of the module's callbacks */
-  neb_deregister_module_callbacks(module);
-
-  logger(dbg_eventbroker, basic)
-      << "Module '" << module->get_filename() << "' unloaded successfully";
-
-  logger(log_info_message, basic)
-      << "Event broker module '" << module->get_filename()
-      << "' deinitialized successfully";
-
-  return OK;
 }
 
 /****************************************************************************/

@@ -147,6 +147,10 @@ void loader::unload_modules() {
       m->close();
     } catch (...) {
     }
+  logger(log_info_message, basic)
+      << "Event broker module '" << m->get_filename()
+      << "' deinitialized successfully";
+
     logger(dbg_eventbroker, basic)
         << "Module '" << m->get_filename() << "' unloaded successfully.";
   }

@@ -88,7 +88,6 @@ void handle::close() {
       else
         deinit(NEBMODULE_FORCE_UNLOAD | NEBMODULE_ENGINE,
                NEBMODULE_NEB_SHUTDOWN);
-      _handle->unload();
     }
     _handle.reset();
   }

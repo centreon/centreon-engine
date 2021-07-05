@@ -415,10 +415,10 @@ void cleanup() {
   // Unload modules.
   if (!test_scheduling && !verify_config) {
     checks::checker::deinit();
-    neb_free_callback_list();
     neb_unload_all_modules(NEBMODULE_FORCE_UNLOAD, sigshutdown
                                                        ? NEBMODULE_NEB_SHUTDOWN
                                                        : NEBMODULE_NEB_RESTART);
+    neb_free_callback_list();
     neb_free_module_list();
     neb_deinit_modules();
   }
