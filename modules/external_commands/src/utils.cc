@@ -22,15 +22,12 @@
 #include <fcntl.h>
 #include <poll.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
 #include <atomic>
 #include <cerrno>
 #include <csignal>
 #include <cstdio>
-#include <cstring>
 #include <memory>
-#include <sstream>
 #include <thread>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/globals.hh"
@@ -166,8 +163,6 @@ int close_command_file(void) {
 
 /* initializes command file worker thread */
 int init_command_file_worker_thread(void) {
-  // sigset_t newmask;
-
   /* initialize circular buffer */
   external_command_buffer.head = 0;
   external_command_buffer.tail = 0;
@@ -182,10 +177,6 @@ int init_command_file_worker_thread(void) {
   /* initialize mutex (only on cold startup) */
   if (!sigrestart)
     pthread_mutex_init(&external_command_buffer.buffer_lock, NULL);
-
-  //  /* new thread should block all signals */
-  //  sigfillset(&newmask);
-  //  pthread_sigmask(SIG_BLOCK, &newmask, NULL);
 
   /* create worker thread */
   worker = std::make_unique<std::thread>(&command_file_worker_thread);
@@ -226,13 +217,6 @@ void command_file_worker_thread() {
   int pollval;
   struct timeval tv;
   int buffer_items = 0;
-
-  /* specify cleanup routine */
-  // pthread_cleanup_push(cleanup_command_file_worker_thread, NULL);
-
-  /* set cancellation info */
-  // pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-  // pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
 
   while (!should_exit) {
     /* wait for data to arrive */
@@ -284,9 +268,6 @@ void command_file_worker_thread() {
       continue;
     }
 
-    /* should we shutdown? */
-    // pthread_testcancel();
-
     /* get number of items in the buffer */
     pthread_mutex_lock(&external_command_buffer.buffer_lock);
     buffer_items = external_command_buffer.items;
@@ -329,26 +310,17 @@ void command_file_worker_thread() {
             tv.tv_sec = 0;
             tv.tv_usec = 250000;
             select(0, nullptr, nullptr, nullptr, &tv);
-
-            // Should we shutdown?
-            // pthread_testcancel();
           }
 
           // Bail if the circular buffer is full.
           if (buffer_items == config->external_command_buffer_slots())
             break;
-
-          // Should we shutdown?
-          // pthread_testcancel();
         }
       }
     }
   }
 
   cleanup_command_file_worker_thread();
-
-  /* removes cleanup handler - this should never be reached */
-  // pthread_cleanup_pop(0);
 }
 
 /* submits an external command for processing */
