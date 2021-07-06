@@ -32,23 +32,11 @@
 
 using namespace com::centreon::engine::logging;
 
-/**************************************
- *                                     *
- *           Global Objects            *
- *                                     *
- **************************************/
-
 // Specify the event broker API version.
 NEB_API_VERSION(CURRENT_NEB_API_VERSION)
 
 // Module handle
 static void* gl_mod_handle(NULL);
-
-/**************************************
- *                                     *
- *         Callback Function           *
- *                                     *
- **************************************/
 
 /**
  *  @brief Function that process external command.
@@ -78,12 +66,6 @@ int callback_external_command(int callback_type, void* data) {
   }
   return (0);
 }
-
-/**************************************
- *                                     *
- *         Exported Functions          *
- *                                     *
- **************************************/
 
 /**
  *  @brief Module exit point.
@@ -115,7 +97,7 @@ extern "C" int nebmodule_deinit(int flags, int reason) {
     logger(log_runtime_error, basic)
         << "external command runtime error `unknown'";
   }
-  return (0);
+  return 0;
 }
 
 /**

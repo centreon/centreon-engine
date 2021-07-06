@@ -36,22 +36,25 @@ namespace broker {
  *  Loader manage all modules.
  */
 class loader {
+  static loader* _instance;
+  std::list<std::unique_ptr<handle>> _modules;
+
+  loader() = default;
+  virtual ~loader() noexcept;
+
  public:
-  std::shared_ptr<handle> add_module(std::string const& filename = "",
+  static void load();
+  static void unload();
+  loader& operator=(const loader&) = delete;
+  loader(const loader&) = delete;
+
+  handle* add_module(std::string const& filename = "",
                                      std::string const& args = "");
-  void del_module(std::shared_ptr<handle> const& mod);
-  std::list<std::shared_ptr<handle> > const& get_modules() const;
+  void del_module(handle* mod);
+  const std::list<std::unique_ptr<handle>>& get_modules() const;
   static loader& instance();
   unsigned int load_directory(std::string const& dir);
   void unload_modules();
-
- private:
-  loader();
-  loader(loader const& right);
-  virtual ~loader() throw();
-  loader& operator=(loader const& right);
-
-  std::list<std::shared_ptr<handle> > _modules;
 };
 }  // namespace broker
 

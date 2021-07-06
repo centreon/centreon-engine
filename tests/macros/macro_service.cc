@@ -45,6 +45,7 @@
 #include <com/centreon/engine/macros/process.hh>
 #include <com/centreon/engine/macros.hh>
 #include "com/centreon/engine/timeperiod.hh"
+#include "com/centreon/engine/broker/loader.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
@@ -58,9 +59,11 @@ class MacroService : public TestEngine {
       _creator.new_timerange(0, 0, 24, 0, i);
     _now = strtotimet("2016-11-24 08:00:00");
     set_time(_now);
+    broker::loader::load();
   }
 
   void TearDown() override {
+    broker::loader::unload();
     _host.reset();
     _host2.reset();
     _host3.reset();

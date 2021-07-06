@@ -171,6 +171,9 @@ int main(int argc, char* argv[]) {
     // Checker init
     checks::checker::init();
 
+    // Loader init
+    broker::loader::load();
+
     // Just display the license.
     if (display_license) {
       logger(logging::log_info_message, logging::basic)

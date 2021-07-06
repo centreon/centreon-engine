@@ -32,11 +32,7 @@ using namespace com::centreon::engine::exceptions;
 using namespace com::centreon::engine::broker;
 using namespace com::centreon::engine::logging;
 
-/**************************************
- *                                     *
- *           Public Methods            *
- *                                     *
- **************************************/
+loader* loader::_instance = nullptr;
 
 /**
  *  Add a new module.
@@ -46,11 +42,10 @@ using namespace com::centreon::engine::logging;
  *
  *  @return The new object module.
  */
-std::shared_ptr<broker::handle> loader::add_module(std::string const& filename,
-                                                   std::string const& args) {
-  std::shared_ptr<handle> module(new handle(filename, args));
-  _modules.push_back(module);
-  return module;
+broker::handle* loader::add_module(const std::string& filename,
+                                                   const std::string& args) {
+  _modules.emplace_back(std::make_unique<handle>(filename, args));
+  return _modules.back().get();
 }
 
 /**
@@ -58,11 +53,9 @@ std::shared_ptr<broker::handle> loader::add_module(std::string const& filename,
  *
  *  @param[in] mod Module to remove.
  */
-void loader::del_module(std::shared_ptr<handle> const& module) {
-  for (std::list<std::shared_ptr<handle> >::iterator it(_modules.begin()),
-       end(_modules.end());
-       it != end; ++it)
-    if (it->get() == module.get()) {
+void loader::del_module(handle* module) {
+  for (auto it = _modules.begin(); it != _modules.end(); ++it)
+    if (it->get() == module) {
       _modules.erase(it);
       break;
     }
@@ -73,7 +66,7 @@ void loader::del_module(std::shared_ptr<handle> const& module) {
  *
  *  @return All modules in a list.
  */
-std::list<std::shared_ptr<broker::handle> > const& loader::get_modules() const {
+const std::list<std::unique_ptr<broker::handle>>& loader::get_modules() const {
   return _modules;
 }
 
@@ -83,8 +76,20 @@ std::list<std::shared_ptr<broker::handle> > const& loader::get_modules() const {
  *  @return Class instance.
  */
 loader& loader::instance() {
-  static loader instance;
-  return instance;
+  assert(_instance);
+  return *_instance;
+}
+
+void loader::load() {
+  if (_instance == nullptr)
+    _instance = new loader();
+}
+
+void loader::unload() {
+  if (_instance) {
+    delete _instance;
+    _instance = nullptr;
+  }
 }
 
 /**
@@ -116,7 +121,7 @@ unsigned int loader::load_directory(std::string const& dir) {
     std::string config_file(dir + "/" + f.base_name() + ".cfg");
     if (io::file_stream::exists(config_file.c_str()) == false)
       config_file = "";
-    std::shared_ptr<handle> module;
+    handle* module;
     try {
       module = add_module(dir + "/" + f.file_name(), config_file);
       module->open();
@@ -137,29 +142,20 @@ unsigned int loader::load_directory(std::string const& dir) {
  *  Unload all modules.
  */
 void loader::unload_modules() {
-  for (std::list<std::shared_ptr<handle> >::iterator it(_modules.begin()),
-       end(_modules.end());
-       it != end; ++it) {
+  for (auto& m : _modules) {
     try {
-      (*it)->close();
+      m->close();
     } catch (...) {
     }
+  logger(log_info_message, basic)
+      << "Event broker module '" << m->get_filename()
+      << "' deinitialized successfully";
+
     logger(dbg_eventbroker, basic)
-        << "Module '" << (*it)->get_filename() << "' unloaded successfully.";
+        << "Module '" << m->get_filename() << "' unloaded successfully.";
   }
   _modules.clear();
 }
-
-/**************************************
- *                                     *
- *           Private Methods           *
- *                                     *
- **************************************/
-
-/**
- *  Default constructor.
- */
-loader::loader() {}
 
 /**
  *  Default destructor.

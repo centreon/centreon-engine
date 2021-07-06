@@ -27,12 +27,6 @@
 using namespace com::centreon::engine::broker;
 using namespace com::centreon::engine::logging;
 
-/**************************************
- *                                     *
- *           Public Methods            *
- *                                     *
- **************************************/
-
 /**
  *  Constructor.
  *
@@ -45,33 +39,10 @@ handle::handle(std::string const& filename, std::string const& args)
 }
 
 /**
- *  Copy constructor.
- *
- *  @param[in] right The object to copy.
- */
-handle::handle(handle const& right) {
-  _internal_copy(right);
-  broker::compatibility::instance().create_module(this);
-}
-
-/**
  *  Destructor.
  */
 handle::~handle() noexcept {
   broker::compatibility::instance().destroy_module(this);
-}
-
-/**
- *  Assignment operator.
- *
- *  @param[in] right The object to copy.
- *
- *  @return This object.
- */
-handle& handle::operator=(handle const& right) {
-  if (this != &right)
-    _internal_copy(right);
-  return *this;
 }
 
 /**
@@ -105,7 +76,7 @@ bool handle::operator!=(handle const& right) const noexcept {
  *  Close and unload module.
  */
 void handle::close() {
-  if (_handle.get()) {
+  if (_handle) {
     if (_handle->is_loaded()) {
       typedef int (*func_deinit)(int, int);
       func_deinit deinit(
@@ -117,7 +88,6 @@ void handle::close() {
       else
         deinit(NEBMODULE_FORCE_UNLOAD | NEBMODULE_ENGINE,
                NEBMODULE_NEB_SHUTDOWN);
-      _handle->unload();
     }
     _handle.reset();
   }
@@ -222,7 +192,7 @@ void handle::open() {
     return;
 
   try {
-    _handle = std::shared_ptr<library>(new library(_filename));
+    _handle = std::make_unique<library>(_filename);
     _handle->load();
 
     int api_version(*static_cast<int*>(_handle->resolve("__neb_api_version")));
@@ -244,7 +214,6 @@ void handle::open() {
     close();
     throw;
   }
-  return;
 }
 
 /**
@@ -261,7 +230,6 @@ void handle::open(std::string const& filename, std::string const& args) {
   _filename = filename;
   _args = args;
   open();
-  return;
 }
 
 /**
@@ -274,7 +242,6 @@ void handle::reload() {
   func_reload routine((func_reload)_handle->resolve_proc("nebmodule_reload"));
   if (routine)
     routine();
-  return;
 }
 
 /**
@@ -285,7 +252,6 @@ void handle::reload() {
 void handle::set_author(std::string const& author) {
   _author = author;
   broker::compatibility::instance().author_module(this);
-  return;
 }
 
 /**
@@ -296,7 +262,6 @@ void handle::set_author(std::string const& author) {
 void handle::set_copyright(std::string const& copyright) {
   _copyright = copyright;
   broker::compatibility::instance().copyright_module(this);
-  return;
 }
 
 /**
@@ -307,7 +272,6 @@ void handle::set_copyright(std::string const& copyright) {
 void handle::set_description(std::string const& description) {
   _description = description;
   broker::compatibility::instance().description_module(this);
-  return;
 }
 
 /**
@@ -318,7 +282,6 @@ void handle::set_description(std::string const& description) {
 void handle::set_license(std::string const& license) {
   _license = license;
   broker::compatibility::instance().license_module(this);
-  return;
 }
 
 /**
@@ -329,7 +292,6 @@ void handle::set_license(std::string const& license) {
 void handle::set_name(std::string const& name) {
   _name = name;
   broker::compatibility::instance().name_module(this);
-  return;
 }
 
 /**
@@ -340,29 +302,4 @@ void handle::set_name(std::string const& name) {
 void handle::set_version(std::string const& version) {
   _version = version;
   broker::compatibility::instance().version_module(this);
-  return;
-}
-
-/**************************************
- *                                     *
- *           Private Methods           *
- *                                     *
- **************************************/
-
-/**
- *  Copy internal data members.
- *
- *  @param[in] right Object to copy.
- */
-void handle::_internal_copy(handle const& right) {
-  _args = right._args;
-  _author = right._author;
-  _copyright = right._copyright;
-  _description = right._description;
-  _filename = right._filename;
-  _handle = right._handle;
-  _license = right._license;
-  _name = right._name;
-  _version = right._version;
-  return;
 }
