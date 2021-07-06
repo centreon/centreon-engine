@@ -17,7 +17,7 @@
  *
  */
 
-#include <sstream>
+#include <fmt/format.h>
 #include "com/centreon/engine/logging/logger.hh"
 #include <grpcpp/server_builder.h>
 #include "enginerpc.hh"
@@ -25,13 +25,10 @@
 using namespace com::centreon::engine;
 
 enginerpc::enginerpc(const std::string& address, uint16_t port) {
-  engine_impl* service = new engine_impl;
-  std::ostringstream oss;
-  oss << address << ":" << port;
-  std::string server_address{oss.str()};
+  std::string server_address{fmt::format("{}:{}", address, port)};
   grpc::ServerBuilder builder;
   builder.AddListeningPort(server_address, grpc::InsecureServerCredentials());
-  builder.RegisterService(service);
+  builder.RegisterService(&_service);
   _server = builder.BuildAndStart();
 }
 

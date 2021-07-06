@@ -608,7 +608,7 @@ set(
 # Subdirectories with core features.
 add_subdirectory(src/broker)
 add_subdirectory(src/checks)
-add_subdirectory(conf)
+#add_subdirectory(conf)
 add_subdirectory(src/downtimes)
 add_subdirectory(src/configuration)
 add_subdirectory(src/commands)
@@ -631,6 +631,7 @@ target_link_libraries(cce_core ${nlohmann_json_LIBS}
   ${PTHREAD_LIBRARIES}
   ${SOCKET_LIBRARIES}
   ${CLIB_LIBRARIES}
+  ${fmt_LIBRARIES}
 )
 
 # centengine target.
