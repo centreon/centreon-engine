@@ -37,6 +37,7 @@ do
       ;;
     -fcr|--force-conan-rebuild)
       CONAN_REBUILD="1"
+      shift
       ;;
     -h|--help)
       show_help

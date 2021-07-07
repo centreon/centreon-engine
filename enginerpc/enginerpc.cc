@@ -19,7 +19,7 @@
 
 #include "com/centreon/engine/enginerpc.hh"
 #include <grpcpp/server_builder.h>
-#include <sstream>
+#include <fmt/format.h>
 #include "com/centreon/engine/logging/logger.hh"
 
 using namespace com::centreon::engine;

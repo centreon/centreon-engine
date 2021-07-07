@@ -1,7 +1,7 @@
 /*
 ** Copyright 1999-2009 Ethan Galstad
 ** Copyright 2009-2010 Nagios Core Development Team and Community Contributors
-** Copyright 2011-2019 Centreon
+** Copyright 2011-2021 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -86,7 +86,6 @@ extern time_t program_start;
 extern time_t event_start;
 
 extern circular_buffer external_command_buffer;
-extern pthread_t worker_threads[];
 
 extern check_stats check_statistics[];
 
