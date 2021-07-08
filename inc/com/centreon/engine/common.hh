@@ -325,7 +325,4 @@ enum ret_val {
 #define HOST_STATECHANGE 0
 #define SERVICE_STATECHANGE 1
 
-/* Thread stuff. */
-#define TOTAL_WORKER_THREADS 1
-
 #endif /* !CCE_COMMON_HH */

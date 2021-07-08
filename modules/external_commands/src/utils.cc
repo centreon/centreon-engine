@@ -1,5 +1,6 @@
 /*
 ** Copyright 2011-2013 Merethis
+** Copyright 2020-2021 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -20,15 +21,14 @@
 #include "com/centreon/engine/modules/external_commands/utils.hh"
 #include <fcntl.h>
 #include <poll.h>
-#include <pthread.h>
 #include <sys/stat.h>
-#include <sys/types.h>
 #include <unistd.h>
+#include <atomic>
 #include <cerrno>
 #include <csignal>
 #include <cstdio>
-#include <cstring>
-#include <sstream>
+#include <memory>
+#include <thread>
 #include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/globals.hh"
 #include "com/centreon/engine/logging/logger.hh"
@@ -42,6 +42,9 @@ using namespace com::centreon::engine::logging;
 static int command_file_fd = -1;
 static int command_file_created = false;
 static FILE* command_file_fp = NULL;
+
+static std::unique_ptr<std::thread> worker;
+static std::atomic_bool should_exit{false};
 
 /* creates external command file as a named pipe (FIFO) and opens it for reading
  * (non-blocked mode) */
@@ -64,7 +67,7 @@ int open_command_file(void) {
         (st.st_mode & S_IFIFO))) {
     /* create the external command file as a named pipe (FIFO) */
     if (mkfifo(config->command_file().c_str(),
-                         S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP) != 0) {
+               S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP) != 0) {
       logger(log_runtime_error, basic)
           << "Error: Could not create external command file '"
           << config->command_file() << "' as named pipe: (" << errno << ") -> "
@@ -160,9 +163,6 @@ int close_command_file(void) {
 
 /* initializes command file worker thread */
 int init_command_file_worker_thread(void) {
-  int result = 0;
-  sigset_t newmask;
-
   /* initialize circular buffer */
   external_command_buffer.head = 0;
   external_command_buffer.tail = 0;
@@ -175,64 +175,32 @@ int init_command_file_worker_thread(void) {
     return ERROR;
 
   /* initialize mutex (only on cold startup) */
-  if (sigrestart == false)
+  if (!sigrestart)
     pthread_mutex_init(&external_command_buffer.buffer_lock, NULL);
 
-  /* new thread should block all signals */
-  sigfillset(&newmask);
-  pthread_sigmask(SIG_BLOCK, &newmask, NULL);
-
   /* create worker thread */
-  result = pthread_create(&worker_threads[COMMAND_WORKER_THREAD], NULL,
-                          command_file_worker_thread, NULL);
-
-  /* main thread should unblock all signals */
-  pthread_sigmask(SIG_UNBLOCK, &newmask, NULL);
-
-  if (result)
-    return ERROR;
+  worker = std::make_unique<std::thread>(&command_file_worker_thread);
 
   return OK;
 }
 
 /* shutdown command file worker thread */
 int shutdown_command_file_worker_thread(void) {
-  int result = 0;
-
-  /*
-   * calling pthread_cancel(0) will cause segfaults with some
-   * thread libraries. It's possible that will happen if the
-   * user has a number of config files larger than the max
-   * open file descriptor limit (ulimit -n) and some retarded
-   * eventbroker module leaks filedescriptors, since we'll then
-   * enter the cleanup() routine from main() before we've
-   * spawned any threads.
-   */
-  if (worker_threads[COMMAND_WORKER_THREAD]) {
+  if (!should_exit) {
     /* tell the worker thread to exit */
-    result = pthread_cancel(worker_threads[COMMAND_WORKER_THREAD]);
+    should_exit = true;
 
     /* wait for the worker thread to exit */
-    if (result == 0)
-      pthread_join(worker_threads[COMMAND_WORKER_THREAD], NULL);
-    /* we're being called from a fork()'ed child process - can't cancel thread,
-     * so just cleanup memory */
-    else {
-      cleanup_command_file_worker_thread(NULL);
-    }
+    worker->join();
   }
 
   return OK;
 }
 
 /* clean up resources used by command file worker thread */
-void cleanup_command_file_worker_thread(void* arg) {
-  int x = 0;
-
-  (void)arg;
-
+void cleanup_command_file_worker_thread() {
   /* release memory allocated to circular buffer */
-  for (x = external_command_buffer.tail; x != external_command_buffer.head;
+  for (int x = external_command_buffer.tail; x != external_command_buffer.head;
        x = (x + 1) % config->external_command_buffer_slots()) {
     delete[]((char**)external_command_buffer.buffer)[x];
     ((char**)external_command_buffer.buffer)[x] = NULL;
@@ -249,17 +217,7 @@ void* command_file_worker_thread(void* arg) {
   struct timeval tv;
   int buffer_items = 0;
 
-  (void)arg;
-
-  /* specify cleanup routine */
-  pthread_cleanup_push(cleanup_command_file_worker_thread, NULL);
-
-  /* set cancellation info */
-  pthread_setcancelstate(PTHREAD_CANCEL_ENABLE, NULL);
-  pthread_setcanceltype(PTHREAD_CANCEL_DEFERRED, NULL);
-
-  while (1) {
-    /* should we shutdown? */
+  while (!should_exit) {
     pthread_testcancel();
 
     /* wait for data to arrive */
@@ -311,9 +269,6 @@ void* command_file_worker_thread(void* arg) {
       continue;
     }
 
-    /* should we shutdown? */
-    pthread_testcancel();
-
     /* get number of items in the buffer */
     pthread_mutex_lock(&external_command_buffer.buffer_lock);
     buffer_items = external_command_buffer.items;
@@ -338,7 +293,8 @@ void* command_file_worker_thread(void* arg) {
       clearerr(command_file_fp);
 
       /* read and process the next command in the file */
-      while (fgets(input_buffer, (int)(sizeof(input_buffer) - 1),
+      while (!should_exit &&
+             fgets(input_buffer, (int)(sizeof(input_buffer) - 1),
                    command_file_fp) != nullptr) {
         // Check if command is thread-safe (for immediate execution).
         if (modules::external_commands::gl_processor.is_thread_safe(
@@ -347,33 +303,25 @@ void* command_file_worker_thread(void* arg) {
         // Submit the external command for processing
         // (retry if buffer is full).
         else {
-          while (submit_external_command(input_buffer, &buffer_items) ==
+          while (!should_exit &&
+                 submit_external_command(input_buffer, &buffer_items) ==
                      ERROR &&
                  buffer_items == config->external_command_buffer_slots()) {
             // Wait a bit.
             tv.tv_sec = 0;
             tv.tv_usec = 250000;
             select(0, nullptr, nullptr, nullptr, &tv);
-
-            // Should we shutdown?
-            pthread_testcancel();
           }
 
           // Bail if the circular buffer is full.
           if (buffer_items == config->external_command_buffer_slots())
             break;
-
-          // Should we shutdown?
-          pthread_testcancel();
         }
       }
     }
   }
 
-  /* removes cleanup handler - this should never be reached */
-  pthread_cleanup_pop(0);
-
-  return nullptr;
+  cleanup_command_file_worker_thread();
 }
 
 /* submits an external command for processing */
