@@ -9,6 +9,7 @@
 
 CCE_BEGIN()
 class enginerpc final {
+  engine_impl _service;
   std::unique_ptr<grpc::Server> _server;
  public:
   enginerpc(const std::string& address, uint16_t port);

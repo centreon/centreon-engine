@@ -4,6 +4,11 @@
 
 ### Bugs
 
+*external commands*
+
+the new C++ standard is not compatible with pthread\_cancel(). This last one is
+removed.
+
 *gRPC*
 
 Reflection module has been removed because of an issue in the compilation.
