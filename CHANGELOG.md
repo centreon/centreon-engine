@@ -4,6 +4,11 @@
 
 ### Bugs
 
+*external commands*
+
+The new C++ standard is not compatible with pthread\_cancel(). This last one has
+been removed from the code.
+
 *gRPC*
 
 The reflection module has been removed because of an issue in the compilation.
@@ -20,7 +25,8 @@ one would be enough.
 
 ### Build
 
-repair the compilation for Raspberry PI
+repair the compilation for Raspberry PI. Link between cbmod and neb module is
+also rectified.
 
 ## 21.04.2
 
