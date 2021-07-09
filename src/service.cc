@@ -1911,12 +1911,6 @@ void service::check_for_flapping(bool update,
       << "Checking service '" << _description << "' on host '" << _hostname
       << "' for flapping...";
 
-  /* if this is a soft service state and not a soft recovery, don't record this
-   * in the history */
-  /* only hard states and soft recoveries get recorded for flap detection */
-  if (get_state_type() == soft && _current_state != service::state_ok)
-    return;
-
   /* what threshold values should we use (global or service-specific)? */
   low_threshold = (get_low_flap_threshold() <= 0.0)
                       ? config->low_service_flap_threshold()
