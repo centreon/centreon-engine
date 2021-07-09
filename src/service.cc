@@ -2009,7 +2009,9 @@ void service::check_for_flapping(bool update,
     is_flapping = false;
   /* else we're above the upper bound, so we are flapping */
   else if (curved_percent_change >= high_threshold)
-    is_flapping = true;
+    /* start flapping on !OK states which makes more sense */
+    if ((_current_state != service::state_ok) || get_is_flapping())
+      is_flapping = true;
 
   logger(dbg_flapping, more)
       << com::centreon::logging::setprecision(2) << "Service "
