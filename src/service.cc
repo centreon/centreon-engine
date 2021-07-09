@@ -1927,6 +1927,13 @@ void service::check_for_flapping(bool update,
 
   update_history = update;
 
+  /* don't update history if host is not up */
+  if (update_history) {
+    host* hst{get_host_ptr()};
+    if (hst->get_current_state() != host::state_up)
+      update_history = false;
+  }
+
   /* should we update state history for this state? */
   if (update_history) {
     if (_current_state == service::state_ok && !get_flap_detection_on(ok))
