@@ -86,7 +86,6 @@ extern time_t program_start;
 extern time_t event_start;
 
 extern circular_buffer external_command_buffer;
-extern pthread_t worker_threads[];
 
 extern check_stats check_statistics[];
 
