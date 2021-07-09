@@ -1671,7 +1671,7 @@ TEST_F(EngineRpc, ChangeHostObjectCustomVar) {
   std::mutex mutex;
   bool continuerunning = false;
 
-  ASSERT_EQ(_host->custom_variables.size(), 0);
+  ASSERT_EQ(_host->custom_variables.size(), 0u);
   call_command_manager(th, &condvar, &mutex, &continuerunning);
   auto output = execute(
       "ChangeHostObjectCustomVar"
@@ -1686,7 +1686,7 @@ TEST_F(EngineRpc, ChangeHostObjectCustomVar) {
   ASSERT_EQ(_host->custom_variables.size(), 1u);
   ASSERT_EQ(_host->custom_variables["TEST_VAR"].get_value(), "test_val");
   _host->custom_variables.clear();
-  ASSERT_EQ(_host->custom_variables.size(), 0);
+  ASSERT_EQ(_host->custom_variables.size(), 0u);
   erpc.shutdown();
 }
 
@@ -1698,7 +1698,7 @@ TEST_F(EngineRpc, ChangeServiceObjectCustomVar) {
   bool continuerunning = false;
 
   _svc->custom_variables.clear();
-  ASSERT_EQ(_svc->custom_variables.size(), 0);
+  ASSERT_EQ(_svc->custom_variables.size(), 0u);
   call_command_manager(th, &condvar, &mutex, &continuerunning);
   auto output = execute(
       "ChangeServiceObjectCustomVar"
@@ -1713,7 +1713,7 @@ TEST_F(EngineRpc, ChangeServiceObjectCustomVar) {
   ASSERT_EQ(_svc->custom_variables.size(), 1u);
   ASSERT_EQ(_svc->custom_variables["TEST_VAR"].get_value(), "test_val");
   _svc->custom_variables.clear();
-  ASSERT_EQ(_svc->custom_variables.size(), 0);
+  ASSERT_EQ(_svc->custom_variables.size(), 0u);
   erpc.shutdown();
 }
 
@@ -1723,7 +1723,7 @@ TEST_F(EngineRpc, ChangeContactObjectCustomVar) {
   std::condition_variable condvar;
   std::mutex mutex;
   bool continuerunning = false;
-  ASSERT_EQ(_contact->get_custom_variables().size(), 0);
+  ASSERT_EQ(_contact->get_custom_variables().size(), 0u);
 
   call_command_manager(th, &condvar, &mutex, &continuerunning);
   auto output = execute(
