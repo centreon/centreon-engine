@@ -161,44 +161,8 @@ int close_command_file(void) {
   return OK;
 }
 
-/* initializes command file worker thread */
-int init_command_file_worker_thread(void) {
-  /* initialize circular buffer */
-  external_command_buffer.head = 0;
-  external_command_buffer.tail = 0;
-  external_command_buffer.items = 0;
-  external_command_buffer.high = 0;
-  external_command_buffer.overflow = 0L;
-  external_command_buffer.buffer =
-      new void*[config->external_command_buffer_slots()];
-  if (external_command_buffer.buffer == NULL)
-    return ERROR;
-
-  /* initialize mutex (only on cold startup) */
-  if (!sigrestart)
-    pthread_mutex_init(&external_command_buffer.buffer_lock, NULL);
-
-  /* create worker thread */
-  worker = std::make_unique<std::thread>(&command_file_worker_thread);
-
-  return OK;
-}
-
-/* shutdown command file worker thread */
-int shutdown_command_file_worker_thread(void) {
-  if (!should_exit) {
-    /* tell the worker thread to exit */
-    should_exit = true;
-
-    /* wait for the worker thread to exit */
-    worker->join();
-  }
-
-  return OK;
-}
-
 /* clean up resources used by command file worker thread */
-void cleanup_command_file_worker_thread() {
+static void cleanup_command_file_worker_thread() {
   /* release memory allocated to circular buffer */
   for (int x = external_command_buffer.tail; x != external_command_buffer.head;
        x = (x + 1) % config->external_command_buffer_slots()) {
@@ -210,7 +174,7 @@ void cleanup_command_file_worker_thread() {
 }
 
 /* worker thread - artificially increases buffer of named pipe */
-void* command_file_worker_thread(void* arg) {
+static void command_file_worker_thread() {
   char input_buffer[MAX_EXTERNAL_COMMAND_LENGTH];
   struct pollfd pfd;
   int pollval;
@@ -322,6 +286,42 @@ void* command_file_worker_thread(void* arg) {
   }
 
   cleanup_command_file_worker_thread();
+}
+
+/* initializes command file worker thread */
+int init_command_file_worker_thread(void) {
+  /* initialize circular buffer */
+  external_command_buffer.head = 0;
+  external_command_buffer.tail = 0;
+  external_command_buffer.items = 0;
+  external_command_buffer.high = 0;
+  external_command_buffer.overflow = 0L;
+  external_command_buffer.buffer =
+      new void*[config->external_command_buffer_slots()];
+  if (external_command_buffer.buffer == NULL)
+    return ERROR;
+
+  /* initialize mutex (only on cold startup) */
+  if (!sigrestart)
+    pthread_mutex_init(&external_command_buffer.buffer_lock, NULL);
+
+  /* create worker thread */
+  worker = std::make_unique<std::thread>(&command_file_worker_thread);
+
+  return OK;
+}
+
+/* shutdown command file worker thread */
+int shutdown_command_file_worker_thread(void) {
+  if (!should_exit) {
+    /* tell the worker thread to exit */
+    should_exit = true;
+
+    /* wait for the worker thread to exit */
+    worker->join();
+  }
+
+  return OK;
 }
 
 /* submits an external command for processing */
