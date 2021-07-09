@@ -48,14 +48,11 @@
 #include "com/centreon/engine/version.hh"
 #include "helper.hh"
 
-
-
 using namespace com::centreon;
 using namespace com::centreon::engine;
 using namespace com::centreon::engine::downtimes;
 using namespace com::centreon::engine::configuration;
 using namespace com::centreon::engine::configuration::applier;
-
 
 class EngineRpc : public TestEngine {
  public:
@@ -234,7 +231,7 @@ TEST_F(EngineRpc, GetVersion) {
   enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("GetVersion");
   ASSERT_EQ(output.front(), oss.str());
-  if (output.size() == 2) {
+  if (output.size() == 2u) {
     oss.str("");
     oss << "minor: " << CENTREON_ENGINE_VERSION_MINOR;
     ASSERT_EQ(output.back(), oss.str());
@@ -318,8 +315,6 @@ TEST_F(EngineRpc, GetWrongHost) {
   erpc.shutdown();
 }
 
-
-
 TEST_F(EngineRpc, GetService) {
   enginerpc erpc("0.0.0.0", 40001);
   std::unique_ptr<std::thread> th;
@@ -391,7 +386,6 @@ TEST_F(EngineRpc, GetWrongService) {
   ASSERT_EQ(vectests, result_names);
   erpc.shutdown();
 }
-
 
 TEST_F(EngineRpc, GetContact) {
   enginerpc erpc("0.0.0.0", 40001);
@@ -704,9 +698,10 @@ TEST_F(EngineRpc, DeleteWrongComment) {
   std::condition_variable condvar;
   std::mutex mutex;
   bool continuerunning = false;
-  std::vector<std::string> vectests = {"DeleteComment failed.", 
-                                       "DeleteComment 0",
-                                      };
+  std::vector<std::string> vectests{
+      "DeleteComment failed.",
+      "DeleteComment 0",
+  };
   call_command_manager(th, &condvar, &mutex, &continuerunning);
 
   auto output = execute("DeleteComment 999");
@@ -724,7 +719,6 @@ TEST_F(EngineRpc, DeleteWrongComment) {
   ASSERT_EQ(comment::comments.size(), 0u);
   erpc.shutdown();
 }
-
 
 TEST_F(EngineRpc, DeleteAllHostComments) {
   enginerpc erpc("0.0.0.0", 40001);
@@ -1482,9 +1476,9 @@ TEST_F(EngineRpc, ChangeHostObjectIntVar) {
   call_command_manager(th, &condvar, &mutex, &continuerunning);
 
   auto output = execute("ChangeHostObjectIntVar test_host 0 1 1.0");
-  ASSERT_EQ(_host->get_check_interval(), 1);
+  ASSERT_EQ(_host->get_check_interval(), 1u);
   output = execute("ChangeHostObjectIntVar test_host 1 1 2.0");
-  ASSERT_EQ(_host->get_retry_interval(), 2);
+  ASSERT_EQ(_host->get_retry_interval(), 2u);
   output = execute("ChangeHostObjectIntVar test_host 2 1 1.0");
   ASSERT_EQ(_host->get_max_attempts(), 1);
   {
@@ -1508,11 +1502,11 @@ TEST_F(EngineRpc, ChangeServiceObjectIntVar) {
   auto output = execute(
       "ChangeServiceObjectIntVar"
       " test_host test_svc 0 1 1.0");
-  ASSERT_EQ(_svc->get_check_interval(), 1);
+  ASSERT_EQ(_svc->get_check_interval(), 1u);
   output = execute(
       "ChangeServiceObjectIntVar"
       " test_host test_svc 1 1 2.0");
-  ASSERT_EQ(_svc->get_retry_interval(), 2);
+  ASSERT_EQ(_svc->get_retry_interval(), 2u);
   output = execute(
       "ChangeServiceObjectIntVar"
       " test_host test_svc 2 1 1.0");
@@ -1539,15 +1533,15 @@ TEST_F(EngineRpc, ChangeContactObjectIntVar) {
   auto output = execute(
       "ChangeContactObjectIntVar"
       " admin 0 1 1.0");
-  ASSERT_EQ(_contact->get_modified_attributes(), 1);
+  ASSERT_EQ(_contact->get_modified_attributes(), 1u);
   output = execute(
       "ChangeContactObjectIntVar"
       " admin 1 2 1.0");
-  ASSERT_EQ(_contact->get_modified_host_attributes(), 2);
+  ASSERT_EQ(_contact->get_modified_host_attributes(), 2u);
   output = execute(
       "ChangeContactObjectIntVar"
       " admin 2 3 1.0");
-  ASSERT_EQ(_contact->get_modified_service_attributes(), 3);
+  ASSERT_EQ(_contact->get_modified_service_attributes(), 3u);
   {
     std::lock_guard<std::mutex> lock(mutex);
     continuerunning = true;
@@ -1752,7 +1746,7 @@ TEST_F(EngineRpc, ChangeContactObjectCustomVar) {
 TEST_F(EngineRpc, ProcessServiceCheckResult) {
   enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("ProcessServiceCheckResult test_host test_svc 0");
-  ASSERT_EQ(output.size(), 1);
+  ASSERT_EQ(output.size(), 1u);
   ASSERT_EQ(output.front(), "ProcessServiceCheckResult: 0");
   erpc.shutdown();
 }
@@ -1760,7 +1754,7 @@ TEST_F(EngineRpc, ProcessServiceCheckResult) {
 TEST_F(EngineRpc, ProcessServiceCheckResultBadHost) {
   enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("ProcessServiceCheckResult \"\" test_svc 0");
-  ASSERT_EQ(output.size(), 2);
+  ASSERT_EQ(output.size(), 2u);
   ASSERT_EQ(output.front(), "ProcessServiceCheckResult failed.");
   erpc.shutdown();
 }
@@ -1768,7 +1762,7 @@ TEST_F(EngineRpc, ProcessServiceCheckResultBadHost) {
 TEST_F(EngineRpc, ProcessServiceCheckResultBadService) {
   enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("ProcessServiceCheckResult test_host \"\" 0");
-  ASSERT_EQ(output.size(), 2);
+  ASSERT_EQ(output.size(), 2u);
   ASSERT_EQ(output.front(), "ProcessServiceCheckResult failed.");
   erpc.shutdown();
 }
@@ -1776,7 +1770,7 @@ TEST_F(EngineRpc, ProcessServiceCheckResultBadService) {
 TEST_F(EngineRpc, ProcessHostCheckResult) {
   enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("ProcessHostCheckResult test_host 0");
-  ASSERT_EQ(output.size(), 1);
+  ASSERT_EQ(output.size(), 1u);
   ASSERT_EQ(output.front(), "ProcessHostCheckResult: 0");
   erpc.shutdown();
 }
@@ -1784,7 +1778,7 @@ TEST_F(EngineRpc, ProcessHostCheckResult) {
 TEST_F(EngineRpc, ProcessHostCheckResultBadHost) {
   enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("ProcessHostCheckResult '' 0");
-  ASSERT_EQ(output.size(), 2);
+  ASSERT_EQ(output.size(), 2u);
   ASSERT_EQ(output.front(), "ProcessHostCheckResult failed.");
   erpc.shutdown();
 }
@@ -1802,7 +1796,7 @@ TEST_F(EngineRpc, NewThresholdsFile) {
       "21,\n \"fit\": 60.5\n }\n]}]");
   enginerpc erpc("0.0.0.0", 40001);
   auto output = execute("NewThresholdsFile /tmp/thresholds_file.json");
-  ASSERT_EQ(output.size(), 1);
+  ASSERT_EQ(output.size(), 1u);
   ASSERT_EQ(output.front(), "NewThresholdsFile: 0");
   command_manager::instance().execute();
   ASSERT_EQ(_ad->get_thresholds_file(), "/tmp/thresholds_file.json");

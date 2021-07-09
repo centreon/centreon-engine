@@ -22,8 +22,6 @@
 
 #include "com/centreon/engine/globals.hh"
 
-#include <map>
-
 #include "com/centreon/engine/logging/logger.hh"
 #include "nagios.h"
 
@@ -70,7 +68,6 @@ int test_scheduling(false);
 int verify_circular_paths(true);
 int verify_config(false);
 nebcallback* neb_callback_list[NEBCALLBACK_NUMITEMS];
-pthread_t worker_threads[TOTAL_WORKER_THREADS];
 sched_info scheduling_info;
 time_t event_start((time_t)-1);
 time_t last_command_check((time_t)-1);
