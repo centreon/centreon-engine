@@ -385,11 +385,11 @@ message ServiceDelayIdentifier {
 message DowntimeCriterias {
   string host_name = 1;
   string service_desc = 2;
-  google.protobuf.UInt64Value start = 3;
-  google.protobuf.UInt64Value end = 4;
+  google.protobuf.Int64Value start = 3;
+  google.protobuf.Int64Value end = 4;
   google.protobuf.BoolValue fixed = 5;
   google.protobuf.UInt32Value triggered_by = 6;
-  google.protobuf.UInt32Value duration = 7;
+  google.protobuf.Int32Value duration = 7;
   string author = 8;
   string comment_data = 9;
 }
