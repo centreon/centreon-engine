@@ -34,7 +34,7 @@ namespace logging {
  */
 class broker : public com::centreon::logging::backend {
   bool _enable;
-  std::thread::id _thread;
+  std::thread::id _thread_id;
 
  public:
   broker();
