@@ -62,6 +62,7 @@ connector::connector(const std::string& connector_name,
       process_listener(),
       _is_running(false),
       _query_quit_ok(false),
+      _version_set{false},
       _query_version_ok(false),
       _process(this, true, true, false),  // Disable stderr.
       _try_to_restart(true),
@@ -418,6 +419,7 @@ void connector::_connector_start() {
 
     // Reset variables.
     _query_quit_ok = false;
+    _version_set = false;
     _query_version_ok = false;
     _is_running = false;
   }
@@ -432,10 +434,10 @@ void connector::_connector_start() {
     _send_query_version();
 
     // Waiting connector version, or 1 seconds.
-    bool is_timeout{
-        _cv_query.wait_for(
-            lock, std::chrono::seconds(config->service_check_timeout())) ==
-        std::cv_status::timeout};
+    bool is_timeout{!_cv_query.wait_for(
+            lock, std::chrono::seconds(config->service_check_timeout()),
+            [this] { return _version_set; })};
+
     if (is_timeout || !_query_version_ok) {
       _process.kill();
       _try_to_restart = false;
@@ -678,6 +680,7 @@ void connector::_recv_query_version(char const* data) {
 
   LOCK_GUARD(lock, _lock);
   _query_version_ok = version_ok;
+  _version_set = true;
   _cv_query.notify_all();
 }
 
