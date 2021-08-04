@@ -20,6 +20,7 @@
 #include <unistd.h>
 #include <cstdlib>
 
+#include <array>
 #include <list>
 #include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/globals.hh"
@@ -257,14 +258,15 @@ void connector::set_command_line(const std::string& command_line) {
  */
 void connector::data_is_available(process& p) noexcept {
   typedef void (connector::*recv_query)(char const*);
-  static recv_query tab_recv_query[] = {nullptr,
-                                        &connector::_recv_query_version,
-                                        nullptr,
-                                        &connector::_recv_query_execute,
-                                        nullptr,
-                                        &connector::_recv_query_quit,
-                                        &connector::_recv_query_error,
-                                        nullptr};
+  static const std::array<recv_query, 8> tab_recv_query{
+      nullptr,
+      &connector::_recv_query_version,
+      nullptr,
+      &connector::_recv_query_execute,
+      nullptr,
+      &connector::_recv_query_quit,
+      &connector::_recv_query_error,
+      nullptr};
 
   try {
     logger(dbg_commands, basic)
@@ -287,7 +289,7 @@ void connector::data_is_available(process& p) noexcept {
           size_t pos(_data_available.find(ending));
           if (pos == std::string::npos)
             break;
-          responses.push_back(_data_available.substr(0, pos));
+          responses.emplace_back(_data_available.substr(0, pos));
           _data_available.erase(0, pos + ending.size());
         }
       }
@@ -298,18 +300,14 @@ void connector::data_is_available(process& p) noexcept {
     }
 
     // Parse queries responses.
-    for (std::list<std::string>::const_iterator it(responses.begin()),
-         end(responses.end());
-         it != end; ++it) {
-      char const* data(it->c_str());
+    for (auto& str : responses) {
+      char const* data = str.c_str();
       char* endptr(nullptr);
       uint32_t id(strtol(data, &endptr, 10));
       logger(dbg_commands, basic)
           << "connector::data_is_available: request id=" << id;
       // Invalid query.
-      if (data == endptr ||
-          id >= sizeof(tab_recv_query) / sizeof(*tab_recv_query) ||
-          !tab_recv_query[id])
+      if (data == endptr || id >= tab_recv_query.size() || !tab_recv_query[id])
         logger(log_runtime_warning, basic) << "Warning: Connector '" << _name
                                            << "' "
                                               "received bad request ID: "
@@ -435,8 +433,8 @@ void connector::_connector_start() {
 
     // Waiting connector version, or 1 seconds.
     bool is_timeout{!_cv_query.wait_for(
-            lock, std::chrono::seconds(config->service_check_timeout()),
-            [this] { return _version_set; })};
+        lock, std::chrono::seconds(config->service_check_timeout()),
+        [this] { return _version_set; })};
 
     if (is_timeout || !_query_version_ok) {
       _process.kill();

@@ -19,7 +19,6 @@
 #include "com/centreon/engine/broker.hh"
 #include <cstring>
 #include <mutex>
-#include <thread>
 #include "com/centreon/engine/logging/broker.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/exceptions/basic.hh"
@@ -34,7 +33,6 @@ using namespace com::centreon::engine::logging;
 broker::broker()
     : backend(false, false, com::centreon::logging::none, false),
       _enable(false) {
-  memset(&_thread, 0, sizeof(_thread));
   open();
 }
 
@@ -66,7 +64,6 @@ broker& broker::operator=(broker const& right) {
     backend::operator=(right);
     std::lock_guard<std::mutex> lock1(_lock);
     std::lock_guard<std::mutex> lock2(right._lock);
-    _thread = right._thread;
     _enable = right._enable;
   }
   return *this;
@@ -93,13 +90,12 @@ void broker::log(uint64_t types,
                  char const* message,
                  uint32_t size) noexcept {
   (void)verbose;
-  std::lock_guard<std::mutex> lock(_lock);
+  static std::unique_lock<std::mutex> lock(_lock, std::defer_lock);
 
-  // Broker is only notified of non-debug log messages.
-  if (message && _enable) {
-    if (_thread != std::this_thread::get_id()) {
-      _thread = std::this_thread::get_id();
-
+  if (!lock.owns_lock()) {
+    lock.lock();
+    // Broker is only notified of non-debug log messages.
+    if (message && _enable) {
       // Copy message because broker module might modify it.
       unique_array_ptr<char> copy(new char[size + 1]);
       strncpy(copy.get(), message, size);
@@ -108,9 +104,6 @@ void broker::log(uint64_t types,
       // Event broker callback.
       broker_log_data(NEBTYPE_LOG_DATA, NEBFLAG_NONE, NEBATTR_NONE, copy.get(),
                       types, time(NULL), NULL);
-
-      // Reset thread.
-      memset(&_thread, 0, sizeof(_thread));
     }
   }
 }
