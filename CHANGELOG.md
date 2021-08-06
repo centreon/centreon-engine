@@ -1,5 +1,14 @@
 # Changelog
 
+## 20.04.14
+
+### Bugs
+
+*logs*
+
+There was a possible deadlock in logging::broker due to creation of logs when
+sending logs, it was then possible to lock a mutex twice.
+
 ## 20.04.13
 
 ### Bugs
@@ -27,7 +36,7 @@ centengine builds again using packages provided by conan-center.
 
 *Check*
 
-if host or service with check_period set to none, Engine burns 100% of the CPU.
+if host or service with check\_period set to none, Engine burns 100% of the CPU.
 This patch fixes this issue.
 
 ## 20.04.11
