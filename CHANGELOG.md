@@ -1,5 +1,14 @@
 # Changelog
 
+## 21.04.4
+
+### Bugs
+
+*logs*
+
+There was a possible deadlock in logging::broker due to creation of logs when
+sending logs, it was then possible to lock a mutex twice.
+
 ## 21.04.3
 
 ### Bugs
