@@ -90,6 +90,7 @@ class connector : public command, public process_listener {
   bool _is_running;
   std::unordered_map<uint64_t, std::shared_ptr<query_info> > _queries;
   bool _query_quit_ok;
+  bool _version_set;
   bool _query_version_ok;
   mutable std::mutex _lock;
   process _process;

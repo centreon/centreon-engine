@@ -19,7 +19,6 @@
 #include "com/centreon/engine/broker.hh"
 #include <cstring>
 #include <mutex>
-#include <thread>
 #include "com/centreon/engine/logging/broker.hh"
 #include "com/centreon/engine/logging/logger.hh"
 #include "com/centreon/exceptions/basic.hh"
@@ -33,8 +32,8 @@ using namespace com::centreon::engine::logging;
  */
 broker::broker()
     : backend(false, false, com::centreon::logging::none, false),
-      _enable(false) {
-  memset(&_thread, 0, sizeof(_thread));
+      _enable(false),
+      _thread_id{} {
   open();
 }
 
@@ -43,9 +42,8 @@ broker::broker()
  *
  *  @param[in] right Object to copy.
  */
-broker::broker(broker const& right) : backend(right), _enable(false) {
-  operator=(right);
-}
+broker::broker(broker const& right)
+    : backend(right), _enable(false), _thread_id{right._thread_id} {}
 
 /**
  *  Destructor.
@@ -64,10 +62,10 @@ broker::~broker() noexcept {
 broker& broker::operator=(broker const& right) {
   if (this != &right) {
     backend::operator=(right);
-    std::lock_guard<std::mutex> lock1(_lock);
-    std::lock_guard<std::mutex> lock2(right._lock);
-    _thread = right._thread;
+    std::lock_guard<std::recursive_mutex> lock1(_lock);
+    std::lock_guard<std::recursive_mutex> lock2(right._lock);
     _enable = right._enable;
+    _thread_id = right._thread_id;
   }
   return *this;
 }
@@ -76,7 +74,7 @@ broker& broker::operator=(broker const& right) {
  *  Close broker log.
  */
 void broker::close() noexcept {
-  std::lock_guard<std::mutex> lock(_lock);
+  std::lock_guard<std::recursive_mutex> lock(_lock);
   _enable = false;
 }
 
@@ -93,13 +91,12 @@ void broker::log(uint64_t types,
                  char const* message,
                  uint32_t size) noexcept {
   (void)verbose;
-  std::lock_guard<std::mutex> lock(_lock);
+  std::lock_guard<std::recursive_mutex> lock(_lock);
 
-  // Broker is only notified of non-debug log messages.
-  if (message && _enable) {
-    if (_thread != std::this_thread::get_id()) {
-      _thread = std::this_thread::get_id();
-
+  if (_thread_id != std::this_thread::get_id()) {
+    // Broker is only notified of non-debug log messages.
+    if (message && _enable) {
+      _thread_id = std::this_thread::get_id();
       // Copy message because broker module might modify it.
       unique_array_ptr<char> copy(new char[size + 1]);
       strncpy(copy.get(), message, size);
@@ -108,9 +105,7 @@ void broker::log(uint64_t types,
       // Event broker callback.
       broker_log_data(NEBTYPE_LOG_DATA, NEBFLAG_NONE, NEBATTR_NONE, copy.get(),
                       types, time(NULL), NULL);
-
-      // Reset thread.
-      memset(&_thread, 0, sizeof(_thread));
+      _thread_id = std::thread::id();
     }
   }
 }
@@ -119,7 +114,7 @@ void broker::log(uint64_t types,
  *  Open broker log.
  */
 void broker::open() {
-  std::lock_guard<std::mutex> lock(_lock);
+  std::lock_guard<std::recursive_mutex> lock(_lock);
   _enable = true;
 }
 
@@ -127,6 +122,6 @@ void broker::open() {
  *  Open borker log.
  */
 void broker::reopen() {
-  std::lock_guard<std::mutex> lock(_lock);
+  std::lock_guard<std::recursive_mutex> lock(_lock);
   _enable = true;
 }
