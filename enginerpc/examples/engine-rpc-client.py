@@ -3,7 +3,9 @@
 
 import inspect, sys, getopt, time, grpc, json
 import engine_pb2
+import broker_pb2
 import engine_pb2_grpc
+import broker_pb2_grpc
 from google.protobuf import descriptor, empty_pb2, timestamp_pb2
 from google.protobuf.json_format import Parse
 from enum import Enum
@@ -45,23 +47,35 @@ class gRPC_types(Enum):
   TYPE_SINT32      = 17
   TYPE_SINT64      = 18
 
-# Client class that provides a communication with gRPC server
+# Client class that provides a communication with Engine gRPC server
 class gRPC_client:
-  def __init__(self):
+  def __init__(self, component):
     self.stub = ""
     self.dic_methods = {}
+    self.component = component
     # Assiociate each method name with his descriptor
-    for m in engine_pb2._ENGINE.methods:
-      self.dic_methods[m.name] = m
+    if self.component == "engine":
+      for m in engine_pb2._ENGINE.methods:
+        self.dic_methods[m.name] = m
+    else:
+      for m in broker_pb2._BROKER.methods:
+        self.dic_methods[m.name] = m
 
   def init_grpc(self, ip, port):
     channel = grpc.insecure_channel("{}:{}".format(ip, port))
-    self.stub = engine_pb2_grpc.EngineStub(channel)
+    if self.component == "engine":
+      self.stub = engine_pb2_grpc.EngineStub(channel)
+    else:
+      self.stub = broker_pb2_grpc.BrokerStub(channel)
 
   # Show list of gRPC methods
   def show_list_grpc_methods(self):
-    for m in engine_pb2._ENGINE.methods:
-      print("- ", m.name)
+    if self.component == "engine":
+      for m in engine_pb2._ENGINE.methods:
+        print("- ", m.name)
+    else:
+      for m in broker_pb2._BROKER.methods:
+        print("- ", m.name)
 
   # Get the method descriptor
   def get_grpc_method(self, method_name):
@@ -263,6 +277,17 @@ def check_arguments(client, args, flags):
         "same command line, you must only use one !\n\n" + colors.ENDC)
     exit(1)
 
+  if args.component == "broker":
+    client = gRPC_client("broker")
+  elif args.component == "engine":
+    client = gRPC_client("engine")
+  else:
+      print(colors.WARNING + "/!\ Warning /!\\\n Please choose a valid component to communicate with.\n"
+            "Follow thoses example :\npython3 engine-rpc-client.py --component=engine --ip=127.0.0.1 --port=50001 --exe=GetVersion\n"
+            "python3 engine-rpc-client.py --component=broker --ip=127.0.0.1 --port=51001 --exe=GetVersion"+ colors.ENDC)
+      exit(1)
+
+
   if flags.LIST_METHOD:
     client.show_list_grpc_methods()
   elif flags.HELP_METHOD:
@@ -270,6 +295,12 @@ def check_arguments(client, args, flags):
   elif flags.DESCRIPTION_METHOD:
     client.get_grpc_method_info(args.method_name)
   elif flags.EXEC_METHOD:
+    if not args.component:
+      print(colors.WARNING + "/!\ Warning /!\\\nNo component filled, please choose a component to communicate with.\n"
+           "Follow thoses example :\npython3 engine-rpc-client.py --component=engine --ip=127.0.0.1 --port=50001 --exe=GetVersion\n"
+           "python3 engine-rpc-client.py --component=broker --ip=127.0.0.1 --port=51001 --exe=GetVersion"+ colors.ENDC)
+      exit(1)
+    
     if not args.port:
       print(colors.WARNING + "/!\ Warning /!\\ Port is not defined" + colors.ENDC)
       exit(1)
@@ -300,7 +331,6 @@ def check_arguments(client, args, flags):
         msg = json_to_message(client, args.method_name, json_datas)
         client.exe(args.method_name, msg)
 
-
 ### Main ###
 if __name__ == "__main__":
   # Defines flags
@@ -314,11 +344,11 @@ if __name__ == "__main__":
   port        = ""
   input_file  = ""
   json_args   = ""
-  client      = gRPC_client()
+  client      = None 
 
   try:
-    opts, args = getopt.getopt(sys.argv[1:], "hlp:f:a:d:e:",
-                              ["help", "list", "port=", "file=",
+    opts, args = getopt.getopt(sys.argv[1:], "hlc:p:f:a:d:e:",
+                              ["help", "list", "component=", "port=", "file=",
                               "args=", "description=", "exe="])
   except getopt.GetoptError as err:
     print(err)
@@ -329,10 +359,10 @@ if __name__ == "__main__":
   for o, a in opts:
     if o in ("-c", "--component"):
       component = a
-      arguments_fields._replace(component=a)
+      arguments_fields = arguments_fields._replace(component=a)
     elif o in ("-i", "--ip"):
       ip = a
-      arguments_fields._replace(ip=a)
+      arguments_fileds = arguments_fields._replace(ip=a)
     elif o in ("-p", "--port"):
       port = a
       arguments_fields = arguments_fields._replace(port=a)
