@@ -304,11 +304,12 @@ def check_arguments(client, args, flags):
 ### Main ###
 if __name__ == "__main__":
   # Defines flags
-  Arguments = namedtuple("Arguments", "ip, port, input_file, json_args, method_name")
+  Arguments = namedtuple("Arguments", "component, ip, port, input_file, json_args, method_name")
   Flags     = namedtuple("Flags", "LIST_METHOD, HELP_METHOD, DESCRIPTION_METHOD, EXEC_METHOD")
 
-  arguments_fields =  Arguments(ip="127.0.0.1", port="", input_file="", json_args="", method_name="")
+  arguments_fields =  Arguments(component="", ip="127.0.0.1", port="", input_file="", json_args="", method_name="")
   flags_fields     =  Flags(LIST_METHOD=False, HELP_METHOD=False, DESCRIPTION_METHOD=False, EXEC_METHOD=False)
+  component   = ""
   ip          = "127.0.0.1"
   port        = ""
   input_file  = ""
@@ -326,7 +327,10 @@ if __name__ == "__main__":
   # Parsing essential options.
   # this allows to reverse the order of the arguments in the reading
   for o, a in opts:
-    if o in ("-i", "--ip"):
+    if o in ("-c", "--component"):
+      component = a
+      arguments_fields._replace(component=a)
+    elif o in ("-i", "--ip"):
       ip = a
       arguments_fields._replace(ip=a)
     elif o in ("-p", "--port"):
