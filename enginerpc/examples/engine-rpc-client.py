@@ -283,8 +283,8 @@ def check_arguments(client, args, flags):
     client = gRPC_client("engine")
   else:
       print(colors.WARNING + "/!\ Warning /!\\\n Please choose a valid component to communicate with.\n"
-            "Follow thoses example :\npython3 engine-rpc-client.py --component=engine --ip=127.0.0.1 --port=50001 --exe=GetVersion\n"
-            "python3 engine-rpc-client.py --component=broker --ip=127.0.0.1 --port=51001 --exe=GetVersion"+ colors.ENDC)
+            "Follow thoses example :\npython3 engine-rpc-client.py --component=engine --ip=127.0.0.1 --port={engine-port} --exe=GetVersion\n"
+            "python3 engine-rpc-client.py --component=broker --ip=127.0.0.1 --port={broker-port}--exe=GetVersion"+ colors.ENDC)
       exit(1)
 
 
@@ -295,12 +295,6 @@ def check_arguments(client, args, flags):
   elif flags.DESCRIPTION_METHOD:
     client.get_grpc_method_info(args.method_name)
   elif flags.EXEC_METHOD:
-    if not args.component:
-      print(colors.WARNING + "/!\ Warning /!\\\nNo component filled, please choose a component to communicate with.\n"
-           "Follow thoses example :\npython3 engine-rpc-client.py --component=engine --ip=127.0.0.1 --port=50001 --exe=GetVersion\n"
-           "python3 engine-rpc-client.py --component=broker --ip=127.0.0.1 --port=51001 --exe=GetVersion"+ colors.ENDC)
-      exit(1)
-    
     if not args.port:
       print(colors.WARNING + "/!\ Warning /!\\ Port is not defined" + colors.ENDC)
       exit(1)
@@ -348,7 +342,7 @@ if __name__ == "__main__":
 
   try:
     opts, args = getopt.getopt(sys.argv[1:], "hlc:p:f:a:d:e:",
-                              ["help", "list", "component=", "port=", "file=",
+                              ["help", "list", "component=", "ip=", "port=", "file=",
                               "args=", "description=", "exe="])
   except getopt.GetoptError as err:
     print(err)
@@ -362,7 +356,7 @@ if __name__ == "__main__":
       arguments_fields = arguments_fields._replace(component=a)
     elif o in ("-i", "--ip"):
       ip = a
-      arguments_fileds = arguments_fields._replace(ip=a)
+      arguments_fields = arguments_fields._replace(ip=a)
     elif o in ("-p", "--port"):
       port = a
       arguments_fields = arguments_fields._replace(port=a)
