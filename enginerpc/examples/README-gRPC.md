@@ -20,11 +20,13 @@ Now you have to install gRPC, so you can do these commands below (on Centos 7) :
 
 ## Download the python script ##
 
-`mkdir ~/install-grpc/ && cd ~/install-grpc/` </br>
-`wget https://raw.githubusercontent.com/centreon/centreon-engine/master/enginerpc/engine.proto` </br>
-`mkdir ~/install-grpc/script/ && cd ~/install-grpc/script/` </br>
-`wget https://raw.githubusercontent.com/centreon/centreon-engine/master/enginerpc/examples/init-proto.sh` </br>
-`wget https://raw.githubusercontent.com/centreon/centreon-engine/master/enginerpc/examples/engine-rpc-client.py`
+```
+mkdir ~/install-grpc/ && cd ~/install-grpc/
+wget https://raw.githubusercontent.com/centreon/centreon-engine/master/enginerpc/engine.proto
+mkdir ~/install-grpc/script/ && cd ~/install-grpc/script/
+wget https://raw.githubusercontent.com/centreon/centreon-engine/master/enginerpc/examples/init-proto.sh
+wget https://raw.githubusercontent.com/centreon/centreon-engine/master/enginerpc/examples/engine-rpc-client.py
+```
 
 ## Execution ##
 
