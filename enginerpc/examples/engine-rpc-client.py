@@ -1,5 +1,5 @@
-# engine-rpc-client.py (second version)
-# last modified 22.06.2021
+# engine-rpc-client.py
+# last modified 17.08.2021
 # file to communicate with gRPC methods
 
 import inspect, sys, getopt, time, grpc, json
@@ -236,7 +236,7 @@ class gRPC_client:
       sys.exit(f"code={e.code()}, message={e.details()}")
     else:
       if not isBlank(response_str):
-        print("response :\n", response_str)
+        print(f"gRPC response :\n\n{response_str}")
       elif VERBOSE_MODE:
         print(grpc.StatusCode.OK)
 
@@ -298,10 +298,9 @@ def check_arguments(client, args, flags):
   elif args.component == "engine":
     client = gRPC_client(args.component)
   else:
-      print(colors.WARNING + "/!\ Warning /!\\\n Please choose a valid component to communicate with.\n"
+      sys.exit(colors.WARNING + "/!\ Warning /!\\\n Please choose a valid component to communicate with.\n"
             "Follow thoses example :\npython3 engine-rpc-client.py --component=engine --ip=127.0.0.1 --port={engine-port} --exe=GetVersion\n"
             "python3 engine-rpc-client.py --component=broker --ip=127.0.0.1 --port={broker-port}--exe=GetVersion"+ colors.ENDC)
-      exit(1)
 
   if flags.LIST_METHOD:
     client.show_list_grpc_methods()
