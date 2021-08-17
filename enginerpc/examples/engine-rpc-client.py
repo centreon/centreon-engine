@@ -1,22 +1,13 @@
-# engine-rpc-client.py (second version)
-# last modified 22.06.2021
+# client_v2.py (second version)
 # file to communicate with gRPC methods
 
 import inspect, sys, getopt, time, grpc, json
 import engine_pb2
 import engine_pb2_grpc
-import google.protobuf.json_format
-import google.protobuf.text_format
-import pdb
 from google.protobuf import descriptor, empty_pb2, timestamp_pb2
 from google.protobuf.json_format import Parse
 from enum import Enum
 from collections import namedtuple
-
-### GLOBALS ###
-
-VERBOSE_MODE = False
-DEBUG = False
 
 ### Class ###
 
@@ -31,6 +22,7 @@ class colors:
   ENDC = '\033[0m'
   BOLD = '\033[1m'
   UNDERLINE = '\033[4m'
+
 
 # Enum for grpc types
 class gRPC_types(Enum):
@@ -76,8 +68,9 @@ class gRPC_client:
     try:
       method = self.dic_methods[method_name]
     except KeyError:
-      sys.exit(f"No method with name '{method_name}' found. Check the list of methods by using -l"
-               "option")
+      print("No method with this name found. Check the list of methods by using -l "
+            "option")
+      exit(1)
 
     return method
 
@@ -97,7 +90,6 @@ class gRPC_client:
     print("For method : {}, input parameter is : {}, output parameter is : {}."
           .format(method.name, m_input.name, m_output.name))
     print("Input Message {} contains the main fields:".format(m_input.name))
-
 
     for f in m_input.fields:
       print(" - {}".format(f.name))
@@ -156,7 +148,7 @@ class gRPC_client:
               self.get_grpc_message_info(m_input, f, 3)
             # same for TYPE_ENUM
             elif f.type == gRPC_types.TYPE_ENUM.value:
-              result_str = self.get_grpc_enum_info(m_input, f, 3, result_str)
+              self.get_grpc_enum_info(m_input, f, 3)
             else:
               result_str += " \"{}\": {},\n".format(f.name, type.name)
 
@@ -184,7 +176,7 @@ class gRPC_client:
           if f.type == gRPC_types.TYPE_MESSAGE.value:
             self.get_grpc_message_info(current_msg_dsc, f, n+1)
           elif f.type == gRPC_types.TYPE_ENUM.value:
-            result_str = self.get_grpc_enum_info(m_input, f, 3, result_str)
+            self.get_grpc_enum_info(m_input, f, 3)
           else:
             result_str += str_format + " \"{}\": {},\n".format(f.name, type.name)
 
@@ -196,41 +188,34 @@ class gRPC_client:
     print(str_format + "}")
 
   # Describe a TYPE_ENUM
-  def get_grpc_enum_info(self, parent_message_descriptor, field, string_space,
-                         result_str):
+  def get_grpc_enum_info(self, parent_message_descriptor, field, string_space):
     current_msg_dsc = parent_message_descriptor.fields_by_name[field.name].enum_type
 
-    result_str += " \"{}\":".format(field.name) + '\n'
+    str_format = string_space * ' '
+    print(str_format + "\"{}\":".format(field.name))
 
-    str_format = ' '
-    result_str += str_format + "{" + '\n'
+    str_format += ' '
+    print(str_format + "{")
 
     for v in current_msg_dsc.values:
-      result_str += str_format + " {}".format(v.name) + '\n'
+      print(str_format + " {}".format(v.name))
 
-    reurn_str += str_format + "}" + '\n'
-    return return_str
+    str_format = ' '
+    str_format += string_space * ' '
+    print(str_format + "}")
 
 
-  # Launch a gRPC method
+  # Launch a grpc method
   def exe(self, method_name, message):
-    try:
+    try :
       str_to_eval = "self.stub." + method_name + "(message)"
       check = eval(str_to_eval)
-      response_str = google.protobuf.text_format.MessageToString(check)
     except grpc.RpcError as e:
-      sys.exit(f"code={e.code()}, message={e.details()}")
+      print(e.code())
     else:
-      if not isBlank(response_str):
-        print("response :\n", response_str)
-      elif VERBOSE_MODE:
-        print(grpc.StatusCode.OK)
+      print(check)
 
 ### Basic Functions ###
-
-# Check if string is blank or not
-def isBlank (myString):
-  return not (myString and myString.strip())
 
 # Convert a json object into a gRPC message
 def json_to_message(client, method_name, json_datas):
@@ -240,11 +225,8 @@ def json_to_message(client, method_name, json_datas):
   else:
     mod = __import__('engine_pb2', fromlist=[m.input_type.name])
 
-  try:
-    c = getattr(mod, m.input_type.name)
-    message = Parse(json.dumps(json_datas), c())
-  except google.protobuf.json_format.ParseError as e:
-    sys.exit(e)
+  c = getattr(mod, m.input_type.name)
+  message = Parse(json.dumps(json_datas), c())
 
   return message
 
@@ -270,14 +252,17 @@ def documentation_message():
 # Function Arguments Errors
 def arg_error(prog_name):
   print("Usage : python3 {} <port> -h|-d|-l|-i|-e".format(prog_name))
-  sys.exit(help_message())
+  help_message()
+  exit(1)
 
 def check_arguments(client, args, flags):
   # check if we have one flags and not more
   if sum(flags._asdict().values()) > 1:
-    sys.exit(colors.WARNING + "/!\ Warning /!\\ You have probably used at least two "
+    print(colors.WARNING + "/!\ Warning /!\\ You have probably used at least two "
         "of these options (-l|--list, -d|--description, -h|--help, -e|--exe) in the "
         "same command line, you must only use one !\n\n" + colors.ENDC)
+    exit(1)
+
   if flags.LIST_METHOD:
     client.show_list_grpc_methods()
   elif flags.HELP_METHOD:
@@ -286,7 +271,8 @@ def check_arguments(client, args, flags):
     client.get_grpc_method_info(args.method_name)
   elif flags.EXEC_METHOD:
     if not args.port:
-      sys.exit(colors.WARNING + "/!\ Warning /!\\ Port is not defined" + colors.ENDC)
+      print(colors.WARNING + "/!\ Warning /!\\ Port is not defined" + colors.ENDC)
+      exit(1)
     client.init_grpc(args.ip, args.port)
 
     # We probably should have an empty message.
@@ -296,23 +282,15 @@ def check_arguments(client, args, flags):
       if m.input_type.name == "Empty":
         mod = __import__('google.protobuf.empty_pb2', fromlist=[m.input_type.name])
         c = getattr(mod, m.input_type.name)
-        try:
-          json_datas = json.loads("{}")
-          message = Parse(json.dumps(json_datas), c())
-        except google.protobuf.json_format.ParseError as e:
-          sys.exit(e)
+        json_datas = json.loads("{}")
+        message = Parse(json.dumps(json_datas), c())
         client.exe(args.method_name, message)
       else:
-        sys.exit(colors.WARNING + "/!\ Warning /!\ Your method have not Empty "
-              "message in his input field but you have not \n entered json "
-              "input file and no json arguments.\n" + colors.ENDC)
+        print(colors.WARNING + "/!\ Warning /!\ Your method have not Empty in his input field but you have not \n"
+              "entered json input file and no json arguments.\n" + colors.ENDC)
 
     if args.json_args:
-      try:
-        json_datas = json.loads(args.json_args)
-      except json.decoder.JSONDecodeError:
-        sys.exit("String could not be converted to JSON object, please check syntax.")
-
+      json_datas = json.loads(args.json_args)
       msg = json_to_message(client, args.method_name, json_datas)
       client.exe(args.method_name, msg)
 
@@ -322,15 +300,15 @@ def check_arguments(client, args, flags):
         msg = json_to_message(client, args.method_name, json_datas)
         client.exe(args.method_name, msg)
 
+
 ### Main ###
 if __name__ == "__main__":
   # Defines flags
   Arguments = namedtuple("Arguments", "ip, port, input_file, json_args, method_name")
   Flags     = namedtuple("Flags", "LIST_METHOD, HELP_METHOD, DESCRIPTION_METHOD, EXEC_METHOD")
-  arguments_fields =  Arguments(ip="127.0.0.1", port="", input_file="",
-                                json_args="", method_name="")
-  flags_fields     =  Flags(LIST_METHOD=False, HELP_METHOD=False,
-                            DESCRIPTION_METHOD=False, EXEC_METHOD=False)
+
+  arguments_fields =  Arguments(ip="127.0.0.1", port="", input_file="", json_args="", method_name="")
+  flags_fields     =  Flags(LIST_METHOD=False, HELP_METHOD=False, DESCRIPTION_METHOD=False, EXEC_METHOD=False)
   ip          = "127.0.0.1"
   port        = ""
   input_file  = ""
@@ -338,7 +316,7 @@ if __name__ == "__main__":
   client      = gRPC_client()
 
   try:
-    opts, args = getopt.getopt(sys.argv[1:], "vhlp:f:a:d:e:",
+    opts, args = getopt.getopt(sys.argv[1:], "hlp:f:a:d:e:",
                               ["help", "list", "port=", "file=",
                               "args=", "description=", "exe="])
   except getopt.GetoptError as err:
@@ -364,8 +342,6 @@ if __name__ == "__main__":
       flags_fields = flags_fields._replace(LIST_METHOD=True)
     elif o in ("-h", "--help"):
       flags_fields = flags_fields._replace(HELP_METHOD=True)
-    elif o in ("-v", "--verbose"):
-      VERBOSE_MODE = True
     elif o in ("-d", "--description"):
       arguments_fields = arguments_fields._replace(method_name=a)
       flags_fields = flags_fields._replace(DESCRIPTION_METHOD=True)
@@ -374,3 +350,44 @@ if __name__ == "__main__":
       flags_fields = flags_fields._replace(EXEC_METHOD=True)
 
   check_arguments(client, arguments_fields, flags_fields)
+
+  """
+  # Parsing others. They executes script functions.
+  for o, a in opts:
+    if o in ("-l", "--list"):
+      client.show_list_grpc_methods()
+    elif o in ("-h", "--help"):
+      help_message()
+    elif o in ("-d", "--description"):
+      method_name = a
+      client.get_grpc_method_info(method_name)
+    elif o in ("-e", "--exe"):
+      method_name = a
+      if not port:
+        print("port is not defined\n")
+        arg_error(sys.argv[0])
+      client.init_grpc(ip, port)
+      # We probably should have an empty message.
+      if not input_file and not json_args:
+        m = client.get_grpc_method(method_name)
+
+        if m.input_type.name == "Empty":
+          mod = __import__('google.protobuf.empty_pb2', fromlist=[m.input_type.name])
+          c = getattr(mod, m.input_type.name)
+          json_datas = json.loads("{}")
+          message = Parse(json.dumps(json_datas), c())
+          client.exe(method_name, message)
+        else:
+          print("Your method have not Empty in his input field but you have not \n"
+                "entered json input file and no json arguments.\n")
+      if json_args:
+        json_datas = json.loads(json_args)
+        msg = json_to_message(client, method_name, json_datas)
+        client.exe(method_name, msg)
+
+      if input_file:
+        with open(input_file) as file:
+          json_datas = json.load(file)
+          msg = json_to_message(client, method_name, json_datas)
+          client.exe(method_name, msg)
+  """
