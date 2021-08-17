@@ -278,9 +278,9 @@ def check_arguments(client, args, flags):
     exit(1)
 
   if args.component == "broker":
-    client = gRPC_client("broker")
+    client = gRPC_client(args.component)
   elif args.component == "engine":
-    client = gRPC_client("engine")
+    client = gRPC_client(args.component)
   else:
       print(colors.WARNING + "/!\ Warning /!\\\n Please choose a valid component to communicate with.\n"
             "Follow thoses example :\npython3 engine-rpc-client.py --component=engine --ip=127.0.0.1 --port={engine-port} --exe=GetVersion\n"
