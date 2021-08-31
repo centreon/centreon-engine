@@ -285,7 +285,7 @@ TEST_F(DowntimeFinderFindMatchingAllTest, MultipleCriterias) {
 // When find_matching_all() is called with the criteria ("end", "4102441200")
 // Then all downtimes with 4102441200 as end time are returned
 TEST_F(DowntimeFinderFindMatchingAllTest, OutOfRangeEnd) {
-  criterias.push_back(downtime_finder::criteria("end", "4102441200"));
+  criterias.push_back(downtime_finder::criteria("end", "2145916799"));
   result = _dtf->find_matching_all(criterias);
   expected.push_back(5);
   ASSERT_EQ(result, expected);
@@ -295,7 +295,7 @@ TEST_F(DowntimeFinderFindMatchingAllTest, OutOfRangeEnd) {
 // When find_matching_all() is called with the criteria ("start", "4102441200")
 // Then all downtimes with 4102441200 as end time are returned
 TEST_F(DowntimeFinderFindMatchingAllTest, OutOfRangeStart) {
-  criterias.push_back(downtime_finder::criteria("start", "4102441200"));
+  criterias.push_back(downtime_finder::criteria("start", "2145916799"));
   result = _dtf->find_matching_all(criterias);
   expected.push_back(5);
   ASSERT_EQ(result, expected);

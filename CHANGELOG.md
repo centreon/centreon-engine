@@ -1,5 +1,13 @@
 # Changelog
 
+## 21.04.4
+
+### Bugs
+
+*Downtime*
+
+Change Limit downtime start date, end date to 2145916799 (31/12/2037 23:59:59) max
+
 ## 21.04.3
 
 ### Bugs
