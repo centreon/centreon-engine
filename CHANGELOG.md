@@ -1,5 +1,13 @@
 # Changelog
 
+## 20.10.7
+
+### Bugs
+
+*Downtime*
+
+Change Limit downtime start date, end date to 2145916799 (31/12/2037 23:59:59) max
+
 ## 20.10.6
 
 ### Bugs
