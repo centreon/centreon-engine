@@ -486,18 +486,18 @@ int downtime_manager::schedule_downtime(downtime::type type,
   if (start_time >= end_time || end_time <= time(nullptr))
     return ERROR;
 
-  if (start_time > 4102441200) {
+  if (start_time > 2145916799) {
     logger(log_verification_error, basic)
         << "SCHEDULE DOWNTIME ALERT : start time is out of range and setted to "
-           "1/1/2100 00:00";
-    start_time = 4102441200;
+           "2037-12-31 23:59:59";
+    start_time = 2145916799;
   }
 
-  if (end_time > 4102441200) {
+  if (end_time > 2145916799) {
     logger(log_verification_error, basic)
         << "SCHEDULE DOWNTIME ALERT : end time is out of range and setted to "
-           "1/1/2100 00:00";
-    end_time = 4102441200;
+           "2037-12-31 23:59:59";
+    end_time = 2145916799;
   }
 
   if (duration > 31622400) {
