@@ -12,20 +12,19 @@ This program build Centreon-engine
     -h|--help     : help
 EOF
 }
-BUILD_TYPE="Debug"
+BUILD_TYPE=Debug
 CONAN_REBUILD="0"
-for i in $(cat conanfile.txt) ; do
-  if [[ $i =~ / ]] ; then
-    if [ ! -d ~/.conan/data/$i ] ; then
-      echo "The package '$i' is missing"
-      CONAN_REBUILD="1"
+while IFS= read -r filename; do
+  if [[ $filename =~ / ]] ; then
+    if [ ! -d ~/.conan/data/"$filename" ] ; then
+      echo "The package '$filename' is missing"
+      CONAN_REBUILD=1
       break
     fi
   fi
-done
+done < conanfile.txt
 
-for i in "$@"
-do
+for i in "$@" ; do
   case $i in
     -f|--force)
       force=1
@@ -52,20 +51,16 @@ done
 my_id=$(id -u)
 
 if [ -r /etc/centos-release ] ; then
-  maj="centos$(cat /etc/centos-release | awk '{print $4}' | cut -f1 -d'.')"
+  maj="centos$(awk '{print $4}' /etc/centos-release | cut -f1 -d'.')"
   v=$(cmake --version)
   if [[ $v =~ "version 3" ]] ; then
     cmake='cmake'
   else
     if rpm -q cmake3 ; then
-      rm -f /usr/bin/cmake
-      ln -s /usr/bin/cmake3 /usr/bin/cmake
-      cmake='cmake'
-    elif [ $maj = "centos7" ] ; then
+      cmake='cmake3'
+    elif [ "$maj" = "centos7" ] ; then
       yum -y install epel-release cmake3
-      mv /usr/bin/cmake /usr/bin/cmake2
-      ln -s /usr/bin/cmake3 /usr/bin/cmake
-      cmake='cmake'
+      cmake='cmake3'
     else
       dnf -y install cmake
       cmake='cmake'
@@ -84,8 +79,7 @@ if [ -r /etc/centos-release ] ; then
 
   good=$(gcc --version | awk '/gcc/ && ($3+0)>5.0{print 1}')
 
-  if [ ! $good ] ; then
-    echo "Your compiler is too old. Trying to used devtoolset-9."
+  if [ ! "$good" ] ; then
     yum -y install centos-release-scl
     yum-config-manager --enable rhel-server-rhscl-7-rpms
     yum -y install devtoolset-9
@@ -97,26 +91,26 @@ if [ -r /etc/centos-release ] ; then
     perl-Thread-Queue
   )
   for i in "${pkgs[@]}"; do
-    if ! rpm -q $i ; then
+    if ! rpm -q "$i" ; then
       if [ $maj = 'centos7' ] ; then
-        yum install -y $i
+        yum install -y "$i"
       else
-        dnf -y --enablerepo=PowerTools install $i
+        dnf -y --enablerepo=PowerTools install "$i"
       fi
     fi
   done
 elif [ -r /etc/issue ] ; then
-  maj=$(cat /etc/issue | awk '{print $1}')
-  version=$(cat /etc/issue | awk '{print $3}')
-  if [ $version = "9" ] ; then
-    dpkg='dpkg'
+  maj=$(awk '{print $1}' /etc/issue)
+  version=$(awk '{print $3}' /etc/issue)
+  if [ "$version" = "9" ] ; then
+    dpkg="dpkg"
   else
     dpkg='dpkg --no-pager'
   fi
   v=$(cmake --version)
-  if [[ $v =~ "version 3" ]] ; then
+  if [[ "$v" =~ "version 3" ]] ; then
     cmake='cmake'
-  elif [ $maj = "Debian" ] || [ $maj = "Ubuntu" ] ; then
+  elif [ "$maj" = "Debian" ] || [ "$maj" = "Ubuntu" ] ; then
     if $dpkg -l cmake ; then
       echo "Bad version of cmake..."
       exit 1
@@ -129,7 +123,7 @@ elif [ -r /etc/issue ] ; then
         exit 1
       fi
     fi
-  elif [ $maj = "Raspbian" ] ; then
+  elif [ "$maj" = "Raspbian" ] ; then
     if $dpkg -l cmake ; then
       echo "Bad version of cmake..."
       exit 1
@@ -146,7 +140,7 @@ elif [ -r /etc/issue ] ; then
     echo "Bad version of cmake..."
     exit 1
   fi
-  if [ $maj = "Debian" ] || [ $maj = "Ubuntu" ]; then
+  if [ "$maj" = "Debian" ] || [ "$maj" = "Ubuntu" ]; then
     pkgs=(
       gcc
       g++
@@ -165,8 +159,7 @@ elif [ -r /etc/issue ] ; then
         fi
       fi
     done
-  fi
-  if [ $maj = "Raspbian" ] ; then
+  elif [ "$maj" = "Raspbian" ] ; then
     pkgs=(
       gcc
       g++
@@ -190,7 +183,7 @@ fi
 
 pip3 install conan --upgrade
 
-if [ $my_id -eq 0 ] ; then
+if [ "$my_id" -eq 0 ] ; then
   conan='/usr/local/bin/conan'
 elif which conan ; then
   conan=$(which conan)
@@ -204,15 +197,15 @@ else
   echo "'build' directory already there"
 fi
 
-if [ "$force" = "1" ] ; then
+if [ "$force" = 1 ] ; then
   rm -rf build
   mkdir build
 fi
 cd build
 
-if [ $maj = "centos7" ] ; then
+if [ "$maj" = centos7 ] ; then
   rm -rf ~/.conan/profiles/default
-  if [ "$CONAN_REBUILD" = "1" ] ; then
+  if [ "$CONAN_REBUILD" = 1 ] ; then
     $conan install .. -s compiler.libcxx=libstdc++11 --build="*"
   else
     $conan install .. -s compiler.libcxx=libstdc++11 --build=missing
