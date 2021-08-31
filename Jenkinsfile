@@ -1,14 +1,17 @@
-import groovy.json.JsonSlurper
 /*
 ** Variables.
 */
 properties([buildDiscarder(logRotator(numToKeepStr: '50'))])
 def serie = '20.04'
 def maintenanceBranch = "${serie}.x"
+def qaBranch = "dev-${serie}.x"
+
 if (env.BRANCH_NAME.startsWith('release-')) {
   env.BUILD = 'RELEASE'
 } else if ((env.BRANCH_NAME == 'master') || (env.BRANCH_NAME == maintenanceBranch)) {
   env.BUILD = 'REFERENCE'
+} else if ((env.BRANCH_NAME == 'develop') || (env.BRANCH_NAME == qaBranch)) {
+  env.BUILD = 'QA'
 } else {
   env.BUILD = 'CI'
 }
@@ -17,7 +20,7 @@ if (env.BRANCH_NAME.startsWith('release-')) {
 ** Pipeline code.
 */
 stage('Source') {
-  node {
+  node("C++") {
     sh 'setup_centreon_build.sh'
     dir('centreon-engine') {
       checkout scm
@@ -38,9 +41,9 @@ stage('Source') {
 }
 
 try {
-  stage('Unit tests') {
-    parallel 'centos7': {
-      node {
+  stage('Build // Unit Tests // RPMs Packaging') {
+    parallel 'build centos7': {
+      node("C++") {
         sh 'setup_centreon_build.sh'
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-unittest.sh centos7"
         step([
@@ -55,6 +58,14 @@ try {
           sh "./centreon-build/jobs/engine/${serie}/mon-engine-analysis.sh"
         }
       }
+    },
+    'packaging centos7': {
+      node("C++") {
+        sh 'setup_centreon_build.sh'
+        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh centos7"
+        stash name: 'el7-rpms', includes: "output/x86_64/*.rpm"
+        archiveArtifacts artifacts: "output/x86_64/*.rpm"
+      }
     }
     if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
       error('Unit tests stage failure.');
@@ -63,8 +74,7 @@ try {
 
   // sonarQube step to get qualityGate result
   stage('Quality gate') {
-    node {
-      sleep 120
+    node("C++") {
       def qualityGate = waitForQualityGate()
       if (qualityGate.status != 'OK') {
         currentBuild.result = 'FAIL'
@@ -75,21 +85,10 @@ try {
     }
   }
 
-  stage('Package') {
-    parallel 'centos7': {
-      node {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh centos7"
-      }
-    }
-    if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
-      error('Package stage failure.');
-    }
-  }
-
-  if ((env.BUILD == 'RELEASE') || (env.BUILD == 'REFERENCE')) {
+  if ((env.BUILD == 'RELEASE') || (env.BUILD == 'QA')) {
     stage('Delivery') {
-      node {
+      node("C++") {
+        unstash 'el7-rpms'
         sh 'setup_centreon_build.sh'
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-delivery.sh"
       }
@@ -97,10 +96,9 @@ try {
         error('Delivery stage failure.');
       }
     }
-
-    if (env.BUILD == 'REFERENCE') {
+  }
+  if (env.BUILD == 'REFERENCE') {
       build job: "centreon-web/${env.BRANCH_NAME}", wait: false
-    }
   }
 }
 finally {
