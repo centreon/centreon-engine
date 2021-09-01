@@ -13,6 +13,10 @@ sending logs, it was then possible to lock a mutex twice.
 
 Change Limit downtime start date, end date to 2145916799 (31/12/2037 23:59:59) max
 
+*notification*
+
+now notification is only send if the host is on state_up
+
 ## 21.04.3
 
 ### Bugs
