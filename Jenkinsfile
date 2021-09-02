@@ -130,8 +130,8 @@ try {
   if ((env.BUILD == 'RELEASE') || (env.BUILD == 'QA')) {
     stage('Delivery') {
       node {
-        unstash el7-rpms
-        unstash el8-rpms
+        unstash 'el7-rpms'
+        unstash 'el8-rpms'
         sh 'setup_centreon_build.sh'
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-delivery.sh"
       }
