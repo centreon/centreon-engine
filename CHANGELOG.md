@@ -13,6 +13,10 @@ sending logs, it was then possible to lock a mutex twice.
 
 Change Limit downtime start date, end date to 2145916799 (31/12/2037 23:59:59) max
 
+*notification*
+
+now notification is not send if the host is on soft state_down and "Soft Service Dependencies Option" is activate.
+
 ## 20.10.6
 
 ### Bugs
