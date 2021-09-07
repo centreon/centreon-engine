@@ -232,12 +232,9 @@ bool notification::sent_to(const std::string& user) const {
 }
 
 /**
- * @brief Return a boolean telling if this notification has been sent to the
- * given user.
+ * @brief insert contacts notified.
  *
- * @param user The name of the user.
- *
- * @return a boolean.
+ * @param contact_notified The names of users notified.
  */
 
 void notification::insert_contacts(std::set<std::string> contact_notified) {
@@ -247,12 +244,9 @@ void notification::insert_contacts(std::set<std::string> contact_notified) {
 }
 
 /**
- * @brief Return a boolean telling if this notification has been sent to the
- * given user.
+ * @brief Return a list of contact notified
  *
- * @param user The name of the user.
- *
- * @return a boolean.
+ * @return contacts_notified.
  */
 std::set<std::string> notification::get_contacts() {
   return _notified_contact;
