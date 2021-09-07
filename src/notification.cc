@@ -237,10 +237,8 @@ bool notification::sent_to(const std::string& user) const {
  * @param contact_notified The names of users notified.
  */
 
-void notification::insert_contacts(std::set<std::string> contact_notified) {
-  for (auto contact : contact_notified) {
-    _notified_contact.insert(contact);
-  }
+void notification::add_contacts(std::set<std::string> contact_notified) {
+  _notified_contact.insert(contact_notified.begin(), contact_notified.end());
 }
 
 /**
@@ -248,7 +246,7 @@ void notification::insert_contacts(std::set<std::string> contact_notified) {
  *
  * @return contacts_notified.
  */
-std::set<std::string> notification::get_contacts() {
+const std::set<std::string>& notification::get_contacts() const {
   return _notified_contact;
 }
 

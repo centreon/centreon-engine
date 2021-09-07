@@ -794,7 +794,7 @@ int notifier::notify(notifier::reason_type type,
        * notify this contact on recovery notification */
       notification* normal_notif = _notification[notifier::cat_normal].get();
       if (normal_notif)
-        notif->insert_contacts(normal_notif->get_contacts());
+        notif->add_contacts(normal_notif->get_contacts());
 
       _notification[cat] = std::move(notif);
     } else {
