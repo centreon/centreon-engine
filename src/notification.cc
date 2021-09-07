@@ -231,6 +231,33 @@ bool notification::sent_to(const std::string& user) const {
          _notified_contact.end();
 }
 
+/**
+ * @brief Return a boolean telling if this notification has been sent to the
+ * given user.
+ *
+ * @param user The name of the user.
+ *
+ * @return a boolean.
+ */
+
+void notification::insert_contacts(std::set<std::string> contact_notified) {
+  for (auto contact : contact_notified) {
+    _notified_contact.insert(contact);
+  }
+}
+
+/**
+ * @brief Return a boolean telling if this notification has been sent to the
+ * given user.
+ *
+ * @param user The name of the user.
+ *
+ * @return a boolean.
+ */
+std::set<std::string> notification::get_contacts() {
+  return _notified_contact;
+}
+
 namespace com {
 namespace centreon {
 namespace engine {

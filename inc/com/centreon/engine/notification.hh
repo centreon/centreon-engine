@@ -59,6 +59,8 @@ class notification {
   notifier::reason_type get_reason() const;
   uint32_t get_notification_interval() const;
   bool sent_to(const std::string& user) const;
+  void insert_contacts(std::set<std::string> contact_notified);
+  std::set<std::string> get_contacts();
 };
 
 std::ostream& operator<<(std::ostream& os, notification const& obj);
