@@ -17,6 +17,8 @@ Change Limit downtime start date, end date to 2145916799 (31/12/2037 23:59:59) m
 
 now notification is not send if the host is on soft state_down and "Soft Service Dependencies Option" is activate.
 
+the notification recovery now is send of all contact notified for normal notifcation (critical,warning,unknown).
+
 ## 21.04.3
 
 ### Bugs
