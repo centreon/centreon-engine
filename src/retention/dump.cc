@@ -226,7 +226,7 @@ std::ostream& dump::scheduled_downtime(std::ostream& os, downtime const& obj) {
  */
 std::ostream& dump::downtimes(std::ostream& os) {
   logger(dbg_functions, basic) << "dump::downtimes()";
-  for (std::pair<time_t, std::shared_ptr<downtime> > const& obj :
+  for (std::pair<time_t, std::shared_ptr<downtime>> const& obj :
        downtimes::downtime_manager::instance().get_scheduled_downtimes())
     dump::scheduled_downtime(os, *obj.second);
   return os;
