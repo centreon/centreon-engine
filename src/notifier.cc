@@ -787,10 +787,18 @@ int notifier::notify(notifier::reason_type type,
     if (!to_notify.empty())
       _last_notification = std::time(nullptr);
 
-    _notification[cat] = std::move(notif);
     /* The notification has been sent.
      * Should we increment the notification number? */
-    if (cat != cat_normal) {
+    if (cat == cat_normal) {
+      /* if normal notification, get contacts from the last notification for
+       * notify this contact on recovery notification */
+      notification* normal_notif = _notification[notifier::cat_normal].get();
+      if (normal_notif)
+        notif->insert_contacts(normal_notif->get_contacts());
+
+      _notification[cat] = std::move(notif);
+    } else {
+      _notification[cat] = std::move(notif);
       switch (cat) {
         case cat_recovery:
           _notification[cat_normal].reset();
