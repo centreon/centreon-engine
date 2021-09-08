@@ -186,7 +186,7 @@ grpc::Status engine_impl::GetHost(grpc::ServerContext* context
             }
           } break;
           default: {
-            err = fmt::format("could not find identfier, you should inform a host");
+            err = fmt::format("could not find identifier, you should inform a host");
             return 1;
             break;
           }
@@ -234,7 +234,7 @@ grpc::Status engine_impl::GetContact(grpc::ServerContext* context
         if (itcontactname != contact::contacts.end())
           selectedcontact = itcontactname->second;
         else {
-          err = fmt::format("could not find contact'{}'", request->name());
+          err = fmt::format("could not find contact '{}'", request->name());
           return 1;
         }
         /* recovering contact's information */
@@ -281,7 +281,7 @@ grpc::Status engine_impl::GetService(grpc::ServerContext* context
             if (itservicenames != service::services.end())
               selectedservice = itservicenames->second;
             else {
-              err = fmt::format("could not find service '{}', '{}'", names.host_name(), names.service_name());
+              err = fmt::format("could not find service ('{}', '{}')", names.host_name(), names.service_name());
               return 1;
             }
           } break;
@@ -293,7 +293,7 @@ grpc::Status engine_impl::GetService(grpc::ServerContext* context
             if (itserviceids != service::services_by_id.end())
               selectedservice = itserviceids->second;
             else {
-              err = fmt::format("could not find service '{}', '{}'", ids.host_id(), ids.service_id());
+              err = fmt::format("could not find service ('{}', '{}')", ids.host_id(), ids.service_id());
               return 1;
             }
           } break;
@@ -590,7 +590,7 @@ grpc::Status engine_impl::AddServiceComment(grpc::ServerContext* context
     if (it != service::services.end())
       temp_service = it->second;
     if (temp_service == nullptr) {
-      err = fmt::format("could not find service '{}', '{}'", request->host_name(), request->svc_desc());
+      err = fmt::format("could not find service ('{}', '{}')", request->host_name(), request->svc_desc());
       return 1;
     }
     auto it2 = host::hosts.find(request->host_name());
@@ -606,8 +606,8 @@ grpc::Status engine_impl::AddServiceComment(grpc::ServerContext* context
         temp_service->get_service_id(), request->entry_time(), request->user(),
         request->comment_data(), request->persistent(), comment::external,
         false, (time_t)0);
-    if (cmt == nullptr)  {
-      err = fmt::format("could not delete comment");
+    if (!cmt)  {
+      err = fmt::format("could not insert comment '{}'", request->comment_data());
       return 1;
     }
     comment::comments.insert({cmt->get_comment_id(), cmt});
