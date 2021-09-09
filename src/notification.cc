@@ -231,6 +231,25 @@ bool notification::sent_to(const std::string& user) const {
          _notified_contact.end();
 }
 
+/**
+ * @brief insert contacts notified.
+ *
+ * @param contact_notified The names of users notified.
+ */
+
+void notification::add_contacts(const std::set<std::string>& contact_notified) {
+  _notified_contact.insert(contact_notified.begin(), contact_notified.end());
+}
+
+/**
+ * @brief Return a list of contact notified
+ *
+ * @return contacts_notified.
+ */
+const std::set<std::string>& notification::get_contacts() const {
+  return _notified_contact;
+}
+
 namespace com {
 namespace centreon {
 namespace engine {
