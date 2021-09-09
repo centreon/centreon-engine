@@ -237,7 +237,7 @@ bool notification::sent_to(const std::string& user) const {
  * @param contact_notified The names of users notified.
  */
 
-void notification::add_contacts(std::set<std::string> contact_notified) {
+void notification::add_contacts(const std::set<std::string>& contact_notified) {
   _notified_contact.insert(contact_notified.begin(), contact_notified.end());
 }
 
