@@ -1101,7 +1101,7 @@ TEST_F(ServiceNotification, SimpleVolatileServiceNotificationWithDowntime) {
 }
 
 TEST_F(ServiceNotification, WarningAndTwoUsers) {
-  /* admin is notified on all whereas admin1 is notified only no critical and
+  /* admin is notified on all whereas admin1 is notified only on critical and
    * recovery. So in case of a warning notification, only admin should be
    * notified for a recovery.
    */
@@ -1152,4 +1152,83 @@ TEST_F(ServiceNotification, WarningAndTwoUsers) {
       out.find("SERVICE NOTIFICATION: admin1;test_host;test_svc;RECOVERY "
                "(OK);cmd;service ok")};
   ASSERT_EQ(rec_admin1, std::string::npos);
+}
+
+TEST_F(ServiceNotification, RecoveryTwoUsers) {
+  /* admin is notified on all whereas admin1 is notified only on critical and
+   * recovery. So in case of critical notification all user should be notified,
+   * on warning notification only admin should be notified,
+   * on recovery notification all user should be notified.
+   */
+  int now{50000};
+  set_time(now);
+  _svc->set_current_state(engine::service::state_ok);
+  _svc->set_last_hard_state(engine::service::state_ok);
+  _svc->set_last_hard_state_change(50000);
+  _svc->set_state_type(checkable::hard);
+  _svc->set_accept_passive_checks(true);
+  testing::internal::CaptureStdout();
+  for (int i = 0; i < 3; i++) {
+    // When i == 0, the state_down is soft => no notification
+    // When i == 1, the state_down is soft => no notification
+    // When i == 2, the state_down is hard down => notification ; just for admin
+    now += 3000;
+    std::cout << "NOW = " << now << std::endl;
+    set_time(now);
+    _svc->set_last_state(_svc->get_current_state());
+    if (notifier::hard == _svc->get_state_type())
+      _svc->set_last_hard_state(_svc->get_current_state());
+
+    std::string cmd(fmt::format(
+        "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;2;service crit",
+        now));
+    process_external_command(cmd.c_str());
+    checks::checker::instance().reap();
+  }
+
+  now += 3000;
+  std::cout << "NOW = " << now << std::endl;
+  set_time(now);
+  std::string cmd(fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;1;service warn",
+      now));
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+
+  now += 3000;
+  std::cout << "NOW = " << now << std::endl;
+  set_time(now);
+  cmd = (fmt::format(
+      "[{}] PROCESS_SERVICE_CHECK_RESULT;test_host;test_svc;0;service ok",
+      now));
+  process_external_command(cmd.c_str());
+  checks::checker::instance().reap();
+  now += 3000;
+  std::cout << "NOW = " << now << std::endl;
+
+  std::string out{testing::internal::GetCapturedStdout()};
+  std::cout << out << std::endl;
+  size_t step1{out.find("NOW = 59000")};
+  size_t step2{
+      out.find("SERVICE NOTIFICATION: "
+               "admin;test_host;test_svc;CRITICAL;cmd;service crit",
+               step1 + 1)};
+  size_t step3{
+      out.find("SERVICE NOTIFICATION: "
+               "admin1;test_host;test_svc;CRITICAL;cmd;service crit",
+               step2 + 1)};
+  size_t step4{out.find("NOW = 62000", step3 + 1)};
+  size_t step5{out.find(
+      "SERVICE NOTIFICATION: admin;test_host;test_svc;WARNING;cmd;service warn",
+      step4 + 1)};
+  size_t step6{out.find("NOW = 65000", step5 + 1)};
+  size_t step7{
+      out.find("SERVICE NOTIFICATION: admin;test_host;test_svc;RECOVERY "
+               "(OK);cmd;service ok",
+               step6 + 1)};
+  size_t step8{
+      out.find("SERVICE NOTIFICATION: admin1;test_host;test_svc;RECOVERY "
+               "(OK);cmd;service ok",
+               step7 + 1)};
+  ASSERT_NE(step8, std::string::npos);
 }
