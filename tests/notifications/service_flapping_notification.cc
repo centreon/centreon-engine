@@ -334,19 +334,20 @@ TEST_F(ServiceFlappingNotification, CheckFlapping) {
   }
 
   std::string out{testing::internal::GetCapturedStdout()};
-  size_t m1{out.find("Step 6:")};
+  size_t m1{out.find("NOW = 53100")};
+  std::cout << "m1 " << m1 << std::endl;
   size_t m2{
       out.find("SERVICE NOTIFICATION: "
-               "admin;test_host;test_description;FLAPPINGSTART (OK);cmd;",
-               m1 + 1)};
-  size_t m3{out.find("Step 7:", m2 + 1)};
-  size_t m4{out.find("Step 17:", m3 + 1)};
+               "admin;test_host;test_description;FLAPPINGSTART (CRITICAL);cmd;",
+               m1)};
+  size_t m3{out.find("Step 7:", m2)};
+  size_t m4{out.find("Step 16:", m3)};
   size_t m5{out.find(
-      "SERVICE FLAPPING ALERT: test_host;test_description;STOPPED;", m4 + 1)};
+      "SERVICE FLAPPING ALERT: test_host;test_description;STOPPED;", m4)};
   size_t m6{
       out.find("SERVICE NOTIFICATION: "
                "admin;test_host;test_description;FLAPPINGSTOP (CRITICAL);cmd;",
-               m5 + 1)};
+               m5)};
   ASSERT_NE(m6, std::string::npos);
 }
 

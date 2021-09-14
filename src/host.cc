@@ -1997,9 +1997,11 @@ void host::check_for_flapping(bool update,
   else if (curved_percent_change <= low_threshold)
     is_flapping = false;
   /* else we're above the upper bound, so we are flapping */
-  else if (curved_percent_change >= high_threshold)
-    is_flapping = true;
-
+  else if (curved_percent_change >= high_threshold) {
+    /* start flapping on !OK states which makes more sense */
+    if ((get_current_state() != host::state_up) || get_is_flapping())
+      is_flapping = true;
+  }
   logger(dbg_flapping, more)
       << "Host " << (is_flapping ? "is" : "is not") << " flapping ("
       << curved_percent_change << "% state change).";

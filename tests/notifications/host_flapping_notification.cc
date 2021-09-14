@@ -233,7 +233,7 @@ TEST_F(HostFlappingNotification, CheckFlapping) {
                                    CHECK_OPTION_NONE, 0, true, 0);
   }
   testing::internal::CaptureStdout();
-  for (int i = 1; i < 8; i++) {
+  for (int i = 1; i < 12; i++) {
     // When i == 0, the state_down is soft => no notification
     // When i == 1, the state_down is soft => no notification
     // When i == 2, the state_down is hard down => notification
@@ -243,7 +243,7 @@ TEST_F(HostFlappingNotification, CheckFlapping) {
     if (notifier::hard == _host->get_state_type())
       _host->set_last_hard_state(_host->get_current_state());
     _host->process_check_result_3x(
-        i % 2 == 0 ? engine::host::state_up : engine::host::state_down,
+        i % 3 == 0 ? engine::host::state_up : engine::host::state_down,
         "The host is flapping", CHECK_OPTION_NONE, 0, true, 0);
   }
 
@@ -251,7 +251,7 @@ TEST_F(HostFlappingNotification, CheckFlapping) {
     // When i == 0, the state_down is soft => no notification
     // When i == 1, the state_down is soft => no notification
     // When i == 2, the state_down is hard down => notification
-    std::cout << "Step " << i << ":";
+    std::cout << "Step " << i << "  :";
     set_time(50420 + i * 60);
     _host->set_last_state(_host->get_current_state());
     if (notifier::hard == _host->get_state_type())
@@ -264,11 +264,11 @@ TEST_F(HostFlappingNotification, CheckFlapping) {
   std::string out{testing::internal::GetCapturedStdout()};
   size_t m1{out.find("Step 6:")};
   size_t m2{out.find(
-      "HOST NOTIFICATION: admin;test_host;FLAPPINGSTART (UP);cmd;", m1 + 1)};
-  size_t m3{out.find("Step 7:", m2 + 1)};
-  size_t m4{out.find("Step 17:", m3 + 1)};
-  size_t m5{out.find("HOST FLAPPING ALERT: test_host;STOPPED;", m4 + 1)};
+      "HOST NOTIFICATION: admin;test_host;FLAPPINGSTART (DOWN);cmd;", m1)};
+  size_t m3{out.find("Step 11:", m2)};
+  size_t m4{out.find("Step 13  :", m3)};
+  size_t m5{out.find("HOST FLAPPING ALERT: test_host;STOPPED;", m4)};
   size_t m6{out.find(
-      "HOST NOTIFICATION: admin;test_host;FLAPPINGSTOP (DOWN);cmd;", m5 + 1)};
+      "HOST NOTIFICATION: admin;test_host;FLAPPINGSTOP (DOWN);cmd;", m5)};
   ASSERT_NE(m6, std::string::npos);
 }
