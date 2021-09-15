@@ -4,6 +4,10 @@
 
 ### Bugs
 
+*Anomalydetection*
+
+Add unit to anomaly thresholds curves
+
 *logs*
 
 There was a possible deadlock in logging::broker due to creation of logs when
