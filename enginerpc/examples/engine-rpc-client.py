@@ -247,12 +247,16 @@ def isBlank (myString):
   return not (myString and myString.strip())
 
 # Convert a json object into a gRPC message
-def json_to_message(client, method_name, json_datas):
+def json_to_message(client, method_name, json_datas, component):
   m = client.get_grpc_method(method_name)
   if m.input_type.name == "Empty":
     mod = __import__('google.protobuf.empty_pb2', fromlist=[m.input_type.name])
-  else:
+    return
+
+  if component == "engine":
     mod = __import__('engine_pb2', fromlist=[m.input_type.name])
+  else:
+    mod = __import__('broker_pb2', fromlist=[m.input_type.name])
 
   try:
     c = getattr(mod, m.input_type.name)
@@ -338,13 +342,13 @@ def check_arguments(client, args, flags):
       except json.decoder.JSONDecodeError:
         sys.exit("String could not be converted to JSON object, please check syntax.")
 
-      msg = json_to_message(client, args.method_name, json_datas)
+      msg = json_to_message(client, args.method_name, json_datas, args.component)
       client.exe(args.method_name, msg)
 
     if args.input_file:
       with open(args.input_file) as file:
         json_datas = json.load(file)
-        msg = json_to_message(client, args.method_name, json_datas)
+        msg = json_to_message(client, args.method_name, json_datas, args.component)
         client.exe(args.method_name, msg)
 
 ### Main ###
