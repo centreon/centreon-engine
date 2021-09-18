@@ -1908,8 +1908,7 @@ void host::check_for_flapping(bool update,
       update_history = false;
     if (get_current_state() == host::state_down && !get_flap_detection_on(down))
       update_history = false;
-    if (get_current_state() == host::state_unreachable &&
-        !get_flap_detection_on(host::unreachable))
+    if (get_current_state() == host::state_unreachable)
       update_history = false;
   }
 

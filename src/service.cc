@@ -1940,6 +1940,9 @@ void service::check_for_flapping(bool update,
     if (_current_state == service::state_critical &&
         !get_flap_detection_on(critical))
       update_history = false;
+    host* hst{get_host_ptr()};
+    if (hst->get_current_state() != host::state_up)
+      update_history = false;
   }
 
   /* record current service state */

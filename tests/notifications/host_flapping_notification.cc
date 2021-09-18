@@ -62,15 +62,32 @@ class HostFlappingNotification : public TestEngine {
     _host->set_state_type(checkable::hard);
     _host->set_problem_has_been_acknowledged(false);
     _host->set_notify_on(static_cast<uint32_t>(-1));
+
+    configuration::host hst_child;
+    hst_child.parse("host_name", "child_host");
+    hst_child.parse("parents", "test_host");
+    hst_child.parse("address", "127.0.0.1");
+    hst_child.parse("_HOST_ID", "13");
+    hst_child.parse("contacts", "admin");
+    hst_aply.add_object(hst_child);
+    hst_aply.resolve_object(hst_child);
+
+    _host2 = hm.begin()->second;
+    _host2->set_current_state(engine::host::state_up);
+    _host2->set_state_type(checkable::hard);
+    _host2->set_problem_has_been_acknowledged(false);
+    _host2->set_notify_on(static_cast<uint32_t>(-1));
   }
 
   void TearDown() override {
     _host.reset();
+    _host2.reset();
     deinit_config_state();
   }
 
  protected:
   std::shared_ptr<engine::host> _host;
+  std::shared_ptr<engine::host> _host2;
 };
 
 // Given a host UP
@@ -271,4 +288,74 @@ TEST_F(HostFlappingNotification, CheckFlapping) {
   size_t m6{out.find(
       "HOST NOTIFICATION: admin;test_host;FLAPPINGSTOP (DOWN);cmd;", m5)};
   ASSERT_NE(m6, std::string::npos);
+}
+
+TEST_F(HostFlappingNotification, CheckFlappingWithHostParentDown) {
+  config->enable_flap_detection(true);
+  // _host->set_current_state(engine::host::state_down);
+  // _host->set_last_hard_state(engine::host::state_down);
+  // _host->set_state_type(checkable::hard);
+  _host2->set_flap_detection_enabled(true);
+  _host2->add_flap_detection_on(engine::host::up);
+  _host2->add_flap_detection_on(engine::host::down);
+  _host2->add_flap_detection_on(engine::host::unreachable);
+  _host2->set_notification_interval(1);
+  set_time(45000);
+  _host2->set_current_state(engine::host::state_up);
+  _host2->set_last_hard_state(engine::host::state_up);
+  _host2->set_last_hard_state_change(50000);
+  _host2->set_state_type(checkable::hard);
+  _host2->set_first_notification_delay(3);
+  // This loop is to store many UP in the state history.
+  for (int i = 1; i < 22; i++) {
+    // When i == 0, the state_down is soft => no notification
+    // When i == 1, the state_down is soft => no notification
+    // When i == 2, the state_down is hard down => notification
+    set_time(45000 + i * 60);
+    _host2->set_last_state(_host2->get_current_state());
+    if (notifier::hard == _host2->get_state_type())
+      _host2->set_last_hard_state(_host2->get_current_state());
+    _host2->process_check_result_3x(engine::host::state_up, "The host is up",
+                                    CHECK_OPTION_NONE, 0, true, 0);
+  }
+  testing::internal::CaptureStdout();
+  for (int i = 1; i < 12; i++) {
+    // When i == 0, the state_down is soft => no notification
+    // When i == 1, the state_down is soft => no notification
+    // When i == 2, the state_down is hard down => notification
+    std::cout << "Step " << i << ":";
+    set_time(50000 + i * 60);
+    _host2->set_last_state(_host2->get_current_state());
+    if (notifier::hard == _host2->get_state_type())
+      _host2->set_last_hard_state(_host2->get_current_state());
+    _host2->process_check_result_3x(
+        i % 3 == 0 ? engine::host::state_up : engine::host::state_unreachable,
+        "The host is flapping", CHECK_OPTION_NONE, 0, true, 0);
+  }
+
+  for (int i = 1; i < 18; i++) {
+    // When i == 0, the state_down is soft => no notification
+    // When i == 1, the state_down is soft => no notification
+    // When i == 2, the state_down is hard down => notification
+    std::cout << "Step " << i << "  :";
+    set_time(50420 + i * 60);
+    _host2->set_last_state(_host2->get_current_state());
+    if (notifier::hard == _host2->get_state_type())
+      _host2->set_last_hard_state(_host2->get_current_state());
+    _host2->process_check_result_3x(engine::host::state_down,
+                                    "The host is flapping", CHECK_OPTION_NONE,
+                                    0, true, 0);
+  }
+
+  std::string out{testing::internal::GetCapturedStdout()};
+  std::cout << out << std::endl;
+  size_t m1{out.find(
+      "HOST NOTIFICATION: admin;child_host;FLAPPINGSTART (DOWN);cmd;")};
+  size_t m2{out.find("HOST FLAPPING ALERT: child_host;STOPPED;")};
+  size_t m3{
+      out.find("HOST NOTIFICATION: admin;child_host;FLAPPINGSTOP (DOWN);cmd;")};
+
+  ASSERT_EQ(m1, std::string::npos);
+  ASSERT_EQ(m2, std::string::npos);
+  ASSERT_EQ(m3, std::string::npos);
 }
