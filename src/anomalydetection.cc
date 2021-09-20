@@ -612,7 +612,8 @@ int anomalydetection::run_async_check(int check_options,
         << " is " << std::get<1>(pd) << std::get<2>(pd);
     if (!std::isnan(std::get<3>(pd)) && !std::isnan(std::get<4>(pd)))
       oss << " which is outside the forecasting range [" << std::get<3>(pd)
-          << " ; " << std::get<4>(pd) << "] |";
+          << std::get<2>(pd) << " ; " << std::get<4>(pd) << std::get<2>(pd)
+          << "] |";
     else
       oss << " and the forecasting range is unknown |";
   }
@@ -767,8 +768,7 @@ void anomalydetection::init_thresholds() {
   nlohmann::json json;
   try {
     json = nlohmann::json::parse(buffer.str());
-  }
-  catch (const nlohmann::json::parse_error& e) {
+  } catch (const nlohmann::json::parse_error& e) {
     logger(log_config_error, basic) << "Error: the file '" << _thresholds_file
                                     << "' contains errors: " << e.what();
     return;
@@ -842,8 +842,9 @@ int anomalydetection::update_thresholds(const std::string& filename) {
   try {
     json = nlohmann::json::parse(buffer.str());
   } catch (const nlohmann::json::parse_error& e) {
-    logger(log_config_error, basic) << "Error: The thresholds file '"
-                                    << filename << "' should be a json file: " << e.what();
+    logger(log_config_error, basic)
+        << "Error: The thresholds file '" << filename
+        << "' should be a json file: " << e.what();
     return -2;
   }
 
