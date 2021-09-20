@@ -4,10 +4,9 @@
 
 ### Bugs
 
-*Downtime*
+*Anomalydetection*
 
-Change downtime limits start/end dates to 2145916799
-(31/12/2037 23:59:59) max.
+Add unit to anomaly thresholds curves
 
 *logs*
 
