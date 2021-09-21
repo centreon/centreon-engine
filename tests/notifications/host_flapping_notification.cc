@@ -292,9 +292,9 @@ TEST_F(HostFlappingNotification, CheckFlapping) {
 
 TEST_F(HostFlappingNotification, CheckFlappingWithHostParentDown) {
   config->enable_flap_detection(true);
-  // _host->set_current_state(engine::host::state_down);
-  // _host->set_last_hard_state(engine::host::state_down);
-  // _host->set_state_type(checkable::hard);
+  _host->set_current_state(engine::host::state_down);
+  _host->set_last_hard_state(engine::host::state_down);
+  _host->set_state_type(checkable::hard);
   _host2->set_flap_detection_enabled(true);
   _host2->add_flap_detection_on(engine::host::up);
   _host2->add_flap_detection_on(engine::host::down);
