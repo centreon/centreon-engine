@@ -2,9 +2,9 @@
 
 ## Installation of gRPC ##
 
-Verify that you have installed theses packages on your system else install them. On Centos 7 you can execute this command below :
+Verify that you have installed these packages on your system, else install them. On Centos 7 you can execute this command below :
 
-```yum install python3-devel, gcc-c++, gcc, epel-release, net-tools, wget```
+```yum install python3-devel gcc-c++ gcc epel-release net-tools wget```
 
 Now you have to install gRPC, so you can do these commands below (on Centos 7) :
 
@@ -12,11 +12,11 @@ Now you have to install gRPC, so you can do these commands below (on Centos 7) :
 
 <img src="https://zupimages.net/up/21/18/dkto.png" />
 
-```pip3 install grpcio-tools=1.33.2```
+```pip3 install grpcio-tools==1.33.2```
 
 <img src="https://zupimages.net/up/21/18/900w.png" />
 
-/!\ Note the 1.33.2 version, highter version may not work (on Centos 7). /!\
+/!\ Note the 1.33.2 version, a higher version may not work (on Centos 7). /!\
 
 ## Download the python script ##
 
@@ -49,6 +49,6 @@ To verify that the script is working well, you can run this command as an exampl
 
 ## Infos ##
 
-I tested this guide on Centreon 20.04, 20.10 and 21.04, that i downloaded from this link : https://download.centreon.com/. </br>
+I tested this guide on Centreon 20.04, 20.10 and 21.04, that I downloaded from this link : https://download.centreon.com/. </br>
 I did not encounter any particular errors.
 
