@@ -59,7 +59,7 @@ class ServiceFlappingNotification : public TestEngine {
 
     configuration::applier::command cmd_aply;
     configuration::command cmd("cmd");
-    cmd.parse("command_line", "/usr/bin/echo 1");
+    cmd.parse("command_line", "echo 1");
     cmd_aply.add_object(cmd);
 
     configuration::applier::host hst_aply;
