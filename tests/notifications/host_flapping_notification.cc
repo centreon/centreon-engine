@@ -237,11 +237,9 @@ TEST_F(HostFlappingNotification, CheckFlapping) {
   _host->set_last_hard_state_change(50000);
   _host->set_state_type(checkable::hard);
   _host->set_first_notification_delay(3);
+
   // This loop is to store many UP in the state history.
   for (int i = 1; i < 22; i++) {
-    // When i == 0, the state_down is soft => no notification
-    // When i == 1, the state_down is soft => no notification
-    // When i == 2, the state_down is hard down => notification
     set_time(45000 + i * 60);
     _host->set_last_state(_host->get_current_state());
     if (notifier::hard == _host->get_state_type())
@@ -249,11 +247,10 @@ TEST_F(HostFlappingNotification, CheckFlapping) {
     _host->process_check_result_3x(engine::host::state_up, "The host is up",
                                    CHECK_OPTION_NONE, 0, true, 0);
   }
+
+  // This loop is to store many UP or DOWN in the state history to start flapping.
   testing::internal::CaptureStdout();
   for (int i = 1; i < 12; i++) {
-    // When i == 0, the state_down is soft => no notification
-    // When i == 1, the state_down is soft => no notification
-    // When i == 2, the state_down is hard down => notification
     std::cout << "Step " << i << ":";
     set_time(50000 + i * 60);
     _host->set_last_state(_host->get_current_state());
@@ -264,10 +261,8 @@ TEST_F(HostFlappingNotification, CheckFlapping) {
         "The host is flapping", CHECK_OPTION_NONE, 0, true, 0);
   }
 
+  // This loop is to store many DOWN in the state history to stop flapping.
   for (int i = 1; i < 18; i++) {
-    // When i == 0, the state_down is soft => no notification
-    // When i == 1, the state_down is soft => no notification
-    // When i == 2, the state_down is hard down => notification
     std::cout << "Step " << i << "  :";
     set_time(50420 + i * 60);
     _host->set_last_state(_host->get_current_state());
@@ -306,11 +301,9 @@ TEST_F(HostFlappingNotification, CheckFlappingWithHostParentDown) {
   _host2->set_last_hard_state_change(50000);
   _host2->set_state_type(checkable::hard);
   _host2->set_first_notification_delay(3);
+
   // This loop is to store many UP in the state history.
   for (int i = 1; i < 22; i++) {
-    // When i == 0, the state_down is soft => no notification
-    // When i == 1, the state_down is soft => no notification
-    // When i == 2, the state_down is hard down => notification
     set_time(45000 + i * 60);
     _host2->set_last_state(_host2->get_current_state());
     if (notifier::hard == _host2->get_state_type())
@@ -318,11 +311,10 @@ TEST_F(HostFlappingNotification, CheckFlappingWithHostParentDown) {
     _host2->process_check_result_3x(engine::host::state_up, "The host is up",
                                     CHECK_OPTION_NONE, 0, true, 0);
   }
+
+  // This loop is to store many UP or DOWN in the state history to start flapping.
   testing::internal::CaptureStdout();
   for (int i = 1; i < 12; i++) {
-    // When i == 0, the state_down is soft => no notification
-    // When i == 1, the state_down is soft => no notification
-    // When i == 2, the state_down is hard down => notification
     std::cout << "Step " << i << ":";
     set_time(50000 + i * 60);
     _host2->set_last_state(_host2->get_current_state());
@@ -333,10 +325,8 @@ TEST_F(HostFlappingNotification, CheckFlappingWithHostParentDown) {
         "The host is flapping", CHECK_OPTION_NONE, 0, true, 0);
   }
 
+  // This loop is to store many DOWN in the state history to stop flapping.
   for (int i = 1; i < 18; i++) {
-    // When i == 0, the state_down is soft => no notification
-    // When i == 1, the state_down is soft => no notification
-    // When i == 2, the state_down is hard down => notification
     std::cout << "Step " << i << "  :";
     set_time(50420 + i * 60);
     _host2->set_last_state(_host2->get_current_state());
@@ -348,7 +338,6 @@ TEST_F(HostFlappingNotification, CheckFlappingWithHostParentDown) {
   }
 
   std::string out{testing::internal::GetCapturedStdout()};
-  std::cout << out << std::endl;
   size_t m1{out.find(
       "HOST NOTIFICATION: admin;child_host;FLAPPINGSTART (DOWN);cmd;")};
   size_t m2{out.find("HOST FLAPPING ALERT: child_host;STOPPED;")};

@@ -268,11 +268,8 @@ TEST_F(ServiceFlappingNotification, CheckFlapping) {
   _service->set_first_notification_delay(3);
   _service->set_max_attempts(1);
 
-  // This loop is to store many UP in the state history.
+  // This loop is to store many OK in the state history.
   for (int i = 1; i < 22; i++) {
-    // When i == 0, the state_critical is soft => no notification
-    // When i == 1, the state_critical is soft => no notification
-    // When i == 2, the state_critical is hard down => notification
     now += 300;
     std::cout << "NOW = " << now << std::endl;
     set_time(now);
@@ -291,10 +288,8 @@ TEST_F(ServiceFlappingNotification, CheckFlapping) {
   }
 
   testing::internal::CaptureStdout();
+  // This loop is to store many CRITICAL or OK in the state history to start the flapping.
   for (int i = 1; i < 8; i++) {
-    // When i == 0, the state_critical is soft => no notification
-    // When i == 1, the state_critical is soft => no notification
-    // When i == 2, the state_critical is hard down => notification
     now += 300;
     std::cout << "NOW = " << now << std::endl;
     set_time(now);
@@ -312,10 +307,8 @@ TEST_F(ServiceFlappingNotification, CheckFlapping) {
     checks::checker::instance().reap();
   }
 
+  // This loop is to store many CRITICAL in the state history to stop the flapping.
   for (int i = 1; i < 18; i++) {
-    // When i == 0, the state_critical is soft => no notification
-    // When i == 1, the state_critical is soft => no notification
-    // When i == 2, the state_critical is hard down => notification
     std::cout << "Step " << i << ":";
     now += 300;
     std::cout << "NOW = " << now << std::endl;
@@ -335,7 +328,6 @@ TEST_F(ServiceFlappingNotification, CheckFlapping) {
 
   std::string out{testing::internal::GetCapturedStdout()};
   size_t m1{out.find("NOW = 53100")};
-  std::cout << "m1 " << m1 << std::endl;
   size_t m2{
       out.find("SERVICE NOTIFICATION: "
                "admin;test_host;test_description;FLAPPINGSTART (CRITICAL);cmd;",
@@ -368,11 +360,8 @@ TEST_F(ServiceFlappingNotification, CheckFlappingWithHostDown) {
   _service->set_first_notification_delay(3);
   _service->set_max_attempts(1);
 
-  // This loop is to store many UP in the state history.
+  // This loop is to store many OK in the state history.
   for (int i = 1; i < 22; i++) {
-    // When i == 0, the state_critical is soft => no notification
-    // When i == 1, the state_critical is soft => no notification
-    // When i == 2, the state_critical is hard down => notification
     now += 300;
     std::cout << "NOW = " << now << std::endl;
     set_time(now);
@@ -391,10 +380,8 @@ TEST_F(ServiceFlappingNotification, CheckFlappingWithHostDown) {
   }
 
   testing::internal::CaptureStdout();
+  // This loop is to store many CRITICAL or OK in the state history to start the flapping.
   for (int i = 1; i < 8; i++) {
-    // When i == 0, the state_critical is soft => no notification
-    // When i == 1, the state_critical is soft => no notification
-    // When i == 2, the state_critical is hard down => notification
     now += 300;
     std::cout << "NOW = " << now << std::endl;
     set_time(now);
@@ -412,10 +399,8 @@ TEST_F(ServiceFlappingNotification, CheckFlappingWithHostDown) {
     checks::checker::instance().reap();
   }
 
+  // This loop is to store many CRITICAL in the state history to stop the flapping.
   for (int i = 1; i < 18; i++) {
-    // When i == 0, the state_critical is soft => no notification
-    // When i == 1, the state_critical is soft => no notification
-    // When i == 2, the state_critical is hard down => notification
     std::cout << "Step " << i << ":";
     now += 300;
     std::cout << "NOW = " << now << std::endl;
@@ -434,7 +419,6 @@ TEST_F(ServiceFlappingNotification, CheckFlappingWithHostDown) {
   }
 
   std::string out{testing::internal::GetCapturedStdout()};
-  std::cout << out << std::endl;
   size_t m1{out.find(
       "SERVICE NOTIFICATION: "
       "admin;test_host;test_description;FLAPPINGSTART (CRITICAL);cmd;")};
@@ -463,11 +447,8 @@ TEST_F(ServiceFlappingNotification, RetentionFlappingNotification) {
   _service->set_first_notification_delay(3);
   _service->set_max_attempts(1);
 
-  // This loop is to store many UP in the state history.
+  // This loop is to store many OK in the state history.
   for (int i = 1; i < 22; i++) {
-    // When i == 0, the state_critical is soft => no notification
-    // When i == 1, the state_critical is soft => no notification
-    // When i == 2, the state_critical is hard down => notification
     now += 300;
     std::cout << "NOW = " << now << std::endl;
     set_time(now);
@@ -485,10 +466,8 @@ TEST_F(ServiceFlappingNotification, RetentionFlappingNotification) {
     checks::checker::instance().reap();
   }
 
+  // This loop is to store many CRITICAL or OK in the state history to start the flapping.
   for (int i = 1; i < 8; i++) {
-    // When i == 0, the state_critical is soft => no notification
-    // When i == 1, the state_critical is soft => no notification
-    // When i == 2, the state_critical is hard down => notification
     now += 300;
     std::cout << "NOW = " << now << std::endl;
     set_time(now);
@@ -505,11 +484,9 @@ TEST_F(ServiceFlappingNotification, RetentionFlappingNotification) {
     process_external_command(cmd.c_str());
     checks::checker::instance().reap();
   }
-
+  
+  // This loop is to store many CRITICAL in the state history to stop the flapping.
   for (int i = 1; i < 18; i++) {
-    // When i == 0, the state_critical is soft => no notification
-    // When i == 1, the state_critical is soft => no notification
-    // When i == 2, the state_critical is hard down => notification
     std::cout << "Step " << i << ":";
     now += 300;
     std::cout << "NOW = " << now << std::endl;
