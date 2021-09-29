@@ -1904,12 +1904,10 @@ void host::check_for_flapping(bool update,
 
   /* should we update state history for this state? */
   if (update_history) {
-    if (get_current_state() == host::state_up && !get_flap_detection_on(up))
-      update_history = false;
-    if (get_current_state() == host::state_down && !get_flap_detection_on(down))
-      update_history = false;
-    if (get_current_state() == host::state_unreachable &&
-        !get_flap_detection_on(host::unreachable))
+    if ((get_current_state() == host::state_up && !get_flap_detection_on(up)) ||
+        (get_current_state() == host::state_down &&
+         !get_flap_detection_on(down)) ||
+        (get_current_state() == host::state_unreachable))
       update_history = false;
   }
 
@@ -3564,10 +3562,9 @@ void host::check_for_orphaned() {
 
     /* determine the time at which the check results should have come in (allow
      * 10 minutes slack time) */
-    expected_time =
-        (time_t)(it->second->get_next_check() + it->second->get_latency() +
-                 config->host_check_timeout() +
-                 config->check_reaper_interval() + 600);
+    expected_time = (time_t)(
+        it->second->get_next_check() + it->second->get_latency() +
+        config->host_check_timeout() + config->check_reaper_interval() + 600);
 
     /* this host was supposed to have executed a while ago, but for some reason
      * the results haven't come back in... */
