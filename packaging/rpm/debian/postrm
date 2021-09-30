@@ -1,0 +1,5 @@
+#!/bin/sh
+
+deluser centreon centreon-engine || true
+deluser centreon-engine || true
+delgroup centreon-engine || true

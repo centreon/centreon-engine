@@ -1,0 +1,506 @@
+##
+## Copyright 2011-2020 Centreon
+##
+
+%if 0%{?suse_version}
+%define group "System/Monitoring"
+%else
+%define group "Applications/System"
+%endif
+%define user centreon-engine
+
+Name:           centreon-engine
+Version:        %{VERSION}
+Release:        %{RELEASE}%{?dist}
+Summary:        Centreon Engine monitoring core.
+%define thismajor 21.10.0
+%define nextmajor 21.11.0
+
+Group:          %{group}
+License:        GPLv2
+URL:            https://github.com/centreon/centreon-engine
+Packager:       Matthieu Kermagoret <mkermagoret@centreon.com>
+Vendor:         Centreon Entreprise Server (CES) Repository, http://yum.centreon.com/standard/
+
+Source0:        %{name}-%{version}.tar.gz
+Source1:        centreonengine_integrate_centreon_engine2centreon.sh
+BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root
+
+BuildRequires:  cmake3 >= 3.15
+
+BuildRequires:  gcc
+BuildRequires:  gcc-c++
+BuildRequires:  make
+BuildRequires:  centreon-clib-devel >= %{thismajor}
+BuildRequires:  centreon-clib-devel < %{nextmajor}
+BuildRequires:  systemd
+Requires:       %{name}-daemon = %{version}-%{release}
+Requires:       %{name}-extcommands = %{version}-%{release}
+
+%description
+Centreon Engine is a monitoring engine, compatible with Nagios
+configuration, designed to monitor hosts and services on your network.
+
+%package daemon
+Summary:    Centreon Engine Daemon is the daemon to schedule checks.
+Group:      %{group}
+Requires:   centreon-clib >= %{thismajor}
+Requires:   centreon-clib < %{nextmajor}
+%{?systemd_requires}
+
+%description daemon
+Centreon Engine is a monitoring engine that schedule checks on your
+network services and hosts.
+
+%package extcommands
+Summary:    Centreon Engine External Commands allow to other applications to send command into the daemon.
+Group:      %{group}
+Requires:   %{name}-daemon = %{version}-%{release}
+
+%description extcommands
+Centreon Engine External Commands allow to other applications to send
+command into the daemon. External applications can submit commands by
+writing to the command file, which is periodically processed by the
+engine daemon.
+
+%package devel
+Summary:    Provide include files for Centreon Engine.
+Group:      %{group}
+Requires:   centreon-clib-devel >= %{thismajor}
+Requires:   centreon-clib-devel < %{nextmajor}
+
+%description devel
+Centreon Engine devel provide include files to develop Centreon Engine
+Modules or Centreon Engine Connector.
+
+%package bench
+Summary:    Centreon Engine benchmarking tools.
+Group:      %{group}
+Requires:   centreon-clib >= %{thismajor}
+Requires:   centreon-clib < %{nextmajor}
+
+%description bench
+Some Centreon Engine benchmarking tools.
+
+%prep
+%setup
+
+%build
+pip3 install conan --upgrade
+cpp11=$(gcc --version | awk '/gcc/ && ($3+0)>5.0{print 1}')
+if [ $cpp11 -eq 1 ] ; then
+  conan install . -s compiler.libcxx=libstdc++11 --build=missing
+else
+  conan install . -s compiler.libcxx=libstdc++
+fi
+
+CXXFLAGS="-DNDEBUG -g -O2 -Wno-long-long" cmake3 \
+    -DWITH_BENCH=1 \
+    -DWITH_CREATE_FILES=0 \
+    -DWITH_GROUP=%{user} \
+    -DWITH_LOGROTATE_DIR=%{_sysconfdir}/logrotate.d \
+    -DWITH_LOGROTATE_SCRIPT=1 \
+    -DWITH_PKGCONFIG_DIR=%{_libdir}/pkgconfig \
+    -DWITH_PKGCONFIG_SCRIPT=1 \
+    -DWITH_STARTUP_SCRIPT=systemd \
+    -DWITH_PREFIX=%{_prefix} \
+    -DWITH_PREFIX_BIN=%{_sbindir} \
+    -DWITH_PREFIX_CONF=%{_sysconfdir}/centreon-engine \
+    -DWITH_PREFIX_LIB=%{_libdir}/centreon-engine \
+    -DWITH_RW_DIR=%{_localstatedir}/lib/centreon-engine/rw \
+    -DWITH_STARTUP_DIR=%{_unitdir} \
+    -DWITH_TESTING=0 \
+    -DWITH_USER=%{user} \
+    -DWITH_VAR_DIR=%{_localstatedir}/log/centreon-engine
+%{__make} %{?jobs:-j%jobs} %{?_smp_mflags} VERBOSE="1"
+
+%install
+%{__rm} -rf $RPM_BUILD_ROOT
+%{__make} -j9 install DESTDIR="$RPM_BUILD_ROOT"
+# Engine 2.x
+#%{__install} -d $RPM_BUILD_ROOT%{_sysconfdir}/centreon-engine
+#%{__install} -d $RPM_BUILD_ROOT%{_sysconfdir}/centreon-engine/conf.d
+#%{__install} -d $RPM_BUILD_ROOT%{_sysconfdir}/centreon-engine/objects.d
+%{__install} -d $RPM_BUILD_ROOT%{_localstatedir}/log/centreon-engine
+%{__install} -d $RPM_BUILD_ROOT%{_localstatedir}/log/centreon-engine/archives
+%{__install} -d $RPM_BUILD_ROOT%{_localstatedir}/lib/centreon-engine
+%{__install} -d $RPM_BUILD_ROOT%{_localstatedir}/lib/centreon-engine/rw
+touch $RPM_BUILD_ROOT%{_localstatedir}/log/centreon-engine/centengine.debug
+%{__install} -d $RPM_BUILD_ROOT%{_datadir}/centreon-engine/extra
+%{__cp} %SOURCE1 $RPM_BUILD_ROOT%{_datadir}/centreon-engine/extra/integrate_centreon_engine2centreon.sh
+
+%clean
+%{__rm} -rf $RPM_BUILD_ROOT
+
+%pre daemon
+if ! id %{user} &>/dev/null; then
+    %{_sbindir}/useradd -d %{_localstatedir}/lib/centreon-engine -r %{user} &>/dev/null
+fi
+if id centreon-broker &>/dev/null; then
+    %{_sbindir}/usermod -a -G %{user} centreon-broker
+fi
+if id centreon-gorgone &>/dev/null; then
+    %{_sbindir}/usermod -a -G centreon-gorgone %{user}
+fi
+%if 0%{?suse_version}
+    %define httpgroup www
+%else
+%if 0%{?centos_version}
+    %define httpgroup apache
+%else
+    %define httpgroup apache
+%endif
+%endif
+if id -g %{httpgroup} &>/dev/null; then
+    %{_sbindir}/usermod -a -G %{user} %{httpgroup}
+fi
+if id -g nagios &>/dev/null; then
+    %{_sbindir}/usermod -a -G %{user} nagios
+fi
+
+%post daemon
+%systemd_post centengine.service || :
+
+%preun daemon
+%systemd_preun centengine.service || :
+
+%files
+
+%files daemon
+%defattr(-,centreon-engine,centreon-engine,-)
+%attr(0664,%{user},%{user}) %config(noreplace) %{_sysconfdir}/centreon-engine/centengine.cfg
+# Centreon Engine 2.x
+#%attr(0775,%{user},%{user}) %config(noreplace) %{_sysconfdir}/centreon-engine/conf.d/
+#%attr(0775,%{user},%{user}) %config(noreplace) %{_sysconfdir}/centreon-engine/objects.d/
+# Centreon Engine 1.x
+%attr(0664,%{user},%{user}) %config(noreplace) %{_sysconfdir}/centreon-engine/resource.cfg
+%attr(0664,%{user},%{user}) %config(noreplace) %{_sysconfdir}/centreon-engine/objects/*.cfg
+
+%defattr(-,root,root,-)
+%config(noreplace) %{_sysconfdir}/logrotate.d/centengine
+%{_unitdir}/centengine.service
+%{_sbindir}/centengine
+%{_sbindir}/centenginestats
+%attr(0775,root,root) %{_datadir}/centreon-engine/extra/integrate_centreon_engine2centreon.sh
+%attr(0755,%{user},%{user}) %{_localstatedir}/log/centreon-engine/
+%attr(0755,%{user},%{user}) %dir %{_localstatedir}/lib/centreon-engine/
+%doc license.txt
+
+%files extcommands
+%defattr(-,root,root,-)
+%{_libdir}/centreon-engine/externalcmd.so
+%attr(0775,%{user},%{user}) %{_localstatedir}/lib/centreon-engine/rw
+%doc license.txt
+
+%files devel
+%defattr(-,root,root,-)
+%{_libdir}/pkgconfig/centengine.pc
+%{_prefix}/include/centreon-engine
+%doc license.txt
+
+%files bench
+%defattr(-,root,root,-)
+%{_libdir}/centreon-engine/bench_passive_module.so
+%{_sbindir}/centengine_bench_passive
+
+%changelog
+* Thu Dec 24 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.5.0-12
+- Do not install rw directory twice.
+
+* Wed Dec 02 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.5.0-11
+- Fix diagnostic tarball generation in case of invalid configuration file.
+
+* Wed Nov 25 2015 Alexandre Fouille <afouille@centreon.com> 1.5.0-10
+- Small fixes to unit tests.
+
+* Tue Nov 17 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.5.0-9
+- Multiple bugfixes.
+
+* Tue Nov 10 2015 Alexandre Fouille <afouille@centreon.com> 1.5.0-8
+- Don't immediately reload at startup.
+- Various small fixes.
+
+* Tue Nov 03 2015 Alexandre Fouille <afouille@centreon.com> 1.5.0-7
+- Add extended user macros.
+
+* Tue Oct 27 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.5.0-6
+- Schedule host/service checks if enabled after configuration reload.
+
+* Mon Oct 26 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.5.0-5
+- Fix configuration reloading mechanism.
+
+* Thu Oct 22 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.5.0-4
+- Remove support code for failure prediction (which never worked).
+
+* Fri Oct 16 2015 Alexandre Fouille <afouille@centreon.com> 1.5.0-3
+- Add hostgroup_id and servicegroup_id in the configuration for hostgroups/servicegroups.
+- Add host_id and service_id to hosts/services.
+
+* Mon Oct 05 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.5.0-2
+- Do not package non-existing centenginews binary.
+
+* Mon Oct 05 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.5.0-1
+- Handle timezone on hosts, services and contacts.
+- Use UNKNOWN state whenever the plugin does not report a valid state.
+- New macros HOSTCHILDREN and HOSTPARENTS.
+
+* Thu Oct 01 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.4.15-6
+- ...but still install Centreon Engine binaries (see 1.4.15-5).
+
+* Thu Oct 01 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.4.15-5
+- Do not install _sbindir.
+
+* Tue Sep 29 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.4.15-4
+- Do not warn about missing contact or contact group on hosts and services.
+
+* Mon Sep 28 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.4.15-3
+- Allow empty groups internal structures to be created.
+
+* Fri Sep 25 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.4.15-2
+- Allow implicit inheritance of contacts and contact groups of base objects in escalations.
+
+* Wed Sep 23 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.4.15-1
+- Implicitely inherit contacts of hosts in services.
+- Repair additive inheritance flag to work only with first template.
+
+* Mon Jul 06 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.4.14-4
+- Update of passive checks benchmarking tool.
+
+* Fri Jun 26 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.4.14-3
+- Update version in binaries (was still 1.4.13).
+- Update default paths of benchmarking module.
+
+* Wed Jun 24 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 2.0.0-7
+- Use /etc/centreon-engine/conf.d and /etc/centreon-engine/objects.d
+
+* Mon Jun 22 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 2.0.0-6
+- Merge changes of the 1.4 branch.
+
+* Mon Jun 22 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.4.14-2
+- Change /var/lib/centreon-engine and /var/log/centreon-engine modes to 755.
+
+* Mon Jun 22 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.4.14-1
+- Add some benchmarking tools.
+
+* Tue May 12 2015 Alexandre Fouille <afouille@centreon.com> 1.4.13-1
+- Fix an erronuous condition preventing recovery notification from firing.
+
+* Fri Apr 24 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 2.0.0-5
+- Inherit check_command property from templates.
+
+* Fri Apr 24 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 1.4.12-2
+- Make notification work with MKlivestatus.
+
+* Thu Apr 23 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 2.0.0-4
+- Make service check_command really optional.
+
+* Thu Apr 23 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 2.0.0-3
+- Update of spec file.
+
+* Wed Apr 22 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 2.0.0-2
+- Set default configuration files compatible with Centreon UI.
+- Remove resource file.
+- Minor cleanup.
+
+* Thu Apr 16 2015 Matthieu Kermagoret <mkermagoret@centreon.com> 2.0.0-1
+- Heavily clean the code.
+- Remove webservice module.
+- Remove notifications system.
+- Remove groups (host groups, service groups, contact groups).
+- Remove many useless little features and configuration options.
+
+* Fri Apr 10 2015 Alexandre Fouille <afouille@centreon.com> 1.4.12-1
+- Don't send recovery notification when it shouldn't.
+- Fix the debug level not taken into account in 32 bits architectures.
+
+* Wed Mar 04 2015 Alexandre Fouille <afouille@centreon.com> 1.4.11-4
+- Don't send up notification of a service or host in downtime.
+
+* Mon Mar 02 2015 Alexandre Fouille <afouille@centreon.com> 1.4.11-3
+- Don't reschedule all the notifications when a notification was not sent.
+
+* Thu Feb 26 2015 Alexandre Fouille <afouille@centreon.com> 1.4.11-2
+- Integrate the reschedule check notification fix.
+
+* Mon Feb 23 2015 Matthieu Kermagoret <mkermagoret@merethis.com> 1.4.11-1
+- Properly save/restore custom variables to/from retention file.
+- Reschedule checks even if notification fail.
+
+* Fri Jan 23 2015 Alexandre Fouille <afouille@merethis.com> 1.4.10-2
+- Bump centreon engine version to 1.4.10
+
+* Wed Jan 21 2015 Alexandre Fouille <afouille@merethis.com> 1.4.10-1
+- Fix a crash at the software exit on a non-terminated command.
+
+* Wed Jan 07 2015 Alexandre Fouille <afouille@merethis.com> 1.4.9-4
+- Add centreon-broker user to centreon-engine group on install.
+
+* Thu Dec 18 2014 Alexandre Fouille <afouille@merethis.com> 1.4.9-3
+- Fix a logical mistake in the notification messages.
+
+* Wed Dec 17 2014 Alexandre Fouille <afouille@merethis.com> 1.4.9-2
+- Properly print normal notification messages.
+- Correctly fill the service groups compatibility structures.
+- Disable existing custom variables at reload.
+
+* Tue Dec 16 2014 Alexandre Fouille <afouille@merethis.com> 1.4.9-1
+- Don't segfault when warning that a hostgroup dependency is empty.
+
+* Mon Oct 20 2014 Alexandre Fouille <afouille@merethis.com> 1.4.8-3
+- Properly handle end-of-line comments.
+- Show an error when objects use illegal object chars.
+- Fix object inheritance. Templates were previously only allowed if not registered.
+
+* Wed Oct 15 2014 Alexandre Fouille <afouille@merethis.com> 1.4.8-2
+- Fix a bug causing a segfault when the software exits.
+
+* Mon Oct 13 2014 Alexandre Fouille <afouille@merethis.com> 1.4.8-1
+- Fix a bug which can cause an host check to be instantly flagged HARD.
+
+* Thu Sep 04 2014 Alexandre Fouille <afouille@merethis.com> 1.4.7-1
+- Fix a bug which can cause the checks of hosts to stop being scheduled.
+
+* Thu Aug 21 2014 Matthieu Kermagoret <mkermagoret@merethis.com> 1.4.6-2
+- Fix check_command_interval parsing (error in 's' suffix).
+
+* Tue Aug 19 2014 Matthieu Kermagoret <mkermagoret@merethis.com> 1.4.6-1
+- Fix compatibility with MKlivestatus.
+- Fix command_check_interval parsing (inverted logic with 's').
+- Fix dependencies attached to service groups.
+- Fix escalations attached to service groups.
+- Fix escalations attached to multiple contacts/contact groups.
+- Allow empty contact groups.
+
+* Fri Aug 01 2014 Matthieu Kermagoret <mkermagoret@merethis.com> 1.4.5-2
+- Properly scope iteration regarding last fix.
+
+* Fri Aug 01 2014 Matthieu Kermagoret <mkermagoret@merethis.com> 1.4.5-1
+- Fix an infinite loop in service escalation validity check.
+
+* Tue Jun 24 2014 Matthieu Kermagoret <mkermagoret@merethis.com> 1.4.4-1
+- Fix access of field /address6/ of contacts.
+- Properly schedule modified hosts and services.
+- Do not allow rescheduling to generate multiple check events.
+
+* Mon Jun 09 2014 Matthieu Kermagoret <mkermagoret@merethis.com> 1.4.3-3
+- Fix changelog order.
+
+* Mon Jun 09 2014 Matthieu Kermagoret <mkermagoret@merethis.com> 1.4.3-2
+- Modify Clib version required (1.4).
+
+* Mon Jun 09 2014 Matthieu Kermagoret <mkermagoret@merethis.com> 1.4.3-1
+- Minor fixes.
+
+* Wed May 21 2014 Matthieu Kermagoret <mkermagoret@merethis.com> 1.3.8-2
+- Use the partial check result method to avoid dead lock.
+
+* Thu Apr 10 2014 Matthieu Kermagoret <mkermagoret@merethis.com> 1.3.8-1
+- Death of connector could block Engine.
+- Need Clib 1.3.
+
+* Tue Feb 18 2014 Matthieu Kermagoret <mkermagoret@merethis.com> 1.3.7-1
+- Do not keep plugin input open.
+
+* Fri Feb 07 2014 Matthieu Kermagoret <mkermagoret@merethis.com> 1.3.6-1
+- Do not delete command upon restart.
+
+* Wed Dec 18 2013 Dorian Guillois <dguillois@merethis.com> 1.3.5-1
+- Fix rescheduling dependencies.
+
+* Wed Nov 20 2013 Remi Werquin <rwerquin@merethis.com> 1.4.2-1
+- Minor fixes.
+
+* Thu Oct 17 2013 Dorian Guillois <dguillois@merethis.com> 1.4.0.5
+- Change centreon-engine spec to use the new cmake package.
+
+* Thu Oct 17 2013 Dorian Guillois <dguillois@merethis.com> 1.3.4.3
+- Change centreon-engine spec to use the new cmake package.
+
+* Mon Oct 14 2013 Dorian Guillois <dguillois@merethis.com> 1.3.4-1
+- Fix webservice undefined symbol on i386.
+
+* Mon Sep 30 2013 Dorian Guillois <dguillois@merethis.com> 1.3.3-1
+- Update to the 1.2 branch of Centreon Clib.
+
+* Tue Jul 30 2013 Matthieu Kermagoret <mkermagoret@merethis.com> 1.3.2-1
+- Return connector errors in plugin output
+
+* Thu May  2 2013 Dorian Guillois <dguillois@merethis.com> 1.3.1-1
+- Fix segfault on process host check result.
+
+* Wed Jan 16 2013 Julien Mathis <jmathis@merethis.com> 1.3.0-18
+- Don't provides nagios
+
+* Fri Jan 11 2013 Julien Mathis <jmathis@merethis.com> 1.3.0-17
+- Fix problem with config file right
+- Remove touch for status.dat and retention.dat
+
+* Fri Aug 17 2012 Dorian Guillois <dguillois@merethis.com> 1.3.0-1
+- Replace Qt by centreon-clib library.
+
+* Tue Jun 26 2012 Maximilien Bersoult <mbersoult@merethis.com> 1.1.3-4
+- Fix migration scripts
+
+* Tue Jun 26 2012 Maximilien Bersoult <mbersoult@merethis.com> 1.2.0-6
+- Fix migration scripts
+
+* Tue Jun 26 2012 Maximilien Bersoult <mbersoult@merethis.com> 1.2.0-5
+- Fix no replace configuration file
+- Add help to migration scripts
+
+* Tue Jun 26 2012 Maximilien Bersoult <mbersoult@merethis.com> 1.1.3-3
+- Fix no replace configuration file
+- Add help to migration scripts
+
+* Thu Jun 21 2012 Matthieu Kermagoret <mkermagoret@merethis.com> 1.2.0-4
+- Fix bug preventing log insertion in NEB modules (Centreon Broker, NDO)
+
+* Thu Jun 21 2012 Matthieu Kermagoret <mkermagoret@merethis.com> 1.1.3-2
+- Fix release number in sources
+- Do not load modules of current directory
+
+* Wed Jun 20 2012 Matthieu Kermagoret <mkermagoret@merethis.com> 1.1.3-1
+- Fix bug preventing log insertion in NEB modules (Centreon Broker, NDO)
+
+* Mon Jun 18 2012 Matthieu Kermagoret <mkermagoret@merethis.com> 1.2.0-3
+- spec file was not using proper variable to set var directory
+
+* Mon Jun 18 2012 Matthieu Kermagoret <mkermagoret@merethis.com> 1.2.0-2
+- Bugfix in configuration sample files
+
+* Fri Jun 15 2012 Matthieu Kermagoret <mkermagoret@merethis.com> 1.2.0-1
+- Major performance improvement by using vfork() syscall
+
+* Mon Jun 04 2012 Maximilien Bersoult <mbersoult@merethis.com> 1.1.2-3
+- Remove centengine.cmd
+- Add requires redhat-lsb for daemon
+- Add integration script for Centreon
+
+* Mon May 07 2012 Matthieu Kermagoret <mkermagoret@merethis.com> 1.1.2-2
+- Fix potential termination error
+
+* Fri Apr 06 2012 Maximilien Bersoult <mbersoult@merethis.com> 1.1.2-1
+- New packaging
+- Centreon Engine 1.1.2
+-   Bugfix parsing command with quote
+-   Replace command id by command name in log files
+
+* Mon Mar 05 2012 Cedric Temple <ctemple@merethis.com> 1.1.1-1
+- Update to new version 1.1.1
+
+* Thu Mar 01 2012 Cedric Temple <ctemple@merethis.com> 1.1.0-3
+- Do not include all /usr/include/centreon-engine
+- Add /var/log/centreon-engine
+
+* Mon Feb 06 2012 Cedric Temple <ctemple@merethis.com> 1.1.0-2
+- Do not include all /etc/init.d
+- Provides nagios*
+- Obsolotes nagios*
+- gsoap dependancy
+
+* Tue Jan 31 2012 Cedric Temple <ctemple@merethis.com> 1.1-1
+- Update to new version
+- Fix PATH during build and install
+
+* Tue Oct 18 2011 Julien Mathis <jmathis@merethis.com> 1.0.1-1
+- Initial build

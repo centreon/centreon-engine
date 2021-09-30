@@ -1,0 +1,36 @@
+#!/usr/bin/make -f
+
+export DH_VERBOSE=1
+ABI=$(shell grep -q "ABI=1" CMakeLists.txt && echo -n 11)
+USE_CXX11=$(shell grep -q "ABI=1" CMakeLists.txt && echo -n 1 || echo -n 0)
+
+%:
+	dh $@
+
+override_dh_auto_configure:
+	conan install -s arch=$(ARCH) -s compiler.libcxx=libstdc++$(ABI) .
+	CXXFLAGS="-std=c++11 -DNDEBUG -O2" cmake \
+          -DUSE_CXX11_ABI=$(USE_CXX11) \
+	  -DWITH_PREFIX=/usr \
+	  -DWITH_PREFIX_CONF=/etc/centreon-engine \
+	  -DWITH_VAR_DIR=/var/lib/centreon-engine \
+	  -DWITH_STARTUP_SCRIPT=systemd \
+	  -DWITH_STARTUP_DIR=/lib/systemd/system \
+	  -DWITH_BENCH=1 \
+	  -DWITH_CREATE_FILES=0 \
+	  -DWITH_GROUP=centreon-engine \
+	  -DWITH_LOGROTATE_SCRIPT=1 \
+	  -DWITH_LOGROTATE_DIR=/etc/logrotate.d \
+	  -DWITH_PKGCONFIG_SCRIPT=0 \
+	  -DWITH_TESTING=0 \
+	  -DWITH_USER=centreon-engine \
+	  .
+
+override_dh_auto_install:
+	make install DESTDIR=debian/centreon-engine
+	mkdir -p debian/centreon-engine/var/lib/centreon-engine/rw
+	mkdir -p debian/centreon-engine/var/log/centreon-engine
+
+override_dh_fixperms:
+	dh_fixperms
+	chmod -R g+w debian/centreon-engine/etc/centreon-engine debian/centreon-engine/var/lib/centreon-engine debian/centreon-engine/var/log/centreon-engine

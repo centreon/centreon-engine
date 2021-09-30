@@ -1,0 +1,13 @@
+Source: centreon-engine
+Section: net
+Priority: optional
+Maintainer: Matthieu Kermagoret <mkermagoret@centreon.com>
+Build-Depends: debhelper (>=10), centreon-clib, cmake, lsb-base, make (>=3)
+Standards-Version: 3.9.8
+Homepage: https://github.com/centreon/centreon-engine
+
+Package: centreon-engine
+Architecture: any
+Depends: centreon-clib, centreon-common, ${shlibs:Depends}, ${misc:Depends}
+Description: Centreon Engine is a monitoring engine, compatible with Nagios
+ configuration, designed to monitor hosts and services on your network.

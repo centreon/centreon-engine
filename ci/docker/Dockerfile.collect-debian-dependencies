@@ -1,0 +1,43 @@
+FROM debian:buster
+RUN apt-get -y update && \
+    apt-get -y install cmake \ 
+    curl \
+    gcc \
+    g++ \
+    pkg-config \
+    ninja-build \
+    libmariadb3 \
+    librrd-dev \
+    libgnutls28-dev \
+    ninja-build \
+    liblua5.3-dev \
+    python3 \
+    python3-pip \
+    libperl-dev \
+    libssh2-1-dev \
+    libgcrypt20-dev
+RUN curl https://bootstrap.pypa.io/get-pip.py -o get-pip.py
+RUN python3 get-pip.py
+RUN pip3 install conan
+RUN ln -s /usr/local/bin/conan /usr/bin/conan
+RUN rm -rf ~/.conan/profiles/default
+RUN echo '\
+    [requires]\n\
+    gtest/cci.20210126\n\
+    asio/1.18.1\n\
+    fmt/7.1.3\n\
+    spdlog/1.8.5\n\
+    nlohmann_json/3.9.1\n\
+    openssl/1.1.1l\n\
+    grpc/1.37.0\n\
+    mariadb-connector-c/3.1.12\n\
+    zlib/1.2.11\n\
+    [generators]\n\
+    cmake_paths\n\
+    cmake_find_package\n\
+    ' > conanfile.txt
+RUN cat conanfile.txt
+RUN conan install . -s compiler.libcxx=libstdc++11 --build='missing'
+WORKDIR /src
+
+

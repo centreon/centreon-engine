@@ -1,14 +1,26 @@
+@Library("centreon-shared-library")_
+
 /*
 ** Variables.
 */
+
 properties([buildDiscarder(logRotator(numToKeepStr: '10'))])
+env.REF_BRANCH = 'master'
+env.PROJECT='centreon-engine'
 def serie = '21.10'
 def maintenanceBranch = "${serie}.x"
 def qaBranch = "dev-${serie}.x"
+def buildBranch = env.BRANCH_NAME
+if (env.CHANGE_BRANCH) {
+  buildBranch = env.CHANGE_BRANCH
+}
 
+/*
+** Branch management
+*/
 if (env.BRANCH_NAME.startsWith('release-')) {
   env.BUILD = 'RELEASE'
-} else if ((env.BRANCH_NAME == 'master') || (env.BRANCH_NAME == maintenanceBranch)) {
+} else if ((env.BRANCH_NAME == env.REF_BRANCH) || (env.BRANCH_NAME == maintenanceBranch)) {
   env.BUILD = 'REFERENCE'
 } else if ((env.BRANCH_NAME == 'develop') || (env.BRANCH_NAME == qaBranch)) {
   env.BUILD = 'QA'
@@ -19,136 +31,99 @@ if (env.BRANCH_NAME.startsWith('release-')) {
 /*
 ** Pipeline code.
 */
-stage('Source') {
+stage('Deliver sources') {
   node("C++") {
-    sh 'setup_centreon_build.sh'
-    dir('centreon-engine') {
+    dir('centreon-engine-centos7') {
       checkout scm
+      loadCommonScripts()
+      /* change to engine */
+      
+      sh 'ci/scripts/engine-sources-delivery.sh centreon-engine'
+      source = readProperties file: 'source.properties'
+      env.VERSION = "${source.VERSION}"
+      env.RELEASE = "${source.RELEASE}"
     }
-    sh "./centreon-build/jobs/engine/${serie}/mon-engine-source.sh"
-    source = readProperties file: 'source.properties'
-    env.VERSION = "${source.VERSION}"
-    env.RELEASE = "${source.RELEASE}"
-    publishHTML([
-      allowMissing: false,
-      keepAll: true,
-      reportDir: 'summary',
-      reportFiles: 'index.html',
-      reportName: 'Centreon Engine Build Artifacts',
-      reportTitles: ''
-    ])
   }
 }
 
-try {
-  stage('Build // Unit Tests // RPMs Packaging') {
-    parallel 'build centos7': {
-      node("C++") {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-unittest.sh centos7"
-        step([
-          $class: 'XUnitBuilder',
-          thresholds: [
-            [$class: 'FailedThreshold', failureThreshold: '0'],
-            [$class: 'SkippedThreshold', failureThreshold: '0']
-          ],
-          tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
-        ])
+stage('Build / Unit tests // Packaging / Signing') {
+  parallel 'centos7 Build and UT': {
+    node("C++") {
+      dir('centreon-engine-centos7') {
+        checkout scm
+        sh 'docker run -i --entrypoint /src/ci/scripts/engine-unit-tests.sh -v "$PWD:/src" registry.centreon.com/centreon-collect-centos7-dependencies:21.10'
+        sh "sudo apt-get install -y clang-tidy"
         withSonarQubeEnv('SonarQubeDev') {
-          sh "./centreon-build/jobs/engine/${serie}/mon-engine-analysis.sh"
+          sh 'ci/scripts/engine-sources-analysis.sh'
         }
       }
-    },
-    'packaging centos7': {
-      node("C++") {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh centos7"
-        stash name: 'el7-rpms', includes: "output/x86_64/*.rpm"
-        archiveArtifacts artifacts: "output/x86_64/*.rpm"
-        sh 'rm -rf output'
-      }
-    },
-    'build centos8': {
-      node("C++") {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-unittest.sh centos8"
-        step([
-          $class: 'XUnitBuilder',
-          thresholds: [
-            [$class: 'FailedThreshold', failureThreshold: '0'],
-            [$class: 'SkippedThreshold', failureThreshold: '0']
-          ],
-          tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
-        ])
-      }
-    },
-    'packaging centos8': {
-      node("C++") {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh centos8"
-        stash name: 'el8-rpms', includes: "output/x86_64/*.rpm"
-        archiveArtifacts artifacts: "output/x86_64/*.rpm"
-        sh 'rm -rf output'
-      }
-    },
-    'build debian10': {
-      node("C++") {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-unittest.sh debian10"
-        step([
-          $class: 'XUnitBuilder',
-          thresholds: [
-            [$class: 'FailedThreshold', failureThreshold: '0'],
-            [$class: 'SkippedThreshold', failureThreshold: '0']
-          ],
-          tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
-        ])
-      }
-    },
-    'packaging debian10': {
-      node("C++") {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh debian10"
-      }
     }
-    if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
-      error('Unit tests stage failure.');
-    }
-  }
-
-  // sonarQube step to get qualityGate result
-  stage('Quality gate') {
+  },
+  'centos7 rpm packaging and signing': {
     node("C++") {
-      def qualityGate = waitForQualityGate()
-      if (qualityGate.status != 'OK') {
-        currentBuild.result = 'FAIL'
-      }
-      if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
-        error('Quality gate failure: ${qualityGate.status}.');
+      dir('centreon-engine-centos7') {
+        checkout scm
+        sh 'docker run -i --entrypoint /src/centreon-engine/ci/scripts/engine-rpm-package.sh -v "$PWD:/src/centreon-engine" -e DISTRIB="el7" -e VERSION=$VERSION -e RELEASE=$RELEASE registry.centreon.com/centreon-collect-centos7-dependencies:21.10'
+        sh 'rpmsign --addsign *.rpm'
+        stash name: 'el7-rpms', includes: '*.rpm'
+        archiveArtifacts artifacts: "*.rpm"
+        sh 'rm -rf *.rpm'
+      } 
+    }
+  },
+  'centos8 Build and UT': {
+    node("C++") {
+      dir('centreon-engine-centos8') {
+        checkout scm
+        sh 'docker run -i --entrypoint /src/ci/scripts/engine-unit-tests.sh -v "$PWD:/src" registry.centreon.com/centreon-collect-centos8-dependencies:21.10'
       }
     }
-  }
-
-  if ((env.BUILD == 'RELEASE') || (env.BUILD == 'QA')) {
-    stage('Delivery') {
-      node("C++") {
-        unstash name: 'el7-rpms'
-        unstash name: 'el8-rpms'
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-delivery.sh"
-      }
-      if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
-        error('Delivery stage failure.');
+  },
+  'centos8 rpm packaging and signing': {
+    node("C++") {
+      dir('centreon-engine-centos8') {
+        checkout scm
+        sh 'docker run -i --entrypoint /src/centreon-engine/ci/scripts/engine-rpm-package.sh -v "$PWD:/src/centreon-engine" -e DISTRIB="el8" -e VERSION=$VERSION -e RELEASE=$RELEASE registry.centreon.com/centreon-collect-centos8-dependencies:21.10'
+        sh 'rpmsign --addsign *.rpm'
+        stash name: 'el8-rpms', includes: '*.rpm'
+        archiveArtifacts artifacts: "*.rpm"
+        sh 'rm -rf *.rpm'
       }
     }
-  }
-  if (env.BUILD == 'REFERENCE') {
-      build job: "centreon-web/${env.BRANCH_NAME}", wait: false
-  }
+  },
+  'debian buster Build and UT': {
+    node("C++") {
+      dir('centreon-engine-debian') {
+        checkout scm
+        sh 'docker run -i --entrypoint /src/ci/scripts/engine-unit-tests.sh -v "$PWD:/src" registry.centreon.com/centreon-collect-debian-dependencies:21.10'
+      }
+    }
+  },
+  'debian buster packaging and signing': {
+    node("C++") {
+      dir('centreon-engine-centos8') {
+        //checkout scm
+        //sh 'docker run -i --entrypoint /src/ci/scripts/engine-rpm-package.sh -v "$PWD:/src" -e DISTRIB="el8" -e VERSION=$VERSION -e RELEASE=$RELEASE registry.centreon.com/centreon-collect-centos8-dependencies:21.10'
+        //sh 'rpmsign --addsign *.rpm'
+        //stash name: 'el8-rpms', includes: '*.rpm'
+        //archiveArtifacts artifacts: "*.rpm"
+        //sh 'rm -rf *.rpm'
+      }
+    }
+  } 
 }
-finally {
-  buildStatus = currentBuild.result ?: 'SUCCESS';
-  if ((buildStatus != 'SUCCESS') && ((env.BUILD == 'RELEASE') || (env.BUILD == 'REFERENCE'))) {
-    slackSend channel: '#monitoring-metrology', message: "@channel Centreon Engine build ${env.BUILD_NUMBER} of branch ${env.BRANCH_NAME} was broken by ${source.COMMITTER}. Please fix it ASAP."
+
+if ((env.BUILD == 'RELEASE') || (env.BUILD == 'QA')) {
+  stage('Delivery') {
+    node("C++") {
+      unstash 'el8-rpms'
+      unstash 'el7-rpms'
+      dir('centreon-engine-delivery') {
+        checkout scm
+        loadCommonScripts()
+        sh 'rm -rf output && mkdir output && mv ../*.rpm output'
+        sh './ci/scripts/engine-rpm-delivery.sh'
+      }
+    }
   }
 }
