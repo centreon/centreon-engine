@@ -5,6 +5,7 @@ if [ -z "$VERSION" -o -z "$RELEASE" -o -z "$DISTRIB" ] ; then
   echo "You need to specify VERSION / RELEASE variables"
   exit 1
 fi
+
 # echo "################################################## install CLIB ##################################################"
 if [ $DISTRIB = "el7" ] ; then
   curl http://yum-1.centreon.com/standard/21.10/el7/unstable/x86_64/clib/centreon-clib-21.10.0-1632908959.e89357c/centreon-clib-21.10.0-1632908959.e89357c.el7.centos.x86_64.rpm --output centreon-clib-21.10.0-1632908959.e89357c.el7.centos.x86_64.rpm
