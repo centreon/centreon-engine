@@ -14,7 +14,7 @@ PROJECT=$1
 echo -n "#####The Delivered project is $PROJECT#####"
 echo -n "#####GET $PROJECT VERSION#####"
 
-cmakelists=$PROJECT/CMakeLists.txt
+cmakelists=CMakeLists.txt
 
 case $PROJECT in
 
