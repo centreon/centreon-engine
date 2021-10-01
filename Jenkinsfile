@@ -104,16 +104,16 @@ try {
           tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
         ])
       }
-    },
-    'packaging debian10': {
-      node("C++") {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh debian10"
-      }
     }
-    if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
-      error('Unit tests stage failure.');
-    }
+    // 'packaging debian10': {
+    //   node("C++") {
+    //     sh 'setup_centreon_build.sh'
+    //     sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh debian10"
+    //   }
+    // }
+    // if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
+    //   error('Unit tests stage failure.');
+    // }
   }
 
   // sonarQube step to get qualityGate result
