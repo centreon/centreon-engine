@@ -20,7 +20,6 @@
 #ifndef CCE_ANOMALYDETECTION_HH
 #define CCE_ANOMALYDETECTION_HH
 
-#include <nlohmann/json.hpp>
 #include <map>
 #include <mutex>
 #include <tuple>

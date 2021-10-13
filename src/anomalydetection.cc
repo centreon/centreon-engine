@@ -22,6 +22,7 @@
 #include <cmath>
 #include <cstring>
 #include <limits>
+#include <nlohmann/json.hpp>
 
 #include "com/centreon/engine/broker.hh"
 #include "com/centreon/engine/checks/checker.hh"
