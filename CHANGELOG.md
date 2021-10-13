@@ -4,11 +4,6 @@
 
 ### Bugs
 
-*Downtime*
-
-Change downtime limits start/end dates to timestamp 2145916799
-(31/12/2037 23:59:59) max.
-
 *logs*
 
 There was a possible deadlock in logging::broker due to creation of logs when
