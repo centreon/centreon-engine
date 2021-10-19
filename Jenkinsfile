@@ -89,25 +89,25 @@ try {
         stash name: 'el8-rpms', includes: "output/x86_64/*.rpm"
         archiveArtifacts artifacts: "output/x86_64/*.rpm"
       }
-    },
-    'build debian10': {
-      node("C++") {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-unittest.sh debian10"
-        step([
-          $class: 'XUnitBuilder',
-          thresholds: [
-            [$class: 'FailedThreshold', failureThreshold: '0'],
-            [$class: 'SkippedThreshold', failureThreshold: '0']
-          ],
-          tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
-        ])
-      }
-    },
-    'packaging debian10': {
-      node("C++") {
-        sh 'setup_centreon_build.sh'
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh debian10"
+//    },
+//    'build debian10': {
+//      node("C++") {
+//        sh 'setup_centreon_build.sh'
+//        sh "./centreon-build/jobs/engine/${serie}/mon-engine-unittest.sh debian10"
+//        step([
+//          $class: 'XUnitBuilder',
+//          thresholds: [
+//            [$class: 'FailedThreshold', failureThreshold: '0'],
+//            [$class: 'SkippedThreshold', failureThreshold: '0']
+//          ],
+//          tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
+//        ])
+//      }
+//    },
+//    'packaging debian10': {
+//      node("C++") {
+//        sh 'setup_centreon_build.sh'
+//        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh debian10"
       }
     }
     if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
