@@ -1,4 +1,7 @@
 <!--
+################################################################################
+# Please log issues encountered in 21.10.0 or higher in https://github.com/centreon/centreon-collect/
+################################################################################
 
 Centreon's Code of Conduct must be respected when opening any issue. (https://github.com/centreon/centreon/blob/master/CODE_OF_CONDUCT.md)
 
@@ -23,6 +26,8 @@ Please describe your issue in English.
 # BUG REPORT INFORMATION
 
 ### Prerequisites
+
+> The opened issue must be related to **centreon-engine 21.04.x or lower**. If you want to log an issue in 21.10.0 or higher, please do so at https://github.com/centreon/centreon-collect/.
 
 > The opened issue, must be code related. GitHub is not meant for support. Feel free to check the CONTRIBUTING section for more details.
 
