@@ -27,7 +27,7 @@ Please describe your issue in English.
 
 ### Prerequisites
 
-> The opened issue must be related to **centreon-broker 21.04.x or lower**. If you want to log an issue in 21.10.0 or higher, please do so at https://github.com/centreon/centreon-collect/.
+> The opened issue must be related to **centreon-engine 21.04.x or lower**. If you want to log an issue in 21.10.0 or higher, please do so at https://github.com/centreon/centreon-collect/.
 
 > The opened issue, must be code related. GitHub is not meant for support. Feel free to check the CONTRIBUTING section for more details.
 
