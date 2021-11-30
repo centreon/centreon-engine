@@ -318,7 +318,8 @@ int shutdown_command_file_worker_thread(void) {
     should_exit = true;
 
     /* wait for the worker thread to exit */
-    worker->join();
+    if (worker && worker->joinable())
+        worker->join();
   }
 
   return OK;
