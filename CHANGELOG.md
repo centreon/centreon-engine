@@ -1,5 +1,11 @@
 # Changelog
 
+## 21.04.5
+
+*modules*
+
+Fixing segfault
+
 ## 21.04.4
 
 ### Bugs
