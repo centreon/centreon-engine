@@ -74,7 +74,7 @@ try {
         stash name: 'el7-rpms', includes: "output/x86_64/*.rpm"
         archiveArtifacts artifacts: "output/x86_64/*.rpm"
       }
-    },
+    },/*
     'build centos8': {
       node("C++") {
         checkoutCentreonBuild()
@@ -96,7 +96,7 @@ try {
         stash name: 'el8-rpms', includes: "output/x86_64/*.rpm"
         archiveArtifacts artifacts: "output/x86_64/*.rpm"
       }
-    },
+    },*/
     'build debian10': {
       node("C++") {
         checkoutCentreonBuild()
