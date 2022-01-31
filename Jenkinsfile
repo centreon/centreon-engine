@@ -141,7 +141,7 @@ try {
     stage('Delivery') {
       node {
         unstash 'el7-rpms'
-        unstash 'el8-rpms'
+        //unstash 'el8-rpms'
         checkoutCentreonBuild()
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-delivery.sh"
       }
