@@ -566,6 +566,6 @@ void parser::_store_into_map(object_ptr obj) {
   if (it != _map_objects[obj->type()].end())
     throw engine_error() << "Parsing of " << obj->type_name() << " failed "
                          << _get_file_info(obj.get()) << ": " << obj->name()
-                         << " alrealdy exists";
+                         << " already exists";
   _map_objects[obj->type()][(real.get()->*ptr)()] = real;
 }
