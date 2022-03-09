@@ -90,10 +90,10 @@ try {
         ])
       }
     },
-    'packaging centos8': {
+    'packaging alma8': {
       node("C++") {
         checkoutCentreonBuild()
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh centos8"
+        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh alma8"
         stash name: 'alma8-rpms', includes: "output/x86_64/*.rpm"
         archiveArtifacts artifacts: "output/x86_64/*.rpm"
       }
