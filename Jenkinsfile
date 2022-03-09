@@ -75,7 +75,7 @@ try {
         stash name: 'el7-rpms', includes: "output/x86_64/*.rpm"
         archiveArtifacts artifacts: "output/x86_64/*.rpm"
       }
-    },/*
+    },
     'build centos8': {
       node("C++") {
         checkoutCentreonBuild()
@@ -90,14 +90,14 @@ try {
         ])
       }
     },
-    'packaging centos8': {
+    'packaging alma8': {
       node("C++") {
         checkoutCentreonBuild()
-        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh centos8"
-        stash name: 'el8-rpms', includes: "output/x86_64/*.rpm"
+        sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh alma8"
+        stash name: 'alma8-rpms', includes: "output/x86_64/*.rpm"
         archiveArtifacts artifacts: "output/x86_64/*.rpm"
       }
-    },*/
+    },
     'build debian10': {
       node("C++") {
         checkoutCentreonBuild()
@@ -142,7 +142,7 @@ try {
     stage('Delivery') {
       node("C++") {
         unstash 'el7-rpms'
-        //unstash 'el8-rpms'
+        unstash 'alma8-rpms'
         checkoutCentreonBuild()
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-delivery.sh"
       }
