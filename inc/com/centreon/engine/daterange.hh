@@ -20,6 +20,7 @@
 #ifndef CCE_OBJECTS_DATERANGE_HH
 #define CCE_OBJECTS_DATERANGE_HH
 #include <ostream>
+#include "com/centreon/engine/common.hh"
 #include "com/centreon/engine/timerange.hh"
 
 struct timeperiod_struct;
@@ -28,14 +29,24 @@ CCE_BEGIN()
 class daterange;
 CCE_END()
 
-typedef std::list<std::shared_ptr<com::centreon::engine::daterange>>
-    daterange_list;
+using daterange_list = std::list<com::centreon::engine::daterange>;
+
+using exception_array = std::array<daterange_list, DATERANGE_TYPES>;
 
 CCE_BEGIN()
 
 class daterange {
  public:
-  daterange(int type,
+  enum type_range {
+    none = -1,
+    calendar_date = 0,
+    month_date = 1,
+    month_day = 2,
+    month_week_day = 3,
+    week_day = 4
+  };
+
+  daterange(type_range type,
             int syear,
             int smon,
             int smday,
@@ -47,42 +58,48 @@ class daterange {
             int ewday,
             int ewday_offset,
             int skip_interval);
+  daterange(type_range type);
 
-  int get_type() const;
-  void set_type(int type);
-  int get_syear() const;
-  void set_syear(int syear);
-  int get_smon() const;
-  void set_smon(int smon);
-  int get_smday() const;
-  void set_smday(int smday);
-  int get_swday() const;
-  void set_swday(int swday);
-  int get_swday_offset() const;
-  void set_swday_offset(int swday_offset);
-  int get_eyear() const;
-  void set_eyear(int eyear);
-  int get_emon() const;
-  void set_emon(int emon);
-  int get_emday() const;
-  void set_emday(int emday);
-  int get_ewday() const;
-  void set_ewday(int ewday);
-  int get_ewday_offset() const;
-  void set_ewday_offset(int ewday_offset);
-  int get_skip_interval() const;
-  void set_skip_interval(int skip_interval);
+  type_range get_type() const { return _type; }
+  void set_type(type_range type) { _type = type; }
+  int get_syear() const { return _syear; }
+  void set_syear(int syear) { _syear = syear; }
+  int get_smon() const { return _smon; }
+  void set_smon(int smon) { _smon = smon; }
+  int get_smday() const { return _smday; }
+  void set_smday(int smday) { _smday = smday; }
+  int get_swday() const { return _swday; }
+  void set_swday(int swday) { _swday = swday; }
+  int get_swday_offset() const { return _swday_offset; }
+  void set_swday_offset(int swday_offset) { _swday_offset = swday_offset; }
+  int get_eyear() const { return _eyear; }
+  void set_eyear(int eyear) { _eyear = eyear; }
+  int get_emon() const { return _emon; }
+  void set_emon(int emon) { _emon = emon; }
+  int get_emday() const { return _emday; }
+  void set_emday(int emday) { _emday = emday; }
+  int get_ewday() const { return _ewday; }
+  void set_ewday(int ewday) { _ewday = ewday; }
+  int get_ewday_offset() const { return _ewday_offset; }
+  void set_ewday_offset(int ewday_offset) { _ewday_offset = ewday_offset; }
+  int get_skip_interval() const { return _skip_interval; }
+  void set_skip_interval(int skip_interval) { _skip_interval = skip_interval; }
+  const timerange_list& get_timerange() const { return _timerange; }
+  void set_timerange(const timerange_list& timerange) {
+    _timerange = timerange;
+  }
+  void add_timerange(const timerange& toadd) { _timerange.push_back(toadd); }
 
-  bool operator==(daterange const& obj) throw();
-  bool operator!=(daterange const& obj2) throw();
-
-  timerange_list times;
+  bool operator==(daterange const& obj) const;
+  bool operator!=(daterange const& obj2) const;
+  bool operator<(daterange const& right) const;
+  bool is_date_data_equal(daterange const& obj) const;
 
   static std::string const& get_month_name(unsigned int index);
   static std::string const& get_weekday_name(unsigned int index);
 
  private:
-  int _type;
+  type_range _type;
   int _syear;  // Start year.
   int _smon;   // Start month.
   // Start day of month (may 3rd, last day in feb).
@@ -96,11 +113,14 @@ class daterange {
   int _ewday;
   int _ewday_offset;
   int _skip_interval;
+  timerange_list _timerange;
 };
-
-CCE_END()
 
 std::ostream& operator<<(std::ostream& os,
                          com::centreon::engine::daterange const& obj);
+
+std::ostream& operator<<(std::ostream& os, exception_array const& obj);
+
+CCE_END()
 
 #endif  // !CCE_OBJECTS_DATERANGE_HH

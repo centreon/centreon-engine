@@ -20,11 +20,12 @@
 #include "com/centreon/engine/configuration/timeperiod.hh"
 #include <cstdio>
 #include "com/centreon/engine/common.hh"
-#include "com/centreon/engine/configuration/timerange.hh"
 #include "com/centreon/engine/exceptions/error.hh"
 #include "com/centreon/engine/string.hh"
+#include "com/centreon/engine/timerange.hh"
 
 using namespace com::centreon;
+using namespace com::centreon::engine;
 using namespace com::centreon::engine::configuration;
 
 #define SETTER(type, method) \
@@ -42,10 +43,7 @@ std::unordered_map<std::string, timeperiod::setter_func> const
  *  @param[in] key The object key.
  */
 timeperiod::timeperiod(key_type const& key)
-    : object(object::timeperiod), _timeperiod_name(key) {
-  _exceptions.resize(DATERANGE_TYPES);
-  _timeranges.resize(7);
-}
+    : object(object::timeperiod), _timeperiod_name(key) {}
 
 /**
  *  Copy constructor.
@@ -87,7 +85,7 @@ timeperiod& timeperiod::operator=(timeperiod const& right) {
  *
  *  @return True if is the same timeperiod, otherwise false.
  */
-bool timeperiod::operator==(timeperiod const& right) const throw() {
+bool timeperiod::operator==(timeperiod const& right) const {
   return (object::operator==(right) && _alias == right._alias &&
           _exceptions == right._exceptions && _exclude == right._exclude &&
           _timeperiod_name == right._timeperiod_name &&
@@ -101,7 +99,7 @@ bool timeperiod::operator==(timeperiod const& right) const throw() {
  *
  *  @return True if is not the same timeperiod, otherwise false.
  */
-bool timeperiod::operator!=(timeperiod const& right) const throw() {
+bool timeperiod::operator!=(timeperiod const& right) const {
   return !operator==(right);
 }
 
@@ -112,7 +110,7 @@ bool timeperiod::operator!=(timeperiod const& right) const throw() {
  *
  *  @return True if this object is less than right.
  */
-bool timeperiod::operator<(timeperiod const& right) const throw() {
+bool timeperiod::operator<(timeperiod const& right) const {
   if (_timeperiod_name != right._timeperiod_name)
     return _timeperiod_name < right._timeperiod_name;
   else if (_alias != right._alias)
@@ -225,8 +223,7 @@ std::string const& timeperiod::alias() const throw() {
  *
  *  @return The exceptions value.
  */
-std::vector<std::list<daterange> > const& timeperiod::exceptions() const
-    throw() {
+exception_array const& timeperiod::exceptions() const throw() {
   return _exceptions;
 }
 
@@ -253,8 +250,7 @@ std::string const& timeperiod::timeperiod_name() const throw() {
  *
  *  @return The timeranges list.
  */
-std::vector<std::list<timerange> > const& timeperiod::timeranges() const
-    throw() {
+days_array const& timeperiod::timeranges() const {
   return _timeranges;
 }
 
@@ -267,7 +263,7 @@ std::vector<std::list<timerange> > const& timeperiod::timeranges() const
  *  @return True on success, otherwise false.
  */
 bool timeperiod::_build_timeranges(std::string const& line,
-                                   std::list<timerange>& timeranges) {
+                                   timerange_list& timeranges) {
   list_string timeranges_str;
   string::split(line, timeranges_str, ',');
   for (list_string::const_iterator it(timeranges_str.begin()),
@@ -282,7 +278,7 @@ bool timeperiod::_build_timeranges(std::string const& line,
     unsigned long end_time;
     if (!_build_time_t(it->substr(pos + 1), end_time))
       return false;
-    timeranges.push_front(timerange(start_time, end_time));
+    timeranges.emplace_back(start_time, end_time);
   }
   return true;
 }
@@ -323,17 +319,7 @@ bool timeperiod::_has_similar_daterange(std::list<daterange> const& lst,
                                         daterange const& range) throw() {
   for (std::list<daterange>::const_iterator it(lst.begin()), end(lst.end());
        it != end; ++it)
-    if (it->type() == range.type() && it->year_start() == range.year_start() &&
-        it->month_start() == range.month_start() &&
-        it->month_day_start() == range.month_day_start() &&
-        it->week_day_start() == range.week_day_start() &&
-        it->week_day_start_offset() == range.week_day_start_offset() &&
-        it->year_end() == range.year_end() &&
-        it->month_end() == range.month_end() &&
-        it->month_day_end() == range.month_day_end() &&
-        it->week_day_end() == range.week_day_end() &&
-        it->week_day_end_offset() == range.week_day_end_offset() &&
-        it->skip_interval() == range.skip_interval())
+    if (it->is_date_data_equal(range))
       return true;
   return false;
 }
@@ -380,19 +366,19 @@ bool timeperiod::_add_calendar_date(std::string const& line) {
       month_day_end = month_day_start;
     }
 
-    std::list<timerange> timeranges;
+    timerange_list timeranges;
     if (!_build_timeranges(line.substr(pos), timeranges))
       return false;
 
     daterange range(daterange::calendar_date);
-    range.year_start(year_start);
-    range.month_start(month_start - 1);
-    range.month_day_start(month_day_start);
-    range.year_end(year_end);
-    range.month_end(month_end - 1);
-    range.month_day_end(month_day_end);
-    range.skip_interval(skip_interval);
-    range.timeranges(timeranges);
+    range.set_syear(year_start);
+    range.set_smon(month_start - 1);
+    range.set_smday(month_day_start);
+    range.set_eyear(year_end);
+    range.set_emon(month_end - 1);
+    range.set_emday(month_day_end);
+    range.set_skip_interval(skip_interval);
+    range.set_timerange(timeranges);
 
     _exceptions[daterange::calendar_date].push_front(range);
     return true;
@@ -545,33 +531,33 @@ bool timeperiod::_add_other_date(std::string const& line) {
   if (type != daterange::none) {
     daterange range(type);
     if (type == daterange::month_day) {
-      range.month_day_start(month_day_start);
-      range.month_day_end(month_day_end);
+      range.set_smday(month_day_start);
+      range.set_emday(month_day_end);
     } else if (type == daterange::month_week_day) {
-      range.month_start(month_start);
-      range.week_day_start(week_day_start);
-      range.week_day_start_offset(week_day_start_offset);
-      range.month_end(month_end);
-      range.week_day_end(week_day_end);
-      range.week_day_end_offset(week_day_end_offset);
+      range.set_smon(month_start);
+      range.set_swday(week_day_start);
+      range.set_swday_offset(week_day_start_offset);
+      range.set_emon(month_end);
+      range.set_ewday(week_day_end);
+      range.set_ewday_offset(week_day_end_offset);
     } else if (type == daterange::week_day) {
-      range.week_day_start(week_day_start);
-      range.week_day_start_offset(week_day_start_offset);
-      range.week_day_end(week_day_end);
-      range.week_day_end_offset(week_day_end_offset);
+      range.set_swday(week_day_start);
+      range.set_swday_offset(week_day_start_offset);
+      range.set_ewday(week_day_end);
+      range.set_ewday_offset(week_day_end_offset);
     } else if (type == daterange::month_date) {
-      range.month_start(month_start);
-      range.month_day_start(month_day_start);
-      range.month_end(month_end);
-      range.month_day_end(month_day_end);
+      range.set_smon(month_start);
+      range.set_smday(month_day_start);
+      range.set_emon(month_end);
+      range.set_emday(month_day_end);
     }
-    range.skip_interval(skip_interval);
+    range.set_skip_interval(skip_interval);
 
-    std::list<timerange> timeranges;
+    timerange_list timeranges;
     if (!_build_timeranges(line.substr(pos), timeranges))
       return false;
 
-    range.timeranges(timeranges);
+    range.set_timerange(timeranges);
     _exceptions[type].push_front(range);
     return true;
   }

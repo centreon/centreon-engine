@@ -137,7 +137,7 @@ TEST_F(Connector, RunWithConnectorSwitchedOff) {
       ++timeout;
     }
     result res{lstnr->get_result()};
-    ASSERT_EQ(res.command_id, 0);
+    ASSERT_EQ(res.command_id, 0u);
     ASSERT_EQ(res.output, "");
   }
 }

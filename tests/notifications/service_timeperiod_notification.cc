@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Centreon (https://www.centreon.com/)
+ * Copyright 2022 Centreon (https://www.centreon.com/)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -152,8 +152,8 @@ TEST_F(ServiceTimePeriodNotification, NoTimePeriodOk) {
   // uint64_t id{_svc->get_next_notification_id()};
   for (int i = 0; i < 7; ++i) {
     timerange_list list_time;
-    list_time.push_back(std::make_shared<engine::timerange>(15000, 38000));
-    list_time.push_back(std::make_shared<engine::timerange>(65000, 85000));
+    list_time.emplace_back(15000, 38000);
+    list_time.emplace_back(65000, 85000);
     tperiod->days[i] = list_time;
   }
 
@@ -261,7 +261,7 @@ TEST_F(ServiceTimePeriodNotification, NoTimePeriodKo) {
   se_aply.resolve_object(se);
   for (int i = 0; i < 7; ++i) {
     timerange_list list_time;
-    list_time.push_back(std::make_shared<engine::timerange>(35000, 85000));
+    list_time.emplace_back(35000, 85000);
     tperiod->days[i] = list_time;
   }
 
@@ -372,8 +372,8 @@ TEST_F(ServiceTimePeriodNotification, TimePeriodOut) {
   // uint64_t id{_svc->get_next_notification_id()};
   for (int i = 0; i < 7; ++i) {
     timerange_list list_time;
-    list_time.push_back(std::make_shared<engine::timerange>(1000, 15000));
-    list_time.push_back(std::make_shared<engine::timerange>(80000, 85000));
+    list_time.emplace_back(1000, 15000);
+    list_time.emplace_back(80000, 85000);
     tperiod->days[i] = list_time;
   }
 
@@ -497,8 +497,7 @@ TEST_F(ServiceTimePeriodNotification, TimePeriodUserOut) {
   // uint64_t id{_svc->get_next_notification_id()};
   for (int i = 0; i < 7; ++i) {
     timerange_list list_time;
-    // list_time.push_back(std::make_shared<engine::timerange>(1000, 15000));
-    list_time.push_back(std::make_shared<engine::timerange>(8000, 85000));
+    list_time.emplace_back(8000, 85000);
     tiperiod->days[i] = list_time;
   }
 
@@ -622,8 +621,7 @@ TEST_F(ServiceTimePeriodNotification, TimePeriodUserIn) {
   // uint64_t id{_svc->get_next_notification_id()};
   for (int i = 0; i < 7; ++i) {
     timerange_list list_time;
-    // list_time.push_back(std::make_shared<engine::timerange>(1000, 15000));
-    list_time.push_back(std::make_shared<engine::timerange>(8000, 85000));
+    list_time.emplace_back(8000, 85000);
     tiperiod->days[i] = list_time;
   }
 
@@ -747,8 +745,7 @@ TEST_F(ServiceTimePeriodNotification, TimePeriodUserAll) {
   // uint64_t id{_svc->get_next_notification_id()};
   for (int i = 0; i < 7; ++i) {
     timerange_list list_time;
-    // list_time.push_back(std::make_shared<engine::timerange>(1000, 15000));
-    list_time.push_back(std::make_shared<engine::timerange>(8000, 85000));
+    list_time.emplace_back(8000, 85000);
     tiperiod->days[i] = list_time;
   }
 
@@ -865,8 +862,7 @@ TEST_F(ServiceTimePeriodNotification, TimePeriodUserNone) {
   // uint64_t id{_svc->get_next_notification_id()};
   for (int i = 0; i < 7; ++i) {
     timerange_list list_time;
-    // list_time.push_back(std::make_shared<engine::timerange>(1000, 15000));
-    list_time.push_back(std::make_shared<engine::timerange>(8000, 85000));
+    list_time.emplace_back(8000, 85000);
     tiperiod->days[i] = list_time;
   }
 
@@ -982,8 +978,7 @@ TEST_F(ServiceTimePeriodNotification, NoTimePeriodUser) {
   // uint64_t id{_svc->get_next_notification_id()};
   for (int i = 0; i < 7; ++i) {
     timerange_list list_time;
-    // list_time.push_back(std::make_shared<engine::timerange>(1000, 15000));
-    list_time.push_back(std::make_shared<engine::timerange>(8000, 85000));
+    list_time.emplace_back(8000, 85000);
     tiperiod->days[i] = list_time;
   }
 
