@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013,2017 Centreon
+** Copyright 2022 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -82,8 +82,8 @@ void applier::timeperiod::add_object(configuration::timeperiod const& obj) {
                                   NEBATTR_NONE, tp.get(), CMD_NONE, &tv);
 
   // Fill time period structure.
-  _add_time_ranges(obj.timeranges(), tp.get());
-  _add_exceptions(obj.exceptions(), tp.get());
+  tp->days = obj.timeranges();
+  tp->exceptions = obj.exceptions();
   _add_exclusions(obj.exclude(), tp.get());
 }
 
@@ -135,21 +135,12 @@ void applier::timeperiod::modify_object(configuration::timeperiod const& obj) {
 
   // Time ranges modified ?
   if (obj.timeranges() != old_cfg.timeranges()) {
-    // Delete old time ranges.
-    for (unsigned int i(0); i < tp->days.size(); ++i)
-      tp->days[i].clear();
-    // Create new time ranges.
-    _add_time_ranges(obj.timeranges(), tp);
+    tp->days = obj.timeranges();
   }
 
   // Exceptions modified ?
   if (obj.exceptions() != old_cfg.exceptions()) {
-    // Delete old exceptions.
-    for (unsigned int i(0); i < tp->exceptions.size(); ++i)
-      tp->exceptions[i].clear();
-
-    // Create new exceptions.
-    _add_exceptions(obj.exceptions(), tp);
+    tp->exceptions = obj.exceptions();
   }
 
   // Exclusions modified ?
@@ -228,60 +219,4 @@ void applier::timeperiod::_add_exclusions(
   for (set_string::const_iterator it(exclusions.begin()), end(exclusions.end());
        it != end; ++it)
     tp->get_exclusions().insert({*it, nullptr});
-}
-
-/**
- *  Add exceptions to a time period.
- *
- *  @param[in]  exceptions Exceptions.
- *  @param[out] tp         Time period object.
- */
-void applier::timeperiod::_add_exceptions(
-    std::vector<std::list<configuration::daterange> > const& exceptions,
-    engine::timeperiod* tp) {
-  for (std::vector<std::list<daterange> >::const_iterator
-           it(exceptions.begin()),
-       end(exceptions.end());
-       it != end; ++it)
-    for (std::list<daterange>::const_iterator it2(it->begin()), end2(it->end());
-         it2 != end2; ++it2) {
-      std::shared_ptr<engine::daterange> dr{new engine::daterange(
-          it2->type(), it2->year_start(), it2->month_start(),
-          it2->month_day_start(), it2->week_day_start(),
-          it2->week_day_start_offset(), it2->year_end(), it2->month_end(),
-          it2->month_day_end(), it2->week_day_end(), it2->week_day_end_offset(),
-          it2->skip_interval())};
-      tp->exceptions[it2->type()].push_back(dr);
-      for (std::list<timerange>::const_iterator it3(it2->timeranges().begin()),
-           end3(it2->timeranges().end());
-           it3 != end3; ++it3) {
-        std::shared_ptr<engine::timerange> tr{
-            new engine::timerange(it3->start(), it3->end())};
-        for (daterange_list::iterator it4(tp->exceptions[it2->type()].begin()),
-             end4(tp->exceptions[it2->type()].end());
-             it4 != end4; ++it4)
-          (*it4)->times.push_back(tr);
-      }
-    }
-}
-
-/**
- *  Add time ranges to a time period.
- *
- *  @param[in]  ranges Time ranges.
- *  @param[out] tp     Time period object.
- */
-void applier::timeperiod::_add_time_ranges(
-    std::vector<std::list<configuration::timerange> > const& ranges,
-    engine::timeperiod* tp) {
-  unsigned short day(0);
-  for (std::vector<std::list<timerange> >::const_iterator it(ranges.begin()),
-       end(ranges.end());
-       it != end; ++it, ++day)
-    for (std::list<timerange>::const_iterator it2(it->begin()), end2(it->end());
-         it2 != end2; ++it2) {
-      std::shared_ptr<engine::timerange> tr{
-          new engine::timerange(it2->start(), it2->end())};
-      tp->days[day].push_back(tr);
-    }
 }

@@ -1,5 +1,5 @@
 /*
-** Copyright 2016 Centreon
+** Copyright 2022 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -94,8 +94,7 @@ TEST_F(GetNextValidTimeCalendarDateTest, AfterCalendarDates) {
 
   for (int i = 0; i < 7; ++i) {
     timerange_list list_time;
-    // list_time.push_back(std::make_shared<engine::timerange>(1000, 15000));
-    list_time.push_back(std::make_shared<engine::timerange>(8000, 85000));
+    list_time.emplace_back(8000, 85000);
     tiperiod->days[i] = list_time;
   }
 

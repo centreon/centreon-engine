@@ -1,5 +1,5 @@
 /*
-** Copyright 2011-2013 Merethis
+** Copyright 2022 Merethis
 **
 ** This file is part of Centreon Engine.
 **
@@ -48,41 +48,7 @@ timerange::timerange(uint64_t start, uint64_t end) {
   _range_end = end;
 }
 
-uint64_t timerange::get_range_start() const {
-  return _range_start;
-}
-
-uint64_t timerange::get_range_end() const {
-  return _range_end;
-}
-
-/**
- *  Equal operator.
- *
- *  @param[in] obj1 The first object to compare.
- *  @param[in] obj2 The second object to compare.
- *
- *  @return True if is the same object, otherwise false.
- */
-bool timerange::operator==(timerange const& obj) noexcept {
-  if (_range_start == obj.get_range_start() &&
-      _range_end == obj.get_range_end()) {
-    return true;
-  }
-  return false;
-}
-
-/**
- *  Not equal operator.
- *
- *  @param[in] obj1 The first object to compare.
- *  @param[in] obj2 The second object to compare.
- *
- *  @return True if is not the same object, otherwise false.
- */
-bool timerange::operator!=(timerange const& obj) noexcept {
-  return !(*this == obj);
-}
+CCE_BEGIN()
 
 /**
  *  Dump timerange content into the stream.
@@ -115,6 +81,8 @@ std::ostream& operator<<(std::ostream& os, timerange const& obj) {
 std::ostream& operator<<(std::ostream& os, timerange_list const& obj) {
   for (timerange_list::const_iterator it(obj.begin()), end(obj.end());
        it != end; ++it)
-    os << **it << ((next(it) == obj.end()) ? "" : ", ");
+    os << *it << ((next(it) == obj.end()) ? "" : ", ");
   return os;
 }
+
+CCE_END()
