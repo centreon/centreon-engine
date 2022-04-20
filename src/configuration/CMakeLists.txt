@@ -35,7 +35,6 @@ set(
   "${SRC_DIR}/connector.cc"
   "${SRC_DIR}/contact.cc"
   "${SRC_DIR}/contactgroup.cc"
-  "${SRC_DIR}/daterange.cc"
   "${SRC_DIR}/group.cc"
   "${SRC_DIR}/host.cc"
   "${SRC_DIR}/hostdependency.cc"
@@ -53,7 +52,6 @@ set(
   "${SRC_DIR}/serviceextinfo.cc"
   "${SRC_DIR}/servicegroup.cc"
   "${SRC_DIR}/timeperiod.cc"
-  "${SRC_DIR}/timerange.cc"
 
   # Headers.
   "${INC_DIR}/anomalydetection.hh"
@@ -61,7 +59,6 @@ set(
   "${INC_DIR}/connector.hh"
   "${INC_DIR}/contactgroup.hh"
   "${INC_DIR}/contact.hh"
-  "${INC_DIR}/daterange.hh"
   "${INC_DIR}/file_info.hh"
   "${INC_DIR}/group.hh"
   "${INC_DIR}/host.hh"
@@ -80,7 +77,6 @@ set(
   "${INC_DIR}/service.hh"
   "${INC_DIR}/state.hh"
   "${INC_DIR}/timeperiod.hh"
-  "${INC_DIR}/timerange.hh"
-
+ 
   PARENT_SCOPE
 )

@@ -1,5 +1,5 @@
 /*
- * Copyright 2019 Centreon (https://www.centreon.com/)
+ * Copyright 2022 Centreon (https://www.centreon.com/)
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -87,7 +87,7 @@ TEST_F(HostDowntimeNotification, SimpleHostDowntime) {
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
   for (size_t i = 0; i < tperiod->days.size(); ++i)
-    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
+    tperiod->days[i].emplace_back(0, 86400);
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7, Uuid())};
@@ -136,7 +136,7 @@ TEST_F(HostDowntimeNotification,
   std::unique_ptr<engine::timeperiod> tperiod{
       new engine::timeperiod("tperiod", "alias")};
   for (size_t i = 0; i < tperiod->days.size(); ++i)
-    tperiod->days[i].push_back(std::make_shared<engine::timerange>(0, 86400));
+    tperiod->days[i].emplace_back(0, 86400);
 
   std::unique_ptr<engine::hostescalation> host_escalation{
       new engine::hostescalation("host_name", 0, 1, 1.0, "tperiod", 7, Uuid())};

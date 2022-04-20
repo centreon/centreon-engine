@@ -1,5 +1,5 @@
 /*
-** Copyright 2016 Centreon
+** Copyright 2022 Centreon
 **
 ** This file is part of Centreon Engine.
 **
@@ -100,12 +100,10 @@ daterange* timeperiod_creator::new_calendar_date(int start_year,
   if (!target)
     target = _timeperiods.begin()->get();
 
-  std::shared_ptr<daterange> dr{
-      new daterange(DATERANGE_CALENDAR_DATE, start_year, start_month, start_day,
-                    0, 0, end_year, end_month, end_day, 0, 0, 0)};
-
-  target->exceptions[DATERANGE_CALENDAR_DATE].push_back(dr);
-  return dr.get();
+  target->exceptions[daterange::calendar_date].emplace_back(
+      daterange::calendar_date, start_year, start_month, start_day, 0, 0,
+      end_year, end_month, end_day, 0, 0, 0);
+  return &*target->exceptions[daterange::calendar_date].rbegin();
 }
 
 /**
@@ -127,12 +125,10 @@ daterange* timeperiod_creator::new_specific_month_date(int start_month,
   if (!target)
     target = _timeperiods.begin()->get();
 
-  std::shared_ptr<daterange> dr{new daterange(DATERANGE_MONTH_DATE, 0,
-                                              start_month, start_day, 0, 0, 0,
-                                              end_month, end_day, 0, 0, 0)};
-
-  target->exceptions[DATERANGE_MONTH_DATE].push_back(dr);
-  return dr.get();
+  target->exceptions[daterange::month_date].emplace_back(
+      daterange::month_date, 0, start_month, start_day, 0, 0, 0, end_month,
+      end_day, 0, 0, 0);
+  return &*target->exceptions[daterange::month_date].rbegin();
 }
 
 /**
@@ -150,11 +146,9 @@ daterange* timeperiod_creator::new_generic_month_date(int start_day,
   if (!target)
     target = _timeperiods.begin()->get();
 
-  std::shared_ptr<daterange> dr{new daterange(
-      DATERANGE_MONTH_DAY, 0, 0, start_day, 0, 0, 0, 0, end_day, 0, 0, 0)};
-
-  target->exceptions[DATERANGE_MONTH_DAY].push_back(dr);
-  return dr.get();
+  target->exceptions[daterange::month_day].emplace_back(
+      daterange::month_day, 0, 0, start_day, 0, 0, 0, 0, end_day, 0, 0, 0);
+  return &*target->exceptions[daterange::month_day].rbegin();
 }
 
 /**
@@ -181,12 +175,10 @@ daterange* timeperiod_creator::new_offset_weekday_of_specific_month(
   if (!target)
     target = _timeperiods.begin()->get();
 
-  std::shared_ptr<daterange> dr{
-      new daterange(DATERANGE_MONTH_WEEK_DAY, 0, start_month, 0, start_wday,
-                    start_offset, 0, end_month, 0, end_wday, end_offset, 0)};
-
-  target->exceptions[DATERANGE_MONTH_WEEK_DAY].push_back(dr);
-  return dr.get();
+  target->exceptions[daterange::month_week_day].emplace_back(
+      daterange::month_week_day, 0, start_month, 0, start_wday, start_offset, 0,
+      end_month, 0, end_wday, end_offset, 0);
+  return &*target->exceptions[daterange::month_week_day].rbegin();
 }
 
 /**
@@ -209,12 +201,10 @@ daterange* timeperiod_creator::new_offset_weekday_of_generic_month(
   if (!target)
     target = _timeperiods.begin()->get();
 
-  std::shared_ptr<daterange> dr{new daterange(DATERANGE_WEEK_DAY, 0, 0, 0,
-                                              start_wday, start_offset, 0, 0, 0,
-                                              end_wday, end_offset, 0)};
-
-  target->exceptions[DATERANGE_WEEK_DAY].push_back(dr);
-  return dr.get();
+  target->exceptions[daterange::week_day].emplace_back(
+      daterange::week_day, 0, 0, 0, start_wday, start_offset, 0, 0, 0, end_wday,
+      end_offset, 0);
+  return &*target->exceptions[daterange::week_day].rbegin();
 }
 
 /**
@@ -234,10 +224,8 @@ void timeperiod_creator::new_timerange(int start_hour,
   if (!target)
     return;
 
-  std::shared_ptr<timerange> tr{new timerange(hmtos(start_hour, start_minute),
-                                              hmtos(end_hour, end_minute))};
-
-  target->times.push_back(tr);
+  target->add_timerange(
+      timerange(hmtos(start_hour, start_minute), hmtos(end_hour, end_minute)));
 }
 
 /**
@@ -259,10 +247,8 @@ void timeperiod_creator::new_timerange(int start_hour,
   if (!target)
     target = _timeperiods.begin()->get();
 
-  std::shared_ptr<timerange> tr{new timerange(hmtos(start_hour, start_minute),
-                                              hmtos(end_hour, end_minute))};
-
-  target->days[day].push_back(tr);
+  target->days[day].emplace_back(hmtos(start_hour, start_minute),
+                                 hmtos(end_hour, end_minute));
 }
 
 /**
@@ -319,7 +305,7 @@ extern "C" time_t time(time_t* t) __THROW {
   return (gl_now);
 }
 
-extern "C" int gettimeofday(struct timeval* tv, struct timezone *tz) __THROW {
+extern "C" int gettimeofday(struct timeval* tv, struct timezone*) __THROW {
   if (tv) {
     tv->tv_sec = gl_now;
     tv->tv_usec = 0;

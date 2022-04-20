@@ -24,7 +24,7 @@
 #include <set>
 #include <string>
 #include <vector>
-#include "com/centreon/engine/configuration/daterange.hh"
+#include "com/centreon/engine/daterange.hh"
 #include "com/centreon/engine/configuration/group.hh"
 #include "com/centreon/engine/configuration/object.hh"
 #include "com/centreon/engine/namespace.hh"
@@ -33,6 +33,9 @@
 CCE_BEGIN()
 
 namespace configuration {
+namespace test {
+class time_period_comparator;
+}
 class timeperiod : public object {
  public:
   typedef std::string key_type;
@@ -41,9 +44,9 @@ class timeperiod : public object {
   timeperiod(timeperiod const& right);
   ~timeperiod() throw() override;
   timeperiod& operator=(timeperiod const& right);
-  bool operator==(timeperiod const& right) const throw();
-  bool operator!=(timeperiod const& right) const throw();
-  bool operator<(timeperiod const& right) const throw();
+  bool operator==(timeperiod const& right) const;
+  bool operator!=(timeperiod const& right) const;
+  bool operator<(timeperiod const& right) const;
   void check_validity() const override;
   key_type const& key() const throw();
   void merge(object const& obj) override;
@@ -51,10 +54,12 @@ class timeperiod : public object {
   bool parse(std::string const& line) override;
 
   std::string const& alias() const throw();
-  std::vector<std::list<daterange> > const& exceptions() const throw();
+  exception_array const& exceptions() const throw();
   set_string const& exclude() const throw();
   std::string const& timeperiod_name() const throw();
-  std::vector<std::list<timerange> > const& timeranges() const throw();
+  days_array const& timeranges() const;
+
+  friend test::time_period_comparator;
 
  private:
   typedef bool (*setter_func)(timeperiod&, char const*);
@@ -63,7 +68,7 @@ class timeperiod : public object {
   bool _add_other_date(std::string const& line);
   bool _add_week_day(std::string const& key, std::string const& value);
   static bool _build_timeranges(std::string const& line,
-                                std::list<timerange>& timeranges);
+                                timerange_list& timeranges);
   static bool _build_time_t(std::string const& time_str, unsigned long& ret);
   static bool _has_similar_daterange(std::list<daterange> const& lst,
                                      daterange const& range) throw();
@@ -75,10 +80,10 @@ class timeperiod : public object {
 
   std::string _alias;
   static std::unordered_map<std::string, setter_func> const _setters;
-  std::vector<std::list<daterange> > _exceptions;
+  exception_array _exceptions;
   group<set_string> _exclude;
   std::string _timeperiod_name;
-  std::vector<std::list<timerange> > _timeranges;
+  days_array _timeranges;
 };
 
 typedef std::shared_ptr<timeperiod> timeperiod_ptr;
