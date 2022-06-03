@@ -1,8 +1,6 @@
-import groovy.json.JsonSlurper
 /*
 ** Variables.
 */
-properties([buildDiscarder(logRotator(numToKeepStr: '50'))])
 def serie = '21.04'
 def maintenanceBranch = "${serie}.x"
 def qaBranch = "dev-${serie}.x"
@@ -16,12 +14,22 @@ if (env.BRANCH_NAME.startsWith('release-')) {
   env.BUILD = 'CI'
 }
 
+def checkoutCentreonBuild() {
+  dir('centreon-build') {
+    checkout resolveScm(source: [$class: 'GitSCMSource',
+      remote: 'https://github.com/centreon/centreon-build.git',
+      credentialsId: 'technique-ci',
+      traits: [[$class: 'jenkins.plugins.git.traits.BranchDiscoveryTrait']]],
+      targets: [BRANCH_NAME, 'master'])
+  }
+}
+
 /*
 ** Pipeline code.
 */
 stage('Source') {
   node("C++") {
-    sh 'setup_centreon_build.sh'
+    checkoutCentreonBuild()
     dir('centreon-engine') {
       checkout scm
     }
@@ -44,7 +52,7 @@ try {
   stage('Build // Unit Tests // RPMs Packaging') {
     parallel 'build centos7': {
       node("C++") {
-        sh 'setup_centreon_build.sh'
+        checkoutCentreonBuild()
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-unittest.sh centos7"
         step([
           $class: 'XUnitBuilder',
@@ -61,7 +69,7 @@ try {
     },
     'packaging centos7': {
       node("C++") {
-        sh 'setup_centreon_build.sh'
+        checkoutCentreonBuild()
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh centos7"
         stash name: 'el7-rpms', includes: "output/x86_64/*.rpm"
         archiveArtifacts artifacts: "output/x86_64/*.rpm"
@@ -69,7 +77,7 @@ try {
     },
     'build alma8': {
       node("C++") {
-        sh 'setup_centreon_build.sh'
+        checkoutCentreonBuild()
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-unittest.sh alma8"
         step([
           $class: 'XUnitBuilder',
@@ -83,15 +91,15 @@ try {
     },
     'packaging alma8': {
       node("C++") {
-        sh 'setup_centreon_build.sh'
+        checkoutCentreonBuild()
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh alma8"
-        stash name: 'el8-rpms', includes: "output/x86_64/*.rpm"
+        stash name: 'alma8-rpms', includes: "output/x86_64/*.rpm"
         archiveArtifacts artifacts: "output/x86_64/*.rpm"
       }
     },
     'build debian10': {
       node("C++") {
-        sh 'setup_centreon_build.sh'
+        checkoutCentreonBuild()
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-unittest.sh debian10"
         step([
           $class: 'XUnitBuilder',
@@ -105,7 +113,7 @@ try {
     },
     'packaging debian10': {
       node("C++") {
-        sh 'setup_centreon_build.sh'
+        checkoutCentreonBuild()
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-package.sh debian10"
       }
     }
@@ -134,7 +142,7 @@ try {
       node {
         unstash 'el7-rpms'
         unstash 'alma8-rpms'
-        sh 'setup_centreon_build.sh'
+        checkoutCentreonBuild()
         sh "./centreon-build/jobs/engine/${serie}/mon-engine-delivery.sh"
       }
       if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
