@@ -17,25 +17,20 @@
  *
  */
 
-#include <fstream>
 #include <gtest/gtest.h>
-#include <com/centreon/engine/configuration/parser.hh>
 #include <com/centreon/engine/configuration/applier/hostescalation.hh>
+#include <com/centreon/engine/configuration/parser.hh>
+#include <fstream>
 #include "helper.hh"
 
 using namespace com::centreon;
 using namespace com::centreon::engine;
 
-
 class ApplierGlobal : public ::testing::Test {
  public:
-  void SetUp() override {
-    init_config_state();
-  }
+  void SetUp() override { init_config_state(); }
 
-  void TearDown() override {
-    deinit_config_state();
-  }
+  void TearDown() override { deinit_config_state(); }
 };
 
 // Given host configuration without host_id
@@ -92,4 +87,40 @@ TEST_F(ApplierGlobal, RpcPort) {
   std::remove("/tmp/test-config.cfg");
 
   ASSERT_EQ(st.rpc_port(), 42);
+}
+
+TEST_F(ApplierGlobal, RpcListenAddress) {
+  configuration::parser parser;
+  configuration::state st;
+
+  ASSERT_EQ(st.rpc_port(), 0u);
+
+  std::remove("/tmp/test-config.cfg");
+
+  std::ofstream ofs("/tmp/test-config.cfg");
+  ofs << "rpc_listen_address=10.11.12.13" << std::endl;
+  ofs.close();
+
+  parser.parse("/tmp/test-config.cfg", st);
+  std::remove("/tmp/test-config.cfg");
+
+  ASSERT_EQ(st.rpc_listen_address(), "10.11.12.13");
+}
+
+TEST_F(ApplierGlobal, NotDefinedRpcListenAddress) {
+  configuration::parser parser;
+  configuration::state st;
+
+  ASSERT_EQ(st.rpc_port(), 0u);
+
+  std::remove("/tmp/test-config.cfg");
+
+  std::ofstream ofs("/tmp/test-config.cfg");
+  ofs << "rpc_port=42" << std::endl;
+  ofs.close();
+
+  parser.parse("/tmp/test-config.cfg", st);
+  std::remove("/tmp/test-config.cfg");
+
+  ASSERT_EQ(st.rpc_listen_address(), "localhost");
 }

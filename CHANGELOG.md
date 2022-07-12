@@ -1,5 +1,12 @@
 # Changelog
 
+## 21.04.6
+
+*grpc*
+
+Listen address for grpc api is fixed by default to localhost. It is also
+customizable with rpc\_listen\_address.
+
 ## 21.04.5
 
 *modules*
