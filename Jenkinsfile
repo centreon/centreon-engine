@@ -54,9 +54,6 @@ try {
           ],
           tools: [[$class: 'GoogleTestType', pattern: 'ut.xml']]
         ])
-        withSonarQubeEnv('SonarQubeDev') {
-          sh "./centreon-build/jobs/engine/${serie}/mon-engine-analysis.sh"
-        }
       }
     },
     'packaging centos7': {
@@ -114,21 +111,6 @@ try {
     // if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
     //   error('Unit tests stage failure.');
     // }
-  }
-
-  // sonarQube step to get qualityGate result
-  stage('Quality gate') {
-    node("C++") {
-      timeout(time: 10, unit: 'MINUTES') {
-        def qualityGate = waitForQualityGate()
-        if (qualityGate.status != 'OK') {
-          currentBuild.result = 'FAIL'
-        }
-      }
-      if ((currentBuild.result ?: 'SUCCESS') != 'SUCCESS') {
-        error('Quality gate failure: ${qualityGate.status}.');
-      }
-    }
   }
 
   if ((env.BUILD == 'RELEASE') || (env.BUILD == 'QA')) {
