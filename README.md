@@ -1,5 +1,7 @@
 # Centreon Engine
 
+**Warning** This repository is now deprecated. Please switch to [Centreon Collect](https://github.com/centreon/centreon-collect).
+
 Centreon Engine is a fast and powerful open-source monitoring scheduler.
 It is a low-level component of the
 [Centreon software suite](https://www.centreon.com).
